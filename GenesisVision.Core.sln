@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenesisVision.Core", "GenesisVision.Core\GenesisVision.Core.csproj", "{25DA2FC8-9928-4D16-B45B-165C03F48715}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenesisVision.Core", "GenesisVision.Core\GenesisVision.Core.csproj", "{25DA2FC8-9928-4D16-B45B-165C03F48715}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0E2AD264-03C9-4304-8492-1B3FBE37D7BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

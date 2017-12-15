@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GenesisVision.Core.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,8 +8,11 @@ namespace GenesisVision.Core.Controllers
     [Route("api/trades")]
     public class TradesController : Controller
     {
-        public TradesController()
+        private readonly ApplicationDbContext context;
+
+        public TradesController(ApplicationDbContext context)
         {
+            this.context = context;
         }
 
         public IActionResult GetTrades(string managerId)
