@@ -20,7 +20,7 @@ namespace GenesisVision.Core.Controllers
         }
         
         /// <summary>
-        /// Create request
+        /// Create request (from cabinet, broker)
         /// </summary>
         public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
         {
@@ -29,7 +29,7 @@ namespace GenesisVision.Core.Controllers
         }
         
         /// <summary>
-        /// Create manager
+        /// Create manager (from broker)
         /// </summary>
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
@@ -37,6 +37,9 @@ namespace GenesisVision.Core.Controllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Create investment program
+        /// </summary>
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
         {
             var res = trustManagementService.CreateInvestmentProgram(investment);

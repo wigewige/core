@@ -1,11 +1,12 @@
 ﻿using GenesisVision.Core.Data;
 using GenesisVision.Core.Data.Models;
+using GenesisVision.Core.Helpers;
+using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenesisVision.Core.Models;
 
 namespace GenesisVision.Core.Services
 {
@@ -69,12 +70,7 @@ namespace GenesisVision.Core.Services
         {
             var result = context.ManagerRequests
                                 .Where(x => x.BrokerTradeServerId == brokerTradeServerId)
-                                .Select(x => new ManagerRequest
-                                             {
-                                                 Currency = x.Currency,
-                                                 Description = x.Description,
-                                                 Name = x.Name
-                                             })
+                                .Select(x => x.ToManagerRequest())
                                 .ToList();
             return OperationResult<List<ManagerRequest>>.Ok(result);
         }

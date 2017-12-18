@@ -10,7 +10,7 @@ namespace GenesisVision.Core.Data.Models
 
     public enum InvestmentRequestStatus
     {
-        Pending = 0,
+        New = 0,
         Executed = 1
     }
 

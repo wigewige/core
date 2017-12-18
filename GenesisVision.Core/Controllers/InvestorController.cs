@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.ViewModels.Investment;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GenesisVision.Core.Controllers
@@ -7,13 +9,29 @@ namespace GenesisVision.Core.Controllers
     [Route("api/investor")]
     public class InvestorController : Controller
     {
-        public InvestorController()
+        private readonly ITrustManagementService trustManagementService;
+
+        public InvestorController(ITrustManagementService trustManagementService)
         {
+            this.trustManagementService = trustManagementService;
         }
 
-        public IActionResult Invest()
+        /// <summary>
+        /// Invest in manager
+        /// </summary>
+        public IActionResult Invest([FromBody]Invest model)
         {
-            return Ok();
+            var res = trustManagementService.Invest(model);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Get investments by filter
+        /// </summary>
+        public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
+        {
+            var res = trustManagementService.GetInvestments(filter);
+            return Ok(res);
         }
     }
 }
