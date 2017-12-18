@@ -55,7 +55,7 @@ namespace GenesisVision.Core.Data
             builder.Entity<ManagerAccountRequests>()
                    .HasOne(x => x.BrokerTradeServers)
                    .WithMany(x => x.ManagerAccountRequests)
-                   .HasForeignKey(x => x.BrokerTradeServersId);
+                   .HasForeignKey(x => x.BrokerTradeServerId);
 
             builder.Entity<ManagerAccountRequests>()
                    .HasOne(x => x.User)

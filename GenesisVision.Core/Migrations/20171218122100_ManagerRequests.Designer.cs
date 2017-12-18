@@ -12,9 +12,10 @@ using System;
 namespace GenesisVision.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171218122100_ManagerRequests")]
+    partial class ManagerRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,8 +170,6 @@ namespace GenesisVision.Core.Migrations
                     b.Property<string>("Description");
 
                     b.Property<string>("Name");
-
-                    b.Property<int>("Status");
 
                     b.Property<int>("Type");
 

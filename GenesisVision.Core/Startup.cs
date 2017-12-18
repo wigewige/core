@@ -27,6 +27,7 @@ namespace GenesisVision.Core
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString));
 
             services.AddTransient<ITrustManagementService, TrustManagementService>();
+            services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<IIpfsService, IpfsService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
         }
@@ -38,7 +39,12 @@ namespace GenesisVision.Core
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }

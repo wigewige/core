@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using GenesisVision.Core.Data;
 using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.ViewModels.Manager;
 
 namespace GenesisVision.Core.Services
 {
