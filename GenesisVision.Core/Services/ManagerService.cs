@@ -3,6 +3,7 @@ using GenesisVision.Core.Data.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GenesisVision.Core.Models;
 
@@ -62,6 +63,20 @@ namespace GenesisVision.Core.Services
             context.SaveChanges();
 
             return OperationResult<Guid>.Ok(manager.Id);
+        }
+
+        public OperationResult<List<ManagerRequest>> GetNewRequests(Guid brokerTradeServerId)
+        {
+            var result = context.ManagerRequests
+                                .Where(x => x.BrokerTradeServerId == brokerTradeServerId)
+                                .Select(x => new ManagerRequest
+                                             {
+                                                 Currency = x.Currency,
+                                                 Description = x.Description,
+                                                 Name = x.Name
+                                             })
+                                .ToList();
+            return OperationResult<List<ManagerRequest>>.Ok(result);
         }
     }
 }

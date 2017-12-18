@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.ViewModels.Manager;
 
@@ -8,5 +9,6 @@ namespace GenesisVision.Core.Services.Interfaces
     {
         OperationResult<Guid> CreateManagerAccount(NewManager request);
         OperationResult<Guid> CreateManagerAccountRequest(NewManagerRequest request);
+        OperationResult<List<ManagerRequest>> GetNewRequests(Guid brokerTradeServerId);
     }
 }

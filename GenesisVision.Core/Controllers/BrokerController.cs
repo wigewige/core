@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.ViewModels.Broker;
+using GenesisVision.Core.ViewModels.Manager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -9,18 +12,23 @@ namespace GenesisVision.Core.Controllers
     [Route("api/broker")]
     public class BrokerController : Controller
     {
-        public BrokerController()
+        private readonly IManagerService managerService;
+
+        public BrokerController(IManagerService managerService)
         {
+            this.managerService = managerService;
         }
 
-        public IActionResult RegisterManager()
+        public IActionResult GetBrokerInitData(Guid brokerTradeServerId)
         {
-            return Ok();
-        }
+            var requests = managerService.GetNewRequests(brokerTradeServerId);
+            var result = new BrokerInitData
+                         {
+                             NewManagerRequest = requests.IsSuccess ? requests.Data : new List<ManagerRequest>()
+                         };
 
-        public IActionResult GetManagers()
-        {
-            return Ok(null);
+
+            return Ok(result);
         }
     }
 }
