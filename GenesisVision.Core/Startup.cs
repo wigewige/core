@@ -26,10 +26,17 @@ namespace GenesisVision.Core
             services.AddEntityFrameworkNpgsql()
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString));
 
+            var ipfsHost = Configuration["IpfsHost"];
+            if (!string.IsNullOrEmpty(ipfsHost) && !string.IsNullOrWhiteSpace(ipfsHost))
+                Constants.IpfsHost = ipfsHost;
+
+
             services.AddTransient<ITrustManagementService, TrustManagementService>();
             services.AddTransient<IManagerService, ManagerService>();
-            services.AddTransient<IIpfsService, IpfsService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
+            services.AddTransient<ITradesService, TradesService>();
+
+            services.AddSingleton<IIpfsService, IpfsService>();
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
