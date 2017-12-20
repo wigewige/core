@@ -8,8 +8,7 @@ using System.Collections.Generic;
 
 namespace GenesisVision.Core.Controllers
 {
-    [Authorize]
-    [Route("api/broker")]
+    //[Authorize]
     public class BrokerController : Controller
     {
         private readonly IManagerService managerService;

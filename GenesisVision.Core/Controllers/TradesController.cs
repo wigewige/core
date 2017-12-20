@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GenesisVision.Core.Controllers
 {
-    [Authorize]
-    [Route("api/trades")]
+    //[Authorize]
     public class TradesController : Controller
     {
         private readonly IIpfsService ipfsService;

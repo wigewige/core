@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GenesisVision.Core.Controllers
 {
-    [Authorize]
-    [Route("api/manager")]
+    //[Authorize]
     public class ManagerController : Controller
     {
         private readonly ITrustManagementService trustManagementService;
