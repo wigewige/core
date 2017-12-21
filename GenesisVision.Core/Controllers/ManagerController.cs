@@ -25,7 +25,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
         {
-            var result = InvokeOperations.InvokeOperation(() => managerService.CreateManagerAccountRequest(request));
+            var result = managerService.CreateManagerAccountRequest(request);
             return Ok(result);
         }
         
@@ -34,7 +34,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
-            var result = InvokeOperations.InvokeOperation(() => managerService.CreateManagerAccount(request));
+            var result = managerService.CreateManagerAccount(request);
             return Ok(result);
         }
 
@@ -43,7 +43,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
         {
-            var result = InvokeOperations.InvokeOperation(() => trustManagementService.CreateInvestmentProgram(investment));
+            var result = trustManagementService.CreateInvestmentProgram(investment);
             return Ok(result);
         }
     }

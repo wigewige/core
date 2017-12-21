@@ -31,7 +31,9 @@ namespace GenesisVision.Core.Helpers
                    {
                        Currency = x.Currency,
                        Description = x.Description,
-                       Name = x.Name
+                       Name = x.Name,
+                       UserId = x.Id,
+                       RequestId = x.Id
                    };
         }
     }

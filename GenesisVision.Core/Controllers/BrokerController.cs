@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using GenesisVision.Core.Models;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -20,13 +21,17 @@ namespace GenesisVision.Core.Controllers
 
         public IActionResult GetBrokerInitData(Guid brokerTradeServerId)
         {
-            var requests = managerService.GetNewRequests(brokerTradeServerId);
-            var result = new BrokerInitData
-                         {
-                             NewManagerRequest = requests.IsSuccess ? requests.Data : new List<ManagerRequest>()
-                         };
+            var result = InvokeOperations.InvokeOperation(() =>
+            {
+                var requests = managerService.GetNewRequests(brokerTradeServerId);
 
-
+                return new BrokerInitData
+                       {
+                           NewManagerRequest = requests.IsSuccess
+                               ? requests.Data
+                               : new List<ManagerRequest>()
+                       };
+            });
             return Ok(result);
         }
     }
