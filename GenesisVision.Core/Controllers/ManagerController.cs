@@ -1,4 +1,6 @@
-﻿using GenesisVision.Core.Services.Interfaces;
+﻿using System;
+using GenesisVision.Core.Models;
+using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 using Microsoft.AspNetCore.Authorization;
@@ -23,8 +25,8 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
         {
-            var res = managerService.CreateManagerAccountRequest(request);
-            return Ok(res);
+            var result = InvokeOperations.InvokeOperation(() => managerService.CreateManagerAccountRequest(request));
+            return Ok(result);
         }
         
         /// <summary>
@@ -32,8 +34,8 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
-            var res = managerService.CreateManagerAccount(request);
-            return Ok(res);
+            var result = InvokeOperations.InvokeOperation(() => managerService.CreateManagerAccount(request));
+            return Ok(result);
         }
 
         /// <summary>
@@ -41,8 +43,8 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
         {
-            var res = trustManagementService.CreateInvestmentProgram(investment);
-            return Ok(res);
+            var result = InvokeOperations.InvokeOperation(() => trustManagementService.CreateInvestmentProgram(investment));
+            return Ok(result);
         }
     }
 }

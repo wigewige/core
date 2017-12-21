@@ -21,6 +21,17 @@ namespace GenesisVision.Core.Services
 
         public OperationResult<Guid> CreateManagerAccountRequest(NewManagerRequest request)
         {
+            Guid userId;
+            if (request.UserId.HasValue)
+            {
+                userId = request.UserId.Value;
+            }
+            else
+            {
+                // todo: create new default AspNetUser
+                throw new Exception("User does not exist");
+            }
+
             var req = new ManagerAccountRequests
                       {
                           Id = Guid.NewGuid(),
@@ -29,7 +40,7 @@ namespace GenesisVision.Core.Services
                           Currency = request.Currency,
                           Description = request.Description,
                           Name = request.Name,
-                          UserId = request.UserId,
+                          UserId = userId,
                           Date = DateTime.Now,
                           Type = ManagerRequestType.FromCabinet,
                           Status = ManagerRequestStatus.Created
