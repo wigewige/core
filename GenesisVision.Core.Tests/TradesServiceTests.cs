@@ -21,14 +21,14 @@ namespace GenesisVision.Core.Tests
         }
 
         [Test]
-        public void TestMetaTraderOrdersSuccess1()
+        public void TestMetaTraderOrdersAllGoodSuccess()
         {
-            var ipfsText = 
+            var ipfsText =
 @"""Login"";""Ticket"";""Symbol"";""PriceOpen"";""PriceClose"";""Profit"";""Volume"";""DateOpen"";""DateClose"";""Direction"";
-""102"";""150016"";""TEST"";""0,989"";""1,037"";""183"";""4"";""13.12.2017 7:48:57"";""13.12.2017 19:29:57"";""Sell"";
-""102"";""431770"";""TEST"";""0,992"";""1,074"";""108"";""9"";""13.12.2017 5:59:49"";""13.12.2017 19:04:49"";""Sell"";
-""102"";""486041"";""TEST"";""0,968"";""1,069"";""383"";""6"";""13.12.2017 3:37:49"";""13.12.2017 18:11:49"";""Sell"";
-""102"";""200852"";""TEST"";""0,934"";""1,021"";""431"";""5"";""13.12.2017 3:43:54"";""13.12.2017 17:09:54"";""Buy"";";
+""102"";""236872"";""TEST"";""0.915"";""1.098"";""281"";""4"";""12/22/2017 2:08:45 PM"";""12/23/2017 1:31:45 AM"";""Sell"";
+""102"";""125616"";""TEST"";""0.926"";""1.060"";""260"";""2"";""12/22/2017 2:34:42 PM"";""12/23/2017 12:52:42 AM"";""Sell"";
+""102"";""236960"";""TEST"";""0.964"";""1.061"";""334"";""2"";""12/22/2017 10:55:39 AM"";""12/23/2017 12:33:39 AM"";""Buy"";
+""102"";""190553"";""TEST"";""0.939"";""1.041"";""266"";""4"";""12/22/2017 9:58:46 AM"";""12/23/2017 12:21:46 AM"";""Sell"";";
 
             var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
 
@@ -36,20 +36,20 @@ namespace GenesisVision.Core.Tests
             Assert.AreEqual(4, result.Data.Count);
             Assert.AreEqual(1, result.Data.Count(x => x.Direction == Direction.Buy));
             Assert.AreEqual(3, result.Data.Count(x => x.Direction == Direction.Sell));
-            Assert.AreEqual(new DateTime(2017, 12, 13, 7, 48, 57), result.Data.First().DateOpen);
-            Assert.AreEqual(new DateTime(2017, 12, 13, 17, 09, 54), result.Data.Last().DateClose);
-            Assert.AreEqual(150016, result.Data.First().Ticket);
+            Assert.AreEqual(new DateTime(2017, 12, 22, 14, 08, 45), result.Data.First().DateOpen);
+            Assert.AreEqual(new DateTime(2017, 12, 23, 0, 21, 46), result.Data.Last().DateClose);
+            Assert.AreEqual(236872, result.Data.First().Ticket);
             Assert.AreEqual("TEST", result.Data.First().Symbol);
-            Assert.AreEqual(0.934, result.Data.Last().PriceOpen);
+            Assert.AreEqual(0.939, result.Data.Last().PriceOpen);
         }
 
         [Test]
-        public void TestMetaTraderOrdersSuccess2()
+        public void TestMetaTraderOrdersMixedHeadersSuccess()
         {
             var ipfsText =
-@"""DateOpen"";""Login"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""Volume"";""DateClose"";""Direction"";""Symbol"";
-""13.12.2017 4:30:44"";""102"";""275610"";""0,922"";""1,054"";""277"";""6"";""13.12.2017 18:32:44"";""Sell"";""TEST"";
-""13.12.2017 6:35:40"";""102"";""446302"";""0,963"";""1,021"";""372"";""1"";""13.12.2017 18:02:40"";""Buy"";""TEST"";";
+@"""Volume"";""DateOpen"";""Login"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""DateClose"";""Direction"";""Symbol"";
+""6"";""12/22/2017 9:56:46 AM"";""102"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""Sell"";""TEST"";
+""9"";""12/22/2017 2:07:38 PM"";""102"";""182837"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
 
             var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
 
@@ -57,18 +57,18 @@ namespace GenesisVision.Core.Tests
             Assert.AreEqual(2, result.Data.Count);
             Assert.AreEqual(1, result.Data.Count(x => x.Direction == Direction.Buy));
             Assert.AreEqual(1, result.Data.Count(x => x.Direction == Direction.Sell));
-            Assert.AreEqual(new DateTime(2017, 12, 13, 4, 30, 44), result.Data.First().DateOpen);
+            Assert.AreEqual(new DateTime(2017, 12, 22, 9, 56, 46), result.Data.First().DateOpen);
             Assert.AreEqual("TEST", result.Data.First().Symbol);
-            Assert.AreEqual(0.963, result.Data.Last().PriceOpen);
+            Assert.AreEqual(0.956, result.Data.Last().PriceOpen);
         }
 
         [Test]
-        public void TestMetaTraderOrdersWrong1()
+        public void TestMetaTraderOrdersNotAllHeadersWrong()
         {
             var ipfsText =
-@"""DateOpen"";""Login"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""DateClose"";""Direction"";""Symbol"";
-""13.12.2017 4:30:44"";""102"";""275610"";""0,922"";""1,054"";""277"";""13.12.2017 18:32:44"";""Sell"";""TEST"";
-""13.12.2017 6:35:40"";""102"";""446302"";""0,963"";""1,021"";""372"";""13.12.2017 18:02:40"";""Buy"";""TEST"";";
+@"""Volume"";""DateOpen"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""DateClose"";""Direction"";""Symbol"";
+""6"";""12/22/2017 9:56:46 AM"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""Sell"";""TEST"";
+""9"";""12/22/2017 2:07:38 PM"";""182837"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
 
             var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
 
@@ -77,12 +77,12 @@ namespace GenesisVision.Core.Tests
         }
 
         [Test]
-        public void TestMetaTraderOrdersWrong2()
+        public void TestMetaTraderOrdersBadCsvWrong()
         {
             var ipfsText =
-@"""DateOpen"";""Login"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""Volume"";""DateClose"";""Direction"";""Symbol"";
-""13.12.2017 4:30:44"";""102"";""275610"";""0,922"";""1,054"";""277"";""6"";""13.12.2017 18:32:44"";""Sell"";""TEST"";
-""13.12.2017 6:35:40"";""102"";""error!"";""0,963"";""1,021"";""372"";""1"";""13.12.2017 18:02:40"";""Buy"";""TEST"";";
+@"""Volume"";""DateOpen"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""DateClose"";""Direction"";""Symbol"";
+""6"";""12/22/2017 9:56:46 AM"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""error!"";""TEST"";
+""9"";""12/22/2017 2:07:38 PM"";""error!"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
 
             var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
 

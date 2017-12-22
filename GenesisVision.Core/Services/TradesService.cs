@@ -4,7 +4,9 @@ using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Trades;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace GenesisVision.Core.Services
 {
@@ -32,8 +34,10 @@ namespace GenesisVision.Core.Services
 
         public OperationResult<List<MetaTraderOrder>> ConvertMetaTraderOrdersFromCsv(string ipfsText)
         {
-            try
+            return InvokeOperations.InvokeOperation(() =>
             {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+
                 var csv = ipfsText.Split(Environment.NewLine);
                 var header = GetHeaderMap(BrokerTradeServerType.MetaTrader4, csv.First());
                 if (!header.IsSuccess)
@@ -61,7 +65,7 @@ namespace GenesisVision.Core.Services
                         else if (propInfo.PropertyType == typeof(long))
                             value = Convert.ToInt64(field);
                         else if (propInfo.PropertyType == typeof(DateTime))
-                            value = DateTime.Parse(field);
+                            value = DateTime.ParseExact(field, "G", null);
                         else if (propInfo.PropertyType == typeof(Direction))
                             value = Enum.Parse(typeof(Direction), field);
 
@@ -69,12 +73,8 @@ namespace GenesisVision.Core.Services
                     }
                     trades.Add(order);
                 }
-                return OperationResult<List<MetaTraderOrder>>.Ok(trades);
-            }
-            catch (Exception e)
-            {
-                return OperationResult<List<MetaTraderOrder>>.Failed(e.Message);
-            }
+                return trades;
+            });
         }
 
         private OperationResult<Dictionary<string, int>> GetHeaderMap(BrokerTradeServerType type, string headerStr)
