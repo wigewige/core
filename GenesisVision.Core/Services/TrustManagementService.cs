@@ -63,8 +63,7 @@ namespace GenesisVision.Core.Services
 
         public OperationResult<List<Investment>> GetInvestments(InvestmentsFilter filter)
         {
-            var query = context.InvestmentPrograms
-                                .AsQueryable();
+            var query = context.InvestmentPrograms.AsQueryable();
 
             if (filter.ManagerId.HasValue)
                 query = query.Where(x => x.ManagersAccountId == filter.ManagerId);

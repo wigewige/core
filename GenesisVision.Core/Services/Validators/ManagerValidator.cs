@@ -24,7 +24,7 @@ namespace GenesisVision.Core.Services.Validators
 
             var server = context.BrokerTradeServers.FirstOrDefault(x => x.Id == request.BrokerTradeServerId);
             if (server == null)
-                result.Add("Does not find trade server");
+                result.Add($"Does not find trade server id \"{request.BrokerTradeServerId}\"");
 
             if (request.UserId.HasValue)
             {
@@ -51,11 +51,11 @@ namespace GenesisVision.Core.Services.Validators
             var req = context.ManagerRequests.FirstOrDefault(x => x.Id == request.RequestId);
             if (req == null)
             {
-                result.Add("Does not find request");
+                result.Add($"Does not find request with id \"{request.RequestId}\"");
                 return result;
             }
             if (req.Status != ManagerRequestStatus.Created)
-                result.Add($"Request status is {req.Status}");
+                result.Add($"Could not proccess request. Request status is {req.Status}.");
 
             return result;
         }

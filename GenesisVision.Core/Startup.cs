@@ -33,10 +33,12 @@ namespace GenesisVision.Core
 
 
             services.AddTransient<ITrustManagementService, TrustManagementService>();
-            services.AddTransient<IManagerValidator, ManagerValidator>();
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
             services.AddTransient<ITradesService, TradesService>();
+
+            services.AddTransient<IManagerValidator, ManagerValidator>();
+            services.AddTransient<IBrokerValidator, BrokerValidator>();
 
             services.AddSingleton<IIpfsService, IpfsService>();
         }

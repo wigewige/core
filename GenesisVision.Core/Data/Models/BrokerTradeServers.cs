@@ -20,6 +20,8 @@ namespace GenesisVision.Core.Data.Models
         public string Name { get; set; }
         public string Host { get; set; }
         public BrokerTradeServerType Type { get; set; }
+        public DateTime RegistrationDate { get; set; }
+        public bool IsEnabled { get; set; }
 
         public Guid BrokerId { get; set; }
         public Brokers Broker { get; set; }
