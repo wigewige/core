@@ -37,7 +37,7 @@ namespace GenesisVision.Core.Services.Validators
                 }
             }
 
-            if (!string.IsNullOrEmpty(request.Name))
+            if (string.IsNullOrEmpty(request.Name))
                 result.Add("'Name' is empty");
 
             return result;
