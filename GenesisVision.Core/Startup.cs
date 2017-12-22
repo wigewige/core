@@ -1,6 +1,7 @@
 ﻿using GenesisVision.Core.Data;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.Services.Validators;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,7 @@ namespace GenesisVision.Core
 
 
             services.AddTransient<ITrustManagementService, TrustManagementService>();
+            services.AddTransient<IManagerValidator, ManagerValidator>();
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
             services.AddTransient<ITradesService, TradesService>();
