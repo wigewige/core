@@ -3,7 +3,7 @@ using System.Security.Principal;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 
-namespace GenesisVision.Core.Services.Validators
+namespace GenesisVision.Core.Services.Validators.Interfaces
 {
     public interface IManagerValidator
     {

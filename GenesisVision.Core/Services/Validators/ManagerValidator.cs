@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using GenesisVision.Core.Data;
 using GenesisVision.Core.Data.Models;
+using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 

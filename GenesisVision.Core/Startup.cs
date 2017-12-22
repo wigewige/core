@@ -2,6 +2,7 @@
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators;
+using GenesisVision.Core.Services.Validators.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ namespace GenesisVision.Core
 
             services.AddTransient<IManagerValidator, ManagerValidator>();
             services.AddTransient<IBrokerValidator, BrokerValidator>();
+            services.AddTransient<IInvestorValidator, InvestorValidator>();
 
             services.AddSingleton<IIpfsService, IpfsService>();
         }
