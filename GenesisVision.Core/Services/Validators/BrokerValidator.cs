@@ -1,10 +1,10 @@
 ﻿using GenesisVision.Core.Data;
+using GenesisVision.Core.Services.Validators.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using GenesisVision.Core.Services.Validators.Interfaces;
 
 namespace GenesisVision.Core.Services.Validators
 {

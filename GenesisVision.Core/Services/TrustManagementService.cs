@@ -91,5 +91,21 @@ namespace GenesisVision.Core.Services
                 return result;
             });
         }
+
+        public OperationResult<List<Investment>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var brokerInvestments = context.InvestmentPrograms
+                                               .Where(x =>
+                                                   x.ManagersAccount.BrokerTradeServerId == brokerTradeServerId &&
+                                                   x.IsEnabled &&
+                                                   x.DateFrom < DateTime.Now &&
+                                                   (x.DateTo == null || x.DateTo > DateTime.Now))
+                                               .Select(x => x.ToInvestment())
+                                               .ToList();
+                return brokerInvestments;
+            });
+        }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using GenesisVision.Core.Models;
-using GenesisVision.Core.Services.Interfaces;
-using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.Services.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenesisVision.Core.Services.Validators.Interfaces;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -16,11 +17,13 @@ namespace GenesisVision.Core.Controllers
     public class BrokerController : Controller
     {
         private readonly IManagerService managerService;
+        private readonly ITrustManagementService trustManagementService;
         private readonly IBrokerValidator brokerValidator;
 
-        public BrokerController(IManagerService managerService, IBrokerValidator brokerValidator)
+        public BrokerController(IManagerService managerService, ITrustManagementService trustManagementService, IBrokerValidator brokerValidator)
         {
             this.managerService = managerService;
+            this.trustManagementService = trustManagementService;
             this.brokerValidator = brokerValidator;
         }
 
@@ -36,12 +39,16 @@ namespace GenesisVision.Core.Controllers
             var result = InvokeOperations.InvokeOperation(() =>
             {
                 var requests = managerService.GetNewRequests(brokerTradeServerId);
+                var investments = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServerId);
 
                 return new BrokerInitData
                        {
                            NewManagerRequest = requests.IsSuccess
                                ? requests.Data
-                               : new List<ManagerRequest>()
+                               : new List<ManagerRequest>(),
+                           Investments = investments.IsSuccess
+                               ? investments.Data
+                               : new List<Investment>()
                        };
             });
             return Ok(result);
