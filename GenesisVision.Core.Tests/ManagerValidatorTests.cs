@@ -2,6 +2,7 @@
 using GenesisVision.Core.Data.Models;
 using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -18,10 +19,13 @@ namespace GenesisVision.Core.Tests
         private IManagerValidator managerValidator;
 
         private IPrincipal user;
+        private AspNetUsers aspNetUser;
         private Brokers broker;
         private BrokerTradeServers brokerTradeServer;
-        private AspNetUsers aspNetUser;
-
+        private ManagerAccounts managerAccountWithProgram;
+        private ManagerAccounts managerAccount;
+        private InvestmentPrograms investmentPrograms;
+        
         [SetUp]
         public void Init()
         {
@@ -54,9 +58,56 @@ namespace GenesisVision.Core.Tests
                                     Type = BrokerTradeServerType.MetaTrader4,
                                     BrokerId = broker.Id
                                 };
+            managerAccount = new ManagerAccounts
+                             {
+                                 Id = Guid.NewGuid(),
+                                 BrokerTradeServerId = brokerTradeServer.Id,
+                                 Description = string.Empty,
+                                 IsEnabled = true,
+                                 Name = "Manager",
+                                 Avatar = string.Empty,
+                                 Currency = "USD",
+                                 Login = "111111",
+                                 Rating = 0m,
+                                 RegistrationDate = DateTime.Now,
+                                 UserId = aspNetUser.Id
+                             };
+            managerAccountWithProgram = new ManagerAccounts
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            BrokerTradeServerId = brokerTradeServer.Id,
+                                            Description = string.Empty,
+                                            IsEnabled = true,
+                                            Name = "Manager",
+                                            Avatar = string.Empty,
+                                            Currency = "USD",
+                                            Login = "111111",
+                                            Rating = 0m,
+                                            RegistrationDate = DateTime.Now,
+                                            UserId = aspNetUser.Id
+                                        };
+            investmentPrograms = new InvestmentPrograms
+                                 {
+                                     Id = Guid.NewGuid(),
+                                     ManagersAccountId = managerAccountWithProgram.Id,
+                                     DateFrom = DateTime.Now.AddDays(-10),
+                                     DateTo = DateTime.Now.AddDays(10),
+                                     FeeEntrance = 100m,
+                                     FeeSuccess = 120m,
+                                     FeeManagement = 10m,
+                                     Description = "Test inv",
+                                     IsEnabled = true,
+                                     Period = 35,
+                                     InvestMinAmount = 500,
+                                     InvestMaxAmount = 1500
+                                 };
+
             context.Add(aspNetUser);
             context.Add(broker);
             context.Add(brokerTradeServer);
+            context.Add(managerAccountWithProgram);
+            context.Add(managerAccount);
+            context.Add(investmentPrograms);
             context.SaveChanges();
 
             user = new ClaimsPrincipal();
@@ -130,6 +181,80 @@ namespace GenesisVision.Core.Tests
                     Name = ""
                 });
             Assert.IsTrue(res2.Any(x => x == errorMsg));
+        }
+
+        [Test]
+        public void ValidateInvestSuccess()
+        {
+            var createInv = new CreateInvestment
+                            {
+                                ManagersAccountId = managerAccount.Id,
+                                Description = "Test_test",
+                                DateFrom = DateTime.Now.AddDays(1),
+                                DateTo = DateTime.Now.AddDays(10),
+                                InvestMaxAmount = 99999,
+                                InvestMinAmount = 100,
+                                FeeSuccess = 10,
+                                FeeManagement = 20,
+                                FeeEntrance = 30,
+                                Period = 35
+                            };
+
+            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.AreEqual(0, result.Count);
+        }
+
+        [Test]
+        public void ValidateInvestWrongInvestments()
+        {
+            var createInv = new CreateInvestment {ManagersAccountId = Guid.NewGuid()};
+            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.IsTrue(result.Any(x => x.Contains("Does not find manager account")));
+        }
+
+        [Test]
+        public void ValidateInvestAlreadyExist()
+        {
+            var createInv = new CreateInvestment {ManagersAccountId = managerAccountWithProgram.Id};
+            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.IsTrue(result.Any(x => x.Contains("Manager has active investment program")));
+        }
+
+        [Test]
+        public void ValidateInvestWrongDates()
+        {
+            var createInv = new CreateInvestment
+                            {
+                                ManagersAccountId = managerAccount.Id,
+                                Description = "Test_test",
+                                DateFrom = DateTime.Now.AddDays(1),
+                                DateTo = DateTime.Now.AddDays(10),
+                                InvestMaxAmount = 99999,
+                                InvestMinAmount = 100,
+                                FeeSuccess = 10,
+                                FeeManagement = 20,
+                                FeeEntrance = 30,
+                                Period = 35
+                            };
+
+            createInv.DateFrom = createInv.DateTo = DateTime.Now.Date;
+            var result1 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.True(result1.Any(x => x == "DateFrom must be greater than today"));
+            Assert.True(result1.Any(x => x == "DateTo must be greater DateFrom"));
+            
+            createInv.DateFrom = DateTime.Now.AddDays(10);
+            createInv.DateTo = DateTime.Now.Date;
+            var result2 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.IsTrue(result2.Any(x => x == "DateTo must be greater DateFrom"));
+            
+            createInv.DateFrom = createInv.DateTo = DateTime.Now.AddDays(10);
+            var result3 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.IsTrue(result3.Any(x => x == "DateTo must be greater DateFrom"));
+
+            createInv.DateFrom = DateTime.Now.Date.AddDays(10);
+            createInv.DateTo = DateTime.Now.Date.AddDays(10).AddHours(1);
+            var result4 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.True(result4.Any(x => x == "Minimum duration is 1 day"));
         }
     }
 }
