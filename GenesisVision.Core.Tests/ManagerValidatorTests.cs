@@ -256,5 +256,34 @@ namespace GenesisVision.Core.Tests
             var result4 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
             Assert.True(result4.Any(x => x == "Minimum duration is 1 day"));
         }
+
+        [Test]
+        public void ValidateInvestWrongPeriod()
+        {
+            var createInv = new CreateInvestment
+                            {
+                                ManagersAccountId = managerAccount.Id,
+                                Period = -1
+                            };
+            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.IsTrue(result.Any(x => x.Contains("Period must be greater than zero")));
+        }
+
+        [Test]
+        public void ValidateInvestWrongFee()
+        {
+            var createInv = new CreateInvestment
+                            {
+                                ManagersAccountId = managerAccount.Id,
+                                Period = 10,
+                                FeeEntrance = -1,
+                                FeeSuccess = -10,
+                                FeeManagement = -20
+                            };
+            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            Assert.IsTrue(result.Any(x => x.Contains("FeeEntrance must be greater or equal zero")));
+            Assert.IsTrue(result.Any(x => x.Contains("FeeSuccess must be greater or equal zero")));
+            Assert.IsTrue(result.Any(x => x.Contains("FeeManagement must be greater or equal zero")));
+        }
     }
 }

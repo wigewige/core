@@ -8,7 +8,6 @@ using GenesisVision.Core.Data.Models;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
-using Microsoft.EntityFrameworkCore;
 
 namespace GenesisVision.Core.Services.Validators
 {
@@ -91,6 +90,21 @@ namespace GenesisVision.Core.Services.Validators
             }
             else if (investment.DateTo.HasValue && investment.DateTo.Value.Date <= DateTime.Now.Date.AddDays(1))
                 result.Add("DateTo must be greater than today");
+
+            if (investment.FeeEntrance < 0)
+                result.Add("FeeEntrance must be greater or equal zero");
+
+            if (investment.FeeSuccess < 0)
+                result.Add("FeeSuccess must be greater or equal zero");
+
+            if (investment.FeeManagement < 0)
+                result.Add("FeeManagement must be greater or equal zero");
+
+            if (string.IsNullOrEmpty(investment.Description))
+                result.Add("'Description' is empty");
+
+            if (investment.Period <= 0)
+                result.Add("Period must be greater than zero");
 
             return result;
         }
