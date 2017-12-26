@@ -8,6 +8,7 @@ using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using Microsoft.EntityFrameworkCore;
 
 namespace GenesisVision.Core.Services
 {
@@ -39,7 +40,17 @@ namespace GenesisVision.Core.Services
                               ManagersAccountId = investment.ManagersAccountId,
                               Period = investment.Period
                           };
+                var firstPeriod = new Periods
+                                  {
+                                      Id = Guid.NewGuid(),
+                                      DateFrom = inv.DateFrom,
+                                      DateTo = inv.DateFrom.AddDays(inv.Period),
+                                      Status = PeriodStatus.InProccess,
+                                      InvestmentProgramId = inv.Id,
+                                      Number = 1
+                                  };
                 context.Add(inv);
+                context.Add(firstPeriod);
                 context.SaveChanges();
 
                 return inv.Id;
@@ -97,6 +108,7 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var brokerInvestments = context.InvestmentPrograms
+                                               .Include(x => x.Periods)
                                                .Where(x =>
                                                    x.ManagersAccount.BrokerTradeServerId == brokerTradeServerId &&
                                                    x.IsEnabled &&

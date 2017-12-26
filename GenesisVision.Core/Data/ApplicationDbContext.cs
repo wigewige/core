@@ -16,6 +16,7 @@ namespace GenesisVision.Core.Data
         public DbSet<ManagerAccounts> ManagersAccounts { get; set; }
         public DbSet<ManagerAccountRequests> ManagerRequests { get; set; }
         public DbSet<InvestmentPrograms> InvestmentPrograms { get; set; }
+        public DbSet<Periods> Periods { get; set; }
         public DbSet<InvestmentRequests> InvestmentRequests { get; set; }
         
         protected override void OnModelCreating(ModelBuilder builder)
@@ -61,6 +62,11 @@ namespace GenesisVision.Core.Data
                    .HasOne(x => x.User)
                    .WithMany(x => x.ManagerAccountRequests)
                    .HasForeignKey(x => x.UserId);
+
+            builder.Entity<Periods>()
+                   .HasOne(x => x.InvestmentProgram)
+                   .WithMany(x => x.Periods)
+                   .HasForeignKey(x => x.InvestmentProgramId);
         }
     }
 }

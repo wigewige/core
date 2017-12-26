@@ -16,5 +16,6 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal FeeEntrance { get; set; }
         public decimal InvestMinAmount { get; set; }
         public decimal? InvestMaxAmount { get; set; }
+        public Period LastPeriod { get; set; }
     }
 }

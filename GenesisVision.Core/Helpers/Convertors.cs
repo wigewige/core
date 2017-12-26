@@ -1,6 +1,7 @@
 ﻿using GenesisVision.Core.Data.Models;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using System.Linq;
 
 namespace GenesisVision.Core.Helpers
 {
@@ -21,7 +22,20 @@ namespace GenesisVision.Core.Helpers
                        DateFrom = inv.DateFrom,
                        DateTo = inv.DateTo,
                        Period = inv.Period,
-                       ManagerId = inv.ManagersAccountId
+                       ManagerId = inv.ManagersAccountId,
+                       LastPeriod = inv.Periods?.OrderByDescending(x => x.Number).First().ToPeriod()
+                   };
+        }
+
+        public static Period ToPeriod(this Periods p)
+        {
+            return new Period
+                   {
+                       Id = p.Id,
+                       DateFrom = p.DateFrom,
+                       DateTo = p.DateTo,
+                       Status = p.Status,
+                       Number = p.Number
                    };
         }
 
