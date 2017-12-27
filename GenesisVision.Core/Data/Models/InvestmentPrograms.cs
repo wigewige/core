@@ -20,6 +20,9 @@ namespace GenesisVision.Core.Data.Models
         public ManagerAccounts ManagersAccount { get; set; }
         public Guid ManagersAccountId { get; set; }
 
+        public ManagerTokens Tokens { get; set; }
+        public Guid ManagerTokensId { get; set; }
+
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 
         public ICollection<Periods> Periods { get; set; }
