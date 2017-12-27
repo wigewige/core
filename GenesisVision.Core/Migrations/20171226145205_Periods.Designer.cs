@@ -12,9 +12,10 @@ using System;
 namespace GenesisVision.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171226145205_Periods")]
+    partial class Periods
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,8 +147,6 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<Guid>("InvestmentProgramtId");
 
-                    b.Property<Guid>("PeriodId");
-
                     b.Property<int>("Status");
 
                     b.Property<int>("Type");
@@ -157,8 +156,6 @@ namespace GenesisVision.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("InvestmentProgramtId");
-
-                    b.HasIndex("PeriodId");
 
                     b.HasIndex("UserId");
 
@@ -274,11 +271,6 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.Core.Data.Models.InvestmentPrograms", "InvestmentProgram")
                         .WithMany("InvestmentRequests")
                         .HasForeignKey("InvestmentProgramtId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("GenesisVision.Core.Data.Models.Periods", "Period")
-                        .WithMany("InvestmentRequests")
-                        .HasForeignKey("PeriodId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GenesisVision.Core.Data.Models.AspNetUsers", "User")

@@ -24,5 +24,7 @@ namespace GenesisVision.Core.Data.Models
         public Guid ManagerTokensId { get; set; }
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
+
+        public ICollection<Periods> Periods { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using Microsoft.EntityFrameworkCore;
 
 namespace GenesisVision.Core.Services
 {
@@ -39,7 +40,17 @@ namespace GenesisVision.Core.Services
                               ManagersAccountId = investment.ManagersAccountId,
                               Period = investment.Period
                           };
+                var firstPeriod = new Periods
+                                  {
+                                      Id = Guid.NewGuid(),
+                                      DateFrom = inv.DateFrom,
+                                      DateTo = inv.DateFrom.AddDays(inv.Period),
+                                      Status = PeriodStatus.InProccess,
+                                      InvestmentProgramId = inv.Id,
+                                      Number = 1
+                                  };
                 context.Add(inv);
+                context.Add(firstPeriod);
                 context.SaveChanges();
 
                 return inv.Id;
@@ -50,6 +61,11 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var lastPeriod = context.Periods
+                                        .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
+                                        .OrderByDescending(x => x.Number)
+                                        .First();
+
                 var invRequest = new InvestmentRequests
                                  {
                                      Id = Guid.NewGuid(),
@@ -58,8 +74,10 @@ namespace GenesisVision.Core.Services
                                      Date = DateTime.Now,
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
-                                     Type = model.RequestType
+                                     Type = InvestmentRequestType.Invest,
+                                     PeriodId = lastPeriod.Id
                                  };
+
                 context.Add(invRequest);
                 context.SaveChanges();
             });
@@ -97,6 +115,7 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var brokerInvestments = context.InvestmentPrograms
+                                               .Include(x => x.Periods)
                                                .Where(x =>
                                                    x.ManagersAccount.BrokerTradeServerId == brokerTradeServerId &&
                                                    x.IsEnabled &&

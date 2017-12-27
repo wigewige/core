@@ -1,5 +1,4 @@
 ﻿using System;
-using GenesisVision.Core.Data.Models;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
@@ -8,6 +7,5 @@ namespace GenesisVision.Core.ViewModels.Investment
         public Guid InvestmentProgramId { get; set; }
         public Guid UserId { get; set; }
         public decimal Amount { get; set; }
-        public InvestmentRequestType RequestType { get; set; }
     }
 }

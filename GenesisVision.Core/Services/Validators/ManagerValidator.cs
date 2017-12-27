@@ -87,10 +87,13 @@ namespace GenesisVision.Core.Services.Validators
                     result.Add("DateTo must be greater DateFrom");
                 else if ((investment.DateTo.Value.Date - investment.DateFrom.Value.Date).TotalDays < 1)
                     result.Add("Minimum duration is 1 day");
+
+                if (investment.Period > 0 && investment.DateFrom.Value.Date.AddDays(investment.Period) > investment.DateTo.Value.Date)
+                    result.Add("DateTo must be greater first period");
             }
             else if (investment.DateTo.HasValue && investment.DateTo.Value.Date <= DateTime.Now.Date.AddDays(1))
                 result.Add("DateTo must be greater than today");
-
+            
             if (investment.FeeEntrance < 0)
                 result.Add("FeeEntrance must be greater or equal zero");
 

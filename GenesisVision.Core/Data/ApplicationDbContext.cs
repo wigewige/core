@@ -17,6 +17,7 @@ namespace GenesisVision.Core.Data
         public DbSet<InvestorAccounts> InvestorAccounts { get; set; }
         public DbSet<ManagerAccountRequests> ManagerRequests { get; set; }
         public DbSet<InvestmentPrograms> InvestmentPrograms { get; set; }
+        public DbSet<Periods> Periods { get; set; }
         public DbSet<InvestmentRequests> InvestmentRequests { get; set; }
         public DbSet<ManagerTokens> ManagerTokens { get; set; }
 
@@ -63,6 +64,16 @@ namespace GenesisVision.Core.Data
                    .HasOne(x => x.User)
                    .WithMany(x => x.ManagerAccountRequests)
                    .HasForeignKey(x => x.UserId);
+
+            builder.Entity<Periods>()
+                   .HasOne(x => x.InvestmentProgram)
+                   .WithMany(x => x.Periods)
+                   .HasForeignKey(x => x.InvestmentProgramId);
+
+            builder.Entity<InvestmentRequests>()
+                   .HasOne(x => x.Period)
+                   .WithMany(x => x.InvestmentRequests)
+                   .HasForeignKey(x => x.PeriodId);
         }
     }
 }
