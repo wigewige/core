@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Data.Models;
+﻿using System.Collections.Generic;
+using GenesisVision.Core.Data.Models;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 using System.Linq;
@@ -35,7 +36,9 @@ namespace GenesisVision.Core.Helpers
                        DateFrom = p.DateFrom,
                        DateTo = p.DateTo,
                        Status = p.Status,
-                       Number = p.Number
+                       Number = p.Number,
+                       InvestmentRequest = p.InvestmentRequests?.Select(ToInvestmentRequest).ToList() ??
+                                           new List<InvestmentRequest>()
                    };
         }
 
@@ -48,6 +51,18 @@ namespace GenesisVision.Core.Helpers
                        Name = x.Name,
                        UserId = x.Id,
                        RequestId = x.Id
+                   };
+        }
+
+        public static InvestmentRequest ToInvestmentRequest(this InvestmentRequests inv)
+        {
+            return new InvestmentRequest
+                   {
+                       Id = inv.Id,
+                       Date = inv.Date,
+                       Status = inv.Status,
+                       Type = inv.Type,
+                       Amount = inv.Amount
                    };
         }
     }

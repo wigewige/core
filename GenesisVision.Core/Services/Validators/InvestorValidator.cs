@@ -22,10 +22,9 @@ namespace GenesisVision.Core.Services.Validators
         {
             var result = new List<string>();
 
-            var investmentProgram = context
-                .InvestmentPrograms
-                .Include(x => x.Periods)
-                .FirstOrDefault(x => x.Id == model.InvestmentProgramId);
+            var investmentProgram = context.InvestmentPrograms
+                                           .Include(x => x.Periods)
+                                           .FirstOrDefault(x => x.Id == model.InvestmentProgramId);
             if (investmentProgram == null)
                 return new List<string> {$"Does not find investment program id \"{model.InvestmentProgramId}\""};
 
@@ -44,6 +43,12 @@ namespace GenesisVision.Core.Services.Validators
         public List<string> ValidateWithdraw(IPrincipal user, Invest model)
         {
             var result = new List<string>();
+
+            var investmentProgram = context.InvestmentPrograms
+                                           .Include(x => x.Periods)
+                                           .FirstOrDefault(x => x.Id == model.InvestmentProgramId);
+            if (investmentProgram == null)
+                return new List<string> { $"Does not find investment program id \"{model.InvestmentProgramId}\"" };
 
             // todo: validations
 

@@ -38,5 +38,20 @@ namespace GenesisVision.Core.Services.Validators
 
             return result;
         }
+
+        public List<string> ValidateGetClosingPeriodData(IPrincipal user, Guid investmentProgramId)
+        {
+            var result = new List<string>();
+
+            var investmentProgram = context.InvestmentPrograms
+                                           .Include(x => x.Periods)
+                                           .FirstOrDefault(x => x.Id == investmentProgramId);
+            if (investmentProgram == null)
+                return new List<string> {$"Does not find investment program id \"{investmentProgramId}\""};
+
+            // todo: check investment program belongs broker
+
+            return result;
+        }
     }
 }

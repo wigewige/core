@@ -6,6 +6,7 @@ using GenesisVision.Core.Data.Models;
 using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 using Microsoft.EntityFrameworkCore;
@@ -124,6 +125,26 @@ namespace GenesisVision.Core.Services
                                                .Select(x => x.ToInvestment())
                                                .ToList();
                 return brokerInvestments;
+            });
+        }
+
+        public OperationResult<ClosePeriodData> GetClosingPeriodData(Guid investmentProgramId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var investment = context.InvestmentPrograms
+                                        .Include(x => x.Periods)
+                                        .ThenInclude(x => x.InvestmentRequests)
+                                        .First(x => x.Id == investmentProgramId);
+
+                var data = new ClosePeriodData
+                           {
+                               NextPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned)?.ToPeriod(),
+                               CurrentPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod()
+                           };
+                data.CanCloseCurrentPeriod = data.CurrentPeriod != null && data.CurrentPeriod.DateTo <= DateTime.Now;
+
+                return data;
             });
         }
     }
