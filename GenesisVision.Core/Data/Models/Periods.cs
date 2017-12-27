@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace GenesisVision.Core.Data.Models
 {
@@ -19,5 +21,7 @@ namespace GenesisVision.Core.Data.Models
 
         public InvestmentPrograms InvestmentProgram { get; set; }
         public Guid InvestmentProgramId { get; set; }
+
+        public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
     }
 }

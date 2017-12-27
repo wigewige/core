@@ -67,6 +67,11 @@ namespace GenesisVision.Core.Data
                    .HasOne(x => x.InvestmentProgram)
                    .WithMany(x => x.Periods)
                    .HasForeignKey(x => x.InvestmentProgramId);
+
+            builder.Entity<InvestmentRequests>()
+                   .HasOne(x => x.Period)
+                   .WithMany(x => x.InvestmentRequests)
+                   .HasForeignKey(x => x.PeriodId);
         }
     }
 }

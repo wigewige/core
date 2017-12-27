@@ -27,5 +27,8 @@ namespace GenesisVision.Core.Data.Models
 
         public InvestmentPrograms InvestmentProgram { get; set; }
         public Guid InvestmentProgramtId { get; set; }
+
+        public Periods Period { get; set; }
+        public Guid PeriodId { get; set; }
     }
 }

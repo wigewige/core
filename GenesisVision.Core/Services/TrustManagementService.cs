@@ -61,6 +61,11 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var lastPeriod = context.Periods
+                                        .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
+                                        .OrderByDescending(x => x.Number)
+                                        .First();
+
                 var invRequest = new InvestmentRequests
                                  {
                                      Id = Guid.NewGuid(),
@@ -69,8 +74,10 @@ namespace GenesisVision.Core.Services
                                      Date = DateTime.Now,
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
-                                     Type = model.RequestType
+                                     Type = InvestmentRequestType.Invest,
+                                     PeriodId = lastPeriod.Id
                                  };
+
                 context.Add(invRequest);
                 context.SaveChanges();
             });
