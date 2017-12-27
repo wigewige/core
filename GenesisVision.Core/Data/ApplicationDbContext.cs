@@ -14,10 +14,12 @@ namespace GenesisVision.Core.Data
         public DbSet<Brokers> Brokers { get; set; }
         public DbSet<BrokerTradeServers> BrokerTradeServers { get; set; }
         public DbSet<ManagerAccounts> ManagersAccounts { get; set; }
+        public DbSet<InvestorAccounts> InvestorAccounts { get; set; }
         public DbSet<ManagerAccountRequests> ManagerRequests { get; set; }
         public DbSet<InvestmentPrograms> InvestmentPrograms { get; set; }
         public DbSet<InvestmentRequests> InvestmentRequests { get; set; }
-        
+        public DbSet<ManagerTokens> ManagerTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
