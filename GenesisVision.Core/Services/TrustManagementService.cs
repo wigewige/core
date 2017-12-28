@@ -26,6 +26,12 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var token = new ManagerTokens
+                            {
+                                Id = Guid.NewGuid(),
+                                TokenAddress = string.Empty,
+                                TokenSymbol = string.Empty
+                            };
                 var inv = new InvestmentPrograms
                           {
                               Id = Guid.NewGuid(),
@@ -39,7 +45,8 @@ namespace GenesisVision.Core.Services
                               InvestMinAmount = investment.InvestMinAmount,
                               IsEnabled = true,
                               ManagersAccountId = investment.ManagersAccountId,
-                              Period = investment.Period
+                              Period = investment.Period,
+                              ManagerTokensId = token.Id
                           };
                 var firstPeriod = new Periods
                                   {
@@ -52,6 +59,7 @@ namespace GenesisVision.Core.Services
                                   };
                 context.Add(inv);
                 context.Add(firstPeriod);
+                context.Add(token);
                 context.SaveChanges();
 
                 return inv.Id;
@@ -62,6 +70,10 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var investor = context.AspNetUsers
+                                      .Include(x => x.InvestorAccount)
+                                      .First(x => x.Id == model.UserId);
+
                 var lastPeriod = context.Periods
                                         .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
                                         .OrderByDescending(x => x.Number)
@@ -76,7 +88,8 @@ namespace GenesisVision.Core.Services
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
                                      Type = InvestmentRequestType.Invest,
-                                     PeriodId = lastPeriod.Id
+                                     PeriodId = lastPeriod.Id,
+                                     InvestorAccountId = investor.InvestorAccount.Id
                                  };
 
                 context.Add(invRequest);

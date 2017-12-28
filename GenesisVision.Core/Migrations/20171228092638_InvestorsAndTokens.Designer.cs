@@ -12,9 +12,10 @@ using System;
 namespace GenesisVision.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171228092638_InvestorsAndTokens")]
+    partial class InvestorsAndTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,8 +158,6 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<Guid>("InvestmentProgramtId");
 
-                    b.Property<Guid>("InvestorAccountId");
-
                     b.Property<Guid>("PeriodId");
 
                     b.Property<int>("Status");
@@ -170,8 +169,6 @@ namespace GenesisVision.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("InvestmentProgramtId");
-
-                    b.HasIndex("InvestorAccountId");
 
                     b.HasIndex("PeriodId");
 
@@ -344,11 +341,6 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.Core.Data.Models.InvestmentPrograms", "InvestmentProgram")
                         .WithMany("InvestmentRequests")
                         .HasForeignKey("InvestmentProgramtId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("GenesisVision.Core.Data.Models.InvestorAccounts", "InvestorAccount")
-                        .WithMany("InvestmentRequestses")
-                        .HasForeignKey("InvestorAccountId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GenesisVision.Core.Data.Models.Periods", "Period")
