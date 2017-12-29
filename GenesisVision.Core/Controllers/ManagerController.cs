@@ -64,6 +64,9 @@ namespace GenesisVision.Core.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get manager details
+        /// </summary>
         [AllowAnonymous]
         public IActionResult Details(Guid managerId)
         {
@@ -73,6 +76,16 @@ namespace GenesisVision.Core.Controllers
 
             var details = managerService.GetManagerDetails(managerId);
             return Ok(details);
+        }
+
+        /// <summary>
+        /// Get managers by filter
+        /// </summary>
+        [AllowAnonymous]
+        public IActionResult GetManagers([FromBody]ManagersFilter filter)
+        {
+            var res = managerService.GetManagersDetails(filter);
+            return Ok(res);
         }
     }
 }

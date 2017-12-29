@@ -106,5 +106,51 @@ namespace GenesisVision.Core.Services
                 return manager.ToManagerAccount();
             });
         }
+
+        public OperationResult<(List<ManagerAccount>, int)> GetManagersDetails(ManagersFilter filter)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var query = context.ManagersAccounts
+                                   .Include(x => x.BrokerTradeServer)
+                                   .ThenInclude(x => x.Broker)
+                                   .AsQueryable();
+
+                if (!string.IsNullOrEmpty(filter.Name))
+                {
+                    var str = filter.Name.Trim().ToLower();
+                    query = query.Where(x => x.Name.ToLower().Contains(str) ||
+                                             x.Description.ToLower().Contains(str) ||
+                                             x.Login.ToLower().Contains(str) ||
+                                             x.Id.ToString().ToLower().Contains(str));
+                }
+                if (!string.IsNullOrEmpty(filter.BrokerName))
+                {
+                    var str = filter.BrokerName.Trim().ToLower();
+                    query = query.Where(x => x.BrokerTradeServer.Broker.Name.ToLower().Contains(str) ||
+                                             x.BrokerTradeServer.Broker.Description.ToLower().Contains(str) ||
+                                             x.BrokerTradeServer.Broker.Id.ToString().ToLower().Contains(str));
+                }
+                if (!string.IsNullOrEmpty(filter.BrokerTradeServerName))
+                {
+                    var str = filter.BrokerTradeServerName.Trim().ToLower();
+                    query = query.Where(x => x.BrokerTradeServer.Name.ToLower().Contains(str) ||
+                                             x.BrokerTradeServer.Host.ToLower().Contains(str) ||
+                                             x.BrokerTradeServer.Id.ToString().ToLower().Contains(str));
+                }
+                if (filter.BrokerTradeServerType.HasValue)
+                    query = query.Where(x => x.BrokerTradeServer.Type == filter.BrokerTradeServerType.Value);
+
+                var count = query.Count();
+
+                if (filter.Skip.HasValue)
+                    query = query.Skip(filter.Skip.Value);
+                if (filter.Take.HasValue)
+                    query = query.Take(filter.Take.Value);
+
+                var managers = query.Select(x => x.ToManagerAccount()).ToList();
+                return (managers, count);
+            });
+        }
     }
 }

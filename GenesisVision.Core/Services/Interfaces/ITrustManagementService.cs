@@ -13,7 +13,7 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult Invest(Invest model);
 
-        OperationResult<List<Investment>> GetInvestments(InvestmentsFilter filter);
+        OperationResult<(List<Investment>, int)> GetInvestments(InvestmentsFilter filter);
 
         OperationResult<List<Investment>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
 

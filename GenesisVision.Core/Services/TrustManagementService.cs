@@ -97,7 +97,7 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult<List<Investment>> GetInvestments(InvestmentsFilter filter)
+        public OperationResult<(List<Investment>, int)> GetInvestments(InvestmentsFilter filter)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
@@ -114,13 +114,15 @@ namespace GenesisVision.Core.Services
                 if (filter.InvestMaxAmountTo.HasValue)
                     query = query.Where(x => x.InvestMaxAmount < filter.InvestMaxAmountTo);
 
+                var count = query.Count();
+
                 if (filter.Skip.HasValue)
                     query = query.Skip(filter.Skip.Value);
                 if (filter.Take.HasValue)
                     query = query.Take(filter.Take.Value);
 
-                var result = query.Select(x => x.ToInvestment()).ToList();
-                return result;
+                var investments = query.Select(x => x.ToInvestment()).ToList();
+                return (investments, count);
             });
         }
 
