@@ -63,5 +63,16 @@ namespace GenesisVision.Core.Controllers
             var result = trustManagementService.CreateInvestmentProgram(investment);
             return Ok(result);
         }
+
+        [AllowAnonymous]
+        public IActionResult Details(Guid managerId)
+        {
+            var errors = managerValidator.ValidateGetManagerDetails(User, managerId);
+            if (errors.Any())
+                return BadRequest(OperationResult.Failed(errors));
+
+            var details = managerService.GetManagerDetails(managerId);
+            return Ok(details);
+        }
     }
 }

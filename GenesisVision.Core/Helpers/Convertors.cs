@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using GenesisVision.Core.Data.Models;
+﻿using GenesisVision.Core.Data.Models;
+using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GenesisVision.Core.Helpers
@@ -63,6 +64,41 @@ namespace GenesisVision.Core.Helpers
                        Status = inv.Status,
                        Type = inv.Type,
                        Amount = inv.Amount
+                   };
+        }
+
+        public static ManagerAccount ToManagerAccount(this ManagerAccounts manager)
+        {
+            return new ManagerAccount
+                   {
+                       Id = manager.Id,
+                       Name = manager.Name,
+                       Avatar = manager.Avatar,
+                       Login = manager.Login,
+                       BrokerTradeServer = manager.BrokerTradeServer?.ToBrokerTradeServers(),
+                       Broker = manager.BrokerTradeServer?.Broker?.ToBroker()
+                   };
+        }
+
+        public static BrokerTradeServer ToBrokerTradeServers(this BrokerTradeServers server)
+        {
+            return new BrokerTradeServer
+                   {
+                       Id = server.Id,
+                       Name = server.Name,
+                       Type = server.Type,
+                       Host = server.Host,
+                       BrokerId = server.BrokerId
+                   };
+        }
+
+        public static Broker ToBroker(this Brokers broker)
+        {
+            return new Broker
+                   {
+                       Id = broker.Id,
+                       Description = broker.Description,
+                       Name = broker.Name
                    };
         }
     }

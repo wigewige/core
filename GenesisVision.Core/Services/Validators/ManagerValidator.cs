@@ -111,5 +111,12 @@ namespace GenesisVision.Core.Services.Validators
 
             return result;
         }
+
+        public List<string> ValidateGetManagerDetails(IPrincipal user, Guid managerId)
+        {
+            return context.ManagersAccounts.Any(x => x.Id == managerId)
+                ? new List<string>()
+                : new List<string> {$"Does not find manager account with id \"{managerId}\""};
+        }
     }
 }

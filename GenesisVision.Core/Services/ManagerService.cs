@@ -4,6 +4,7 @@ using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,6 +92,18 @@ namespace GenesisVision.Core.Services
                                     .Select(x => x.ToManagerRequest())
                                     .ToList();
                 return result;
+            });
+        }
+
+        public OperationResult<ManagerAccount> GetManagerDetails(Guid managerId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var manager = context.ManagersAccounts
+                                     .Include(x => x.BrokerTradeServer)
+                                     .ThenInclude(x => x.Broker)
+                                     .First(x => x.Id == managerId);
+                return manager.ToManagerAccount();
             });
         }
     }
