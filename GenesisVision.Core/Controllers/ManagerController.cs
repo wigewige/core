@@ -52,6 +52,19 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
+        /// Update manager account
+        /// </summary>
+        public IActionResult UpdateManagerAccount([FromBody]UpdateManagerAccount account)
+        {
+            var errors = managerValidator.ValidateUpdateManagerAccount(User, account);
+            if (errors.Any())
+                return BadRequest(OperationResult.Failed(errors));
+
+            var details = managerService.UpdateManagerAccount(account);
+            return Ok(details);
+        }
+
+        /// <summary>
         /// Create investment program
         /// </summary>
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)

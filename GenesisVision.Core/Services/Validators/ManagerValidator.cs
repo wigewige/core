@@ -118,5 +118,24 @@ namespace GenesisVision.Core.Services.Validators
                 ? new List<string>()
                 : new List<string> {$"Does not find manager account with id \"{managerId}\""};
         }
+
+        public List<string> ValidateUpdateManagerAccount(IPrincipal user, UpdateManagerAccount account)
+        {
+            var managerExistsErrors = ValidateGetManagerDetails(user, account.ManagerAccountId);
+            if (managerExistsErrors.Any())
+                return managerExistsErrors;
+
+            // todo: check managerAccount belongs user
+
+            var result = new List<string>();
+
+            if (string.IsNullOrEmpty(account.Description))
+                result.Add("'Description' is empty");
+
+            if (string.IsNullOrEmpty(account.Name))
+                result.Add("'Name' is empty");
+
+            return result;
+        }
     }
 }

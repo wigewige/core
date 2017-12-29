@@ -16,5 +16,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateCreateInvestmentProgram(IPrincipal user, CreateInvestment investment);
 
         List<string> ValidateGetManagerDetails(IPrincipal user, Guid managerId);
+
+        List<string> ValidateUpdateManagerAccount(IPrincipal user, UpdateManagerAccount account);
     }
 }

@@ -14,6 +14,7 @@ namespace GenesisVision.Core.Data.Models
         public bool IsEnabled { get; set; }
         public decimal Rating { get; set; }
         public DateTime RegistrationDate { get; set; }
+        public string IpfsHash { get; set; }
         
         public AspNetUsers User { get; set; }
         public Guid UserId { get; set; }

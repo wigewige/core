@@ -5,6 +5,7 @@ using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,12 @@ namespace GenesisVision.Core.Services
     public class ManagerService : IManagerService
     {
         private readonly ApplicationDbContext context;
+        private readonly IIpfsService ipfsService;
 
-        public ManagerService(ApplicationDbContext context)
+        public ManagerService(ApplicationDbContext context, IIpfsService ipfsService)
         {
             this.context = context;
+            this.ipfsService = ipfsService;
         }
 
         public OperationResult<Guid> CreateManagerAccountRequest(NewManagerRequest request)
@@ -77,9 +80,37 @@ namespace GenesisVision.Core.Services
                               };
                 context.Add(manager);
                 managerRequest.Status = ManagerRequestStatus.Processed;
+                context.SaveChanges();
+
+                var ipfsUpdate = UpdateManagerAccountInIpfs(manager.Id);
+                if (ipfsUpdate.IsSuccess)
+                {
+                    manager.IpfsHash = ipfsUpdate.Data;
+                    context.SaveChanges();
+                }
+
+                return manager.Id;
+            });
+        }
+
+        public OperationResult UpdateManagerAccount(UpdateManagerAccount account)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var manager = context.ManagersAccounts.First(x => x.Id == account.ManagerAccountId);
+
+                manager.Avatar = account.Avatar;
+                manager.Name = account.Name;
+                manager.Description = account.Description;
 
                 context.SaveChanges();
-                return manager.Id;
+
+                var ipfsUpdate = UpdateManagerAccountInIpfs(account.ManagerAccountId);
+                if (ipfsUpdate.IsSuccess)
+                {
+                    manager.IpfsHash = ipfsUpdate.Data;
+                    context.SaveChanges();
+                }
             });
         }
 
@@ -151,6 +182,17 @@ namespace GenesisVision.Core.Services
                 var managers = query.Select(x => x.ToManagerAccount()).ToList();
                 return (managers, count);
             });
+        }
+
+        private OperationResult<string> UpdateManagerAccountInIpfs(Guid managerId)
+        {
+            var account = GetManagerDetails(managerId);
+            if (!account.IsSuccess)
+                return OperationResult<string>.Failed();
+
+            var json = JsonConvert.SerializeObject(account.Data);
+
+            return ipfsService.WriteIpfsText(json);
         }
     }
 }

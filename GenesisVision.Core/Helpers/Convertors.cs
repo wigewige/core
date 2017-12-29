@@ -75,6 +75,10 @@ namespace GenesisVision.Core.Helpers
                        Name = manager.Name,
                        Avatar = manager.Avatar,
                        Login = manager.Login,
+                       Description = manager.Description,
+                       Currency = manager.Currency,
+                       IpfsHash = manager.IpfsHash,
+                       IsEnabled = manager.IsEnabled,
                        BrokerTradeServer = manager.BrokerTradeServer?.ToBrokerTradeServers(),
                        Broker = manager.BrokerTradeServer?.Broker?.ToBroker()
                    };

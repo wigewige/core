@@ -24,6 +24,15 @@ namespace GenesisVision.Core.Services
             });
         }
 
+        public OperationResult<string> WriteIpfsText(string text)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var res = ipfs.FileSystem.AddTextAsync(text).Result;
+                return res.Hash;
+            });
+        }
+
         public OperationResult<byte[]> GetIpfsFile(string hash)
         {
             return InvokeOperations.InvokeOperation(() =>
