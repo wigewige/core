@@ -11,12 +11,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace GenesisVision.Core.Tests
+namespace GenesisVision.Core.Tests.Validators
 {
     [TestFixture]
     public class ManagerValidatorTests
     {
         private IManagerValidator managerValidator;
+
+        private ApplicationDbContext context;
 
         private IPrincipal user;
         private AspNetUsers aspNetUser;
@@ -30,8 +32,8 @@ namespace GenesisVision.Core.Tests
         public void Init()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase("database");
-            var context = new ApplicationDbContext(optionsBuilder.Options);
+            optionsBuilder.UseInMemoryDatabase("databaseManagerValidator");
+            context = new ApplicationDbContext(optionsBuilder.Options);
 
             aspNetUser = new AspNetUsers
                          {
@@ -191,7 +193,7 @@ namespace GenesisVision.Core.Tests
                                 ManagersAccountId = managerAccount.Id,
                                 Description = "Test_test",
                                 DateFrom = DateTime.Now.AddDays(1),
-                                DateTo = DateTime.Now.AddDays(10),
+                                DateTo = DateTime.Now.AddDays(36),
                                 InvestMaxAmount = 99999,
                                 InvestMinAmount = 100,
                                 FeeSuccess = 10,
@@ -201,7 +203,7 @@ namespace GenesisVision.Core.Tests
                             };
 
             var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
-            Assert.AreEqual(0, result.Count);
+            Assert.IsEmpty(result);
         }
 
         [Test]
@@ -284,6 +286,44 @@ namespace GenesisVision.Core.Tests
             Assert.IsTrue(result.Any(x => x.Contains("FeeEntrance must be greater or equal zero")));
             Assert.IsTrue(result.Any(x => x.Contains("FeeSuccess must be greater or equal zero")));
             Assert.IsTrue(result.Any(x => x.Contains("FeeManagement must be greater or equal zero")));
+        }
+
+        [Test]
+        public void ValidateGetManagerDetails()
+        {
+            var result1 = managerValidator.ValidateGetManagerDetails(user, managerAccount.Id);
+            Assert.IsEmpty(result1);
+            
+            var result2 = managerValidator.ValidateGetManagerDetails(user, Guid.NewGuid());
+            Assert.IsNotEmpty(result2);
+        }
+
+        [Test]
+        public void ValidateCreateManagerAccount()
+        {
+            var res1 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = Guid.NewGuid()});
+            Assert.IsTrue(res1.Any(x => x.Contains("Does not find request")));
+
+            var requestId = Guid.NewGuid();
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = aspNetUser.Id, Status = ManagerRequestStatus.Declined});
+            context.SaveChanges();
+
+            var res2 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            Assert.IsTrue(res2.Any(x => x.Contains("Could not proccess request")));
+
+            requestId = Guid.NewGuid();
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = aspNetUser.Id, Status = ManagerRequestStatus.Processed});
+            context.SaveChanges();
+
+            var res3 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            Assert.IsTrue(res3.Any(x => x.Contains("Could not proccess request")));
+
+            requestId = Guid.NewGuid();
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = aspNetUser.Id, Status = ManagerRequestStatus.Created});
+            context.SaveChanges();
+
+            var res4 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            Assert.IsEmpty(res4);
         }
     }
 }

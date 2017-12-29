@@ -1,13 +1,11 @@
-using System;
-using GenesisVision.Core.Models;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Trades;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 
-namespace GenesisVision.Core.Tests
+namespace GenesisVision.Core.Tests.Services
 {
     [TestFixture]
     public class TradesServiceTests

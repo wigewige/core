@@ -8,5 +8,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
     public interface IInvestorValidator
     {
         List<string> ValidateInvest(IPrincipal user, Invest model);
+
+        List<string> ValidateWithdraw(IPrincipal user, Invest model);
     }
 }

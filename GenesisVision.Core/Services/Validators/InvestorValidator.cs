@@ -48,7 +48,7 @@ namespace GenesisVision.Core.Services.Validators
                                            .Include(x => x.Periods)
                                            .FirstOrDefault(x => x.Id == model.InvestmentProgramId);
             if (investmentProgram == null)
-                return new List<string> { $"Does not find investment program id \"{model.InvestmentProgramId}\"" };
+                return new List<string> {$"Does not find investment program id \"{model.InvestmentProgramId}\""};
 
             // todo: validations
 
