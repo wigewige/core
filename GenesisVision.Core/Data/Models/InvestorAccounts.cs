@@ -13,6 +13,6 @@ namespace GenesisVision.Core.Data.Models
         public AspNetUsers User { get; set; }
         public Guid UserId { get; set; }
 
-        public ICollection<InvestmentRequests> InvestmentRequestses { get; set; }
+        public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
     }
 }

@@ -71,7 +71,7 @@ namespace GenesisVision.Core.Data
 
             builder.Entity<InvestmentRequests>()
                    .HasOne(x => x.InvestorAccount)
-                   .WithMany(x => x.InvestmentRequestses)
+                   .WithMany(x => x.InvestmentRequests)
                    .HasForeignKey(x => x.InvestorAccountId);
 
             builder.Entity<InvestmentRequests>()

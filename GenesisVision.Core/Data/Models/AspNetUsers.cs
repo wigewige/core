@@ -27,6 +27,8 @@ namespace GenesisVision.Core.Data.Models
 
         public ICollection<ManagerAccountRequests> ManagerAccountRequests { get; set; }
 
+        public ICollection<IOTransactions> IOTransactions { get; set; }
+
         public InvestorAccounts InvestorAccount { get; set; }
     }
 }
