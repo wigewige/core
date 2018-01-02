@@ -3,6 +3,7 @@ using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using Ipfs.Api;
 using System.IO;
+using GenesisVision.Core.Helpers;
 
 namespace GenesisVision.Core.Services
 {
