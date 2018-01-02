@@ -18,6 +18,7 @@ namespace GenesisVision.Core.Data.Models
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
         public PeriodStatus Status { get; set; }
+        public decimal StartBalance { get; set; }
 
         public InvestmentPrograms InvestmentProgram { get; set; }
         public Guid InvestmentProgramId { get; set; }

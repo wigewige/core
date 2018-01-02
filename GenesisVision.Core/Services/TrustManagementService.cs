@@ -179,7 +179,16 @@ namespace GenesisVision.Core.Services
                 
                 var nextPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
                 if (nextPeriod != null)
+                {
                     nextPeriod.Status = PeriodStatus.InProccess;
+
+                    var investments = nextPeriod.InvestmentRequests
+                                                .Where(x => x.Type == InvestmentRequestType.Invest &&
+                                                            x.Status == InvestmentRequestStatus.New)
+                                                .ToList();
+                    nextPeriod.StartBalance = investments.Sum(x => x.Amount);
+                    investments.ForEach(x => x.Status = InvestmentRequestStatus.Executed);
+                }
 
                 if (!investment.DateTo.HasValue || DateTime.Now < investment.DateTo.Value)
                 {
@@ -195,6 +204,16 @@ namespace GenesisVision.Core.Services
                     context.Add(newPeriod);
                 }
 
+                context.SaveChanges();
+            });
+        }
+
+        public OperationResult SetPeriodStartBalance(Guid periodId, decimal balance)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var period = context.Periods.First(x => x.Id == periodId);
+                period.StartBalance = balance;
                 context.SaveChanges();
             });
         }

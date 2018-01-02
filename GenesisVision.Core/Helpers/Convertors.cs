@@ -38,6 +38,7 @@ namespace GenesisVision.Core.Helpers
                        DateTo = p.DateTo,
                        Status = p.Status,
                        Number = p.Number,
+                       StartBalance = p.StartBalance,
                        InvestmentRequest = p.InvestmentRequests?.Select(ToInvestmentRequest).ToList() ??
                                            new List<InvestmentRequest>()
                    };

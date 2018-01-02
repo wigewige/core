@@ -81,5 +81,19 @@ namespace GenesisVision.Core.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Set investment period start balance
+        /// </summary>
+        public IActionResult SetPeriodStartBalance(Guid periodId, decimal balance)
+        {
+            var errors = brokerValidator.ValidateSetPeriodStartBalance(User, periodId, balance);
+            if (errors.Any())
+                return BadRequest(OperationResult.Failed(errors));
+
+            var result = trustManagementService.SetPeriodStartBalance(periodId, balance);
+
+            return Ok(result);
+        }
     }
 }

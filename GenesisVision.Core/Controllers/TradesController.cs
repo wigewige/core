@@ -17,6 +17,9 @@ namespace GenesisVision.Core.Controllers
             this.tradesServer = tradesServer;
         }
 
+        /// <summary>
+        /// Get trades by IPFS hash id
+        /// </summary>
         public IActionResult GetTrades(string ipfsHashId)
         {
             var text = ipfsService.GetIpfsText(ipfsHashId);

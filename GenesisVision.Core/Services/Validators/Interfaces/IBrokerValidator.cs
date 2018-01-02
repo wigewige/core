@@ -12,5 +12,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateGetClosingPeriodData(IPrincipal user, Guid investmentProgramId);
 
         List<string> ValidateClosePeriod(IPrincipal user, Guid investmentProgramId);
+
+        List<string> ValidateSetPeriodStartBalance(IPrincipal user, Guid periodId, decimal balance);
     }
 }

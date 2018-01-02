@@ -11,6 +11,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
         public PeriodStatus Status { get; set; }
+        public decimal StartBalance { get; set; }
         public List<InvestmentRequest> InvestmentRequest { get; set; }
     }
 }
