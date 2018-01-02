@@ -72,5 +72,27 @@ namespace GenesisVision.Core.Services.Validators
 
             return new List<string>();
         }
+
+        public List<string> ValidateSetPeriodStartBalance(IPrincipal user, Guid periodId, decimal balance)
+        {
+            var result = new List<string>();
+
+            var period = context.Periods
+                                .Include(x => x.InvestmentRequests)
+                                .FirstOrDefault(x => x.Id == periodId);
+            if (period == null)
+                return new List<string> {$"Does not find period id \"{periodId}\""};
+
+            if (period.Status != PeriodStatus.InProccess)
+                return new List<string> {$"Period has status {period.Status}"};
+
+            var investmentsAmount = period.InvestmentRequests
+                                          .Where(x => x.Type == InvestmentRequestType.Invest)
+                                          .Sum(x => x.Amount);
+            if (balance < investmentsAmount)
+                result.Add("Balance could not be less than total investments");
+            
+            return result;
+        }
     }
 }
