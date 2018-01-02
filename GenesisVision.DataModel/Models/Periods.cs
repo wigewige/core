@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.DataModel.Models
 {
-    public enum PeriodStatus
-    {
-        Planned = 0,
-        InProccess = 1,
-        Closed = 2
-    }
-
     public class Periods
     {
         public Guid Id { get; set; }

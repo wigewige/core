@@ -1,18 +1,8 @@
 ﻿using System;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.DataModel.Models
 {
-    public enum InvestmentRequestType
-    {
-        Invest = 0,
-        Withdrawal = 1
-    }
-
-    public enum InvestmentRequestStatus
-    {
-        New = 0,
-        Executed = 1
-    }
 
     public class InvestmentRequests
     {

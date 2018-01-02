@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 
 namespace GenesisVision.Core.ViewModels.Investment

@@ -8,6 +8,7 @@ using System.Security.Principal;
 using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Helpers;
 using GenesisVision.Core.ViewModels.Broker;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services.Validators
 {

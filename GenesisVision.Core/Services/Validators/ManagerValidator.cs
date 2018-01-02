@@ -8,6 +8,7 @@ using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services.Validators
 {

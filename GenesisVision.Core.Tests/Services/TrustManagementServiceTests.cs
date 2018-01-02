@@ -4,6 +4,7 @@ using GenesisVision.DataModel;
 using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.DataModel.Enums;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 

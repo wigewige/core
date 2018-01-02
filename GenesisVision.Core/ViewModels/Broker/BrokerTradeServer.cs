@@ -1,4 +1,5 @@
 ﻿using System;
+using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 
 namespace GenesisVision.Core.ViewModels.Broker

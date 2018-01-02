@@ -3,19 +3,13 @@ using System;
 
 namespace GenesisVision.DataModel.Models
 {
-    public enum IOTransactionType
-    {
-        Undefined = 0,
-        Input = 1,
-        Output = 2
-    }
 
     public class IOTransactions
     {
         public Guid Id { get; set; }
-        string Currency { get; set; }
-        IOTransactionType Type { get; set; }
-        IOTransactionStatus Status { get; set; }
+        public string Currency { get; set; }
+        public IOTransactionType Type { get; set; }
+        public IOTransactionStatus Status { get; set; }
 
         public AspNetUsers User { get; set; }
         public Guid UserId { get; set; }

@@ -1,13 +1,16 @@
-﻿using GenesisVision.DataModel;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.DataModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace GenesisVision.Core
 {
@@ -25,13 +28,11 @@ namespace GenesisVision.Core
             services.AddMvc();
 
             var connectionString = Configuration["DbContextSettings:ConnectionString"];
-
-            var dbContextOptions = 
-                new System.Action<Microsoft.EntityFrameworkCore.Infrastructure.NpgsqlDbContextOptionsBuilder>(
-                    options => options.MigrationsAssembly("GenesisVision.Core"));
+            var dbContextOptions = new Action<NpgsqlDbContextOptionsBuilder>(options => options.MigrationsAssembly("GenesisVision.Core"));
 
             services.AddEntityFrameworkNpgsql()
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString, dbContextOptions));
+
             var ipfsHost = Configuration["IpfsHost"];
             if (!string.IsNullOrEmpty(ipfsHost) && !string.IsNullOrWhiteSpace(ipfsHost))
                 Constants.IpfsHost = ipfsHost;

@@ -1,5 +1,6 @@
 ﻿using GenesisVision.DataModel.Models;
 using GenesisVision.Core.ViewModels.Other;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.ViewModels.Manager
 {

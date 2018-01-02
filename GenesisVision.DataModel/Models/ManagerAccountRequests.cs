@@ -1,20 +1,8 @@
 ﻿using System;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.DataModel.Models
 {
-    public enum ManagerRequestType
-    {
-        FromCabinet = 0,
-        FromBroker = 1,
-    }
-
-    public enum ManagerRequestStatus
-    {
-        Created = 0,
-        Processed = 1,
-        Declined = 2
-    }
-
     public class ManagerAccountRequests
     {
         public Guid Id { get; set; }

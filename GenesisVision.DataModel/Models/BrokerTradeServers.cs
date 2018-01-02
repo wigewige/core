@@ -1,19 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.DataModel.Models
 {
-    public enum BrokerTradeServerType
-    {
-        Undefined = 0,
-        MetaTrader4 = 1,
-        MetaTrader5 = 2,
-        NinjaTrader = 3,
-        cTrader = 4,
-        Rumus = 5,
-        Metastock = 6,
-    }
-
     public class BrokerTradeServers
     {
         public Guid Id { get; set; }

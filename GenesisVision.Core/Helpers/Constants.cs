@@ -1,4 +1,4 @@
-﻿namespace GenesisVision.DataModel
+﻿namespace GenesisVision.Core.Helpers
 {
     public static class Constants
     {

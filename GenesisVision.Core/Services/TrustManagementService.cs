@@ -9,6 +9,7 @@ using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace GenesisVision.Core.Services
