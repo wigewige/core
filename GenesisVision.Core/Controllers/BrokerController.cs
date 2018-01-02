@@ -67,5 +67,19 @@ namespace GenesisVision.Core.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Close investment period
+        /// </summary>
+        public IActionResult ClosePeriod(Guid investmentProgramId)
+        {
+            var errors = brokerValidator.ValidateClosePeriod(User, investmentProgramId);
+            if (errors.Any())
+                return BadRequest(OperationResult.Failed(errors));
+
+            var result = trustManagementService.ClosePeriod(investmentProgramId);
+
+            return Ok(result);
+        }
     }
 }

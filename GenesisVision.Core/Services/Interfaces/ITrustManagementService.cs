@@ -18,5 +18,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult<List<Investment>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
 
         OperationResult<ClosePeriodData> GetClosingPeriodData(Guid investmentProgramId);
+
+        OperationResult ClosePeriod(Guid investmentProgramId);
     }
 }

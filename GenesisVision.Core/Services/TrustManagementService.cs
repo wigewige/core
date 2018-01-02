@@ -162,5 +162,41 @@ namespace GenesisVision.Core.Services
                 return data;
             });
         }
+
+        public OperationResult ClosePeriod(Guid investmentProgramId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var investment = context.InvestmentPrograms
+                                        .Include(x => x.Periods)
+                                        .ThenInclude(x => x.InvestmentRequests)
+                                        .First(x => x.Id == investmentProgramId);
+
+                var currentPeriod = investment.Periods.First(x => x.Status == PeriodStatus.InProccess);
+                currentPeriod.Status = PeriodStatus.Closed;
+
+                // todo: proportional accrual of money
+                
+                var nextPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
+                if (nextPeriod != null)
+                    nextPeriod.Status = PeriodStatus.InProccess;
+
+                if (!investment.DateTo.HasValue || DateTime.Now < investment.DateTo.Value)
+                {
+                    var newPeriod = new Periods
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        DateFrom = DateTime.Now,
+                                        DateTo = DateTime.Now.AddDays(investment.Period),
+                                        InvestmentProgramId = investmentProgramId,
+                                        Number = investment.Periods.Max(x => x.Number) + 1,
+                                        Status = PeriodStatus.Planned
+                                    };
+                    context.Add(newPeriod);
+                }
+
+                context.SaveChanges();
+            });
+        }
     }
 }
