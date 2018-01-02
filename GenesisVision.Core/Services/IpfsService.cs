@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Data;
+﻿using GenesisVision.DataModel;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using Ipfs.Api;

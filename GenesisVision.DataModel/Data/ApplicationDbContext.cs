@@ -1,7 +1,7 @@
-﻿using GenesisVision.Core.Data.Models;
+﻿using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GenesisVision.Core.Data
+namespace GenesisVision.DataModel
 {
     public class ApplicationDbContext : DbContext
     {

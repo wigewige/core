@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Data;
+﻿using GenesisVision.DataModel;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators;

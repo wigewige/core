@@ -1,11 +1,11 @@
-﻿using GenesisVision.Core.Data;
+﻿using GenesisVision.DataModel;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using GenesisVision.Core.Data.Models;
+using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Helpers;
 using GenesisVision.Core.ViewModels.Broker;
 

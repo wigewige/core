@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Data.Models;
+﻿using GenesisVision.DataModel.Models;
 using GenesisVision.Core.ViewModels.Other;
 
 namespace GenesisVision.Core.ViewModels.Manager

@@ -1,5 +1,5 @@
 ﻿using System;
-using GenesisVision.Core.Data.Models;
+using GenesisVision.DataModel.Models;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {

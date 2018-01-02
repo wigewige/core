@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GenesisVision.Core\GenesisVision.Core.csproj" />
+    <ProjectReference Include="..\GenesisVision.DataModel\GenesisVision.DataModel.csproj" />
   </ItemGroup>
 
 </Project>

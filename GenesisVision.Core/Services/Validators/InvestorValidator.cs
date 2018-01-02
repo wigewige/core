@@ -1,5 +1,5 @@
-﻿using GenesisVision.Core.Data;
-using GenesisVision.Core.Data.Models;
+﻿using GenesisVision.DataModel;
+using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using Microsoft.EntityFrameworkCore;

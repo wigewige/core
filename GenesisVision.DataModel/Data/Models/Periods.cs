@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace GenesisVision.Core.Data.Models
+namespace GenesisVision.DataModel.Models
 {
     public enum PeriodStatus
     {

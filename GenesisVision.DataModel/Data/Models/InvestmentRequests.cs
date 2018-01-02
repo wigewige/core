@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenesisVision.Core.Data.Models
+namespace GenesisVision.DataModel.Models
 {
     public enum InvestmentRequestType
     {

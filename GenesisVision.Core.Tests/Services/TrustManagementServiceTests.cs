@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using GenesisVision.Core.Data;
-using GenesisVision.Core.Data.Models;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;

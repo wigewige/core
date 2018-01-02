@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Data.Models;
+﻿using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Trades;

@@ -1,4 +1,4 @@
-﻿namespace GenesisVision.Core.Data.Enums
+﻿namespace GenesisVision.DataModel.Enums
 {
     public enum IOTransactionStatus
     {

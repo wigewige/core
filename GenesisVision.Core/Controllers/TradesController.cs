@@ -1,5 +1,4 @@
-﻿using GenesisVision.Core.Data;
-using GenesisVision.Core.Services.Interfaces;
+﻿using GenesisVision.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

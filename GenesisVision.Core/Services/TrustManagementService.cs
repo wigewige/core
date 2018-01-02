@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenesisVision.Core.Data;
-using GenesisVision.Core.Data.Models;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Models;
 using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
