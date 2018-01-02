@@ -25,9 +25,13 @@ namespace GenesisVision.Core
             services.AddMvc();
 
             var connectionString = Configuration["DbContextSettings:ConnectionString"];
-            services.AddEntityFrameworkNpgsql()
-                    .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString));
 
+            var dbContextOptions = 
+                new System.Action<Microsoft.EntityFrameworkCore.Infrastructure.NpgsqlDbContextOptionsBuilder>(
+                    options => options.MigrationsAssembly("GenesisVision.Core"));
+
+            services.AddEntityFrameworkNpgsql()
+                    .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString, dbContextOptions));
             var ipfsHost = Configuration["IpfsHost"];
             if (!string.IsNullOrEmpty(ipfsHost) && !string.IsNullOrWhiteSpace(ipfsHost))
                 Constants.IpfsHost = ipfsHost;
