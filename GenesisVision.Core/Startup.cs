@@ -4,8 +4,11 @@ using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.DataModel;
+using GenesisVision.DataModel.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +36,20 @@ namespace GenesisVision.Core
             services.AddEntityFrameworkNpgsql()
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString, dbContextOptions));
 
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultTokenProviders();
+
+            services.AddAuthentication(options =>
+                    {
+                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    })
+                    .AddJwtBearer(options =>
+                    {
+                        options.Audience = "http://localhost:5001/";
+                        options.Authority = "http://localhost:5000/";
+                    });
+
             var ipfsHost = Configuration["IpfsHost"];
             if (!string.IsNullOrEmpty(ipfsHost) && !string.IsNullOrWhiteSpace(ipfsHost))
                 Constants.IpfsHost = ipfsHost;
@@ -56,6 +73,8 @@ namespace GenesisVision.Core
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

@@ -38,10 +38,7 @@ namespace GenesisVision.Core.Tests.Validators
 
             aspNetUser = new AspNetUsers
                          {
-                             Id = Guid.NewGuid(),
-                             AccessFailedCount = 0,
-                             Email = "test@test.com",
-                             EmailConfirmed = true,
+                             Id = Guid.NewGuid()
                          };
             broker = new Brokers
                      {

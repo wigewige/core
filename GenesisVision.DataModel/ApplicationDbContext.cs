@@ -1,12 +1,13 @@
 ﻿using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace GenesisVision.DataModel
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(DbContextOptions options)
             : base(options)
         {
         }
@@ -26,6 +27,12 @@ namespace GenesisVision.DataModel
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<ApplicationUser>()
+                   .HasOne(x => x.AspNetUsers)
+                   .WithOne(x => x.ApplicationUser)
+                   .HasForeignKey<AspNetUsers>(x => x.Id);
+
 
             builder.Entity<ManagerAccounts>()
                    .HasOne(x => x.User)
