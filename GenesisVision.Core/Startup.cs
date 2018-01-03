@@ -1,4 +1,5 @@
 ﻿using GenesisVision.Core.Helpers;
+using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators;
@@ -13,7 +14,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Threading.Tasks;
 
 namespace GenesisVision.Core
 {
@@ -28,7 +31,7 @@ namespace GenesisVision.Core
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            ConfigureConstants();
 
             var connectionString = Configuration["DbContextSettings:ConnectionString"];
             var dbContextOptions = new Action<NpgsqlDbContextOptionsBuilder>(options => options.MigrationsAssembly("GenesisVision.Core"));
@@ -40,21 +43,52 @@ namespace GenesisVision.Core
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
 
-            services.AddAuthentication(options =>
-                    {
-                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    })
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
-                        options.Audience = "http://localhost:5001/";
-                        options.Authority = "http://localhost:5000/";
-                    });
+                        options.TokenValidationParameters = new TokenValidationParameters
+                                                            {
+                                                                ValidateIssuer = true,
+                                                                ValidateAudience = true,
+                                                                ValidateLifetime = true,
+                                                                ValidateIssuerSigningKey = true,
 
+                                                                ValidIssuer = "GenesisVision.Core",
+                                                                ValidAudience = "GenesisVision.Core",
+                                                                IssuerSigningKey = JwtSecurityKey.Create(Constants.SecretKey)
+                                                            };
+
+                        options.Events = new JwtBearerEvents
+                                         {
+                                             OnAuthenticationFailed = context =>
+                                             {
+                                                 Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+                                                 return Task.CompletedTask;
+                                             },
+                                             OnTokenValidated = context =>
+                                             {
+                                                 Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+                                                 return Task.CompletedTask;
+                                             }
+                                         };
+                    });
+            
+            services.AddMvc();
+            
+            ConfigureCustomServices(services);
+        }
+
+        private void ConfigureConstants()
+        {
             var ipfsHost = Configuration["IpfsHost"];
             if (!string.IsNullOrEmpty(ipfsHost) && !string.IsNullOrWhiteSpace(ipfsHost))
                 Constants.IpfsHost = ipfsHost;
 
+            Constants.SecretKey = Configuration["SecretKey"];
+        }
 
+        private void ConfigureCustomServices(IServiceCollection services)
+        {
             services.AddTransient<ITrustManagementService, TrustManagementService>();
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
@@ -66,7 +100,7 @@ namespace GenesisVision.Core
 
             services.AddSingleton<IIpfsService, IpfsService>();
         }
-        
+
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -76,12 +110,7 @@ namespace GenesisVision.Core
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
