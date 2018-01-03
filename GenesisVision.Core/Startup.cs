@@ -9,6 +9,7 @@ using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -48,6 +49,9 @@ namespace GenesisVision.Core
                     {
                         options.TokenValidationParameters = new TokenValidationParameters
                                                             {
+                                                                RequireExpirationTime = true,
+                                                                RequireSignedTokens = true,
+
                                                                 ValidateIssuer = true,
                                                                 ValidateAudience = true,
                                                                 ValidateLifetime = true,
@@ -57,7 +61,8 @@ namespace GenesisVision.Core
                                                                 ValidAudience = "GenesisVision.Core",
                                                                 IssuerSigningKey = JwtSecurityKey.Create(Constants.SecretKey)
                                                             };
-
+                        //options.RequireHttpsMetadata = true; todo: enable it
+                        options.SaveToken = true;
                         options.Events = new JwtBearerEvents
                                          {
                                              OnAuthenticationFailed = context =>
@@ -72,8 +77,9 @@ namespace GenesisVision.Core
                                              }
                                          };
                     });
-            
-            services.AddMvc();
+
+            services.AddMvcCore()
+                    .AddJsonFormatters();
             
             ConfigureCustomServices(services);
         }
@@ -99,6 +105,7 @@ namespace GenesisVision.Core
             services.AddTransient<IInvestorValidator, InvestorValidator>();
 
             services.AddSingleton<IIpfsService, IpfsService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

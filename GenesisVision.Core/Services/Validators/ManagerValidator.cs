@@ -31,7 +31,7 @@ namespace GenesisVision.Core.Services.Validators
 
             if (request.UserId.HasValue)
             {
-                var aspNetUser = context.AspNetUsers.FirstOrDefault(x => x.Id == request.UserId.Value);
+                var aspNetUser = context.Users.FirstOrDefault(x => x.Id == request.UserId.Value);
                 if (aspNetUser == null)
                 {
                     result.Add("Does not find user");

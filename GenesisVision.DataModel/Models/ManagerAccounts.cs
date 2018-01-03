@@ -16,7 +16,7 @@ namespace GenesisVision.DataModel.Models
         public DateTime RegistrationDate { get; set; }
         public string IpfsHash { get; set; }
         
-        public AspNetUsers User { get; set; }
+        public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
 
         public BrokerTradeServers BrokerTradeServer { get; set; }

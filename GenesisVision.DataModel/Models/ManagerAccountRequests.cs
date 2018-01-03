@@ -14,7 +14,7 @@ namespace GenesisVision.DataModel.Models
         public string Currency { get; set; }
         public ManagerRequestStatus Status { get; set; }
 
-        public AspNetUsers User { get; set; }
+        public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
 
         public BrokerTradeServers BrokerTradeServers { get; set; }

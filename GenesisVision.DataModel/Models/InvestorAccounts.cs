@@ -10,7 +10,7 @@ namespace GenesisVision.DataModel.Models
 
         public Portfolios Portfolio { get; set; }
 
-        public AspNetUsers User { get; set; }
+        public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
