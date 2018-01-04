@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using GenesisVision.Core.Helpers;
-using GenesisVision.Core.Helpers.TokenHelper;
+﻿using GenesisVision.Core.Helpers.TokenHelper;
+using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -18,12 +12,14 @@ namespace GenesisVision.Core.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly IEmailSender emailSender;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender)
             : base(userManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.emailSender = emailSender;
         }
 
         [HttpPost]
@@ -34,7 +30,10 @@ namespace GenesisVision.Core.Controllers
 
             var user = await userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return BadRequest($"User with email '{model.Email}' not found");
+                return BadRequest($"Wrong email/password");
+
+            if (!await userManager.IsEmailConfirmedAsync(user))
+                return BadRequest("Email does not confirmed");
 
             var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
             if (result.Succeeded)
@@ -43,7 +42,7 @@ namespace GenesisVision.Core.Controllers
                 return Ok(token.Value);
             }
 
-            return BadRequest();
+            return BadRequest($"Wrong email/password");
         }
 
         [HttpPost]
@@ -57,16 +56,27 @@ namespace GenesisVision.Core.Controllers
                 {
                     var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     
-                    // todo
-                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code = code}, protocol: HttpContext.Request.Scheme);
-                    //emailSender.SendEmail(model.Email, callbackUrl);
-
-                    var confirm = await userManager.ConfirmEmailAsync(user, code);
-
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
+                    var text = $"Confirmation url: {callbackUrl}";
+                    emailSender.SendEmailAsync(model.Email, "Registration", text, text);
+                    
                     return Ok();
                 }
             }
-            
+
+            return BadRequest();
+        }
+        
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+                return BadRequest($"Empty userId/code");
+
+            var user = await userManager.FindByIdAsync(userId);
+            var result = await userManager.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+                return Ok();
+
             return BadRequest();
         }
     }

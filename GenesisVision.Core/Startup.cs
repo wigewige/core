@@ -40,7 +40,14 @@ namespace GenesisVision.Core
             services.AddEntityFrameworkNpgsql()
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString, dbContextOptions));
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+                    {
+                        options.Password.RequiredLength = 6;
+                        options.Password.RequireLowercase = false;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireDigit = false;
+                    })
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
 
@@ -90,6 +97,11 @@ namespace GenesisVision.Core
             if (!string.IsNullOrEmpty(ipfsHost) && !string.IsNullOrWhiteSpace(ipfsHost))
                 Constants.IpfsHost = ipfsHost;
 
+            var gethHost = Configuration["GethHost"];
+            if (!string.IsNullOrEmpty(gethHost) && !string.IsNullOrWhiteSpace(gethHost))
+                Constants.GethHost = gethHost;
+
+
             Constants.JwtValidIssuer = Configuration["JWT:ValidIssuer"];
             Constants.JwtValidAudience = Configuration["JWT:ValidAudience"];
             Constants.JwtSecretKey = Configuration["JWT:SecretKey"];
@@ -97,6 +109,11 @@ namespace GenesisVision.Core
             var expiryInMinutesStr = Configuration["JWT:ExpiryInMinutes"];
             if (!string.IsNullOrEmpty(expiryInMinutesStr) && int.TryParse(expiryInMinutesStr, out var expiryInMinutes))
                 Constants.JwtExpiryInMinutes = expiryInMinutes;
+
+
+            Constants.SendGridApiKey = Configuration["EmailSender:SendGrid:ApiKey"];
+            Constants.SendGridFromEmail = Configuration["EmailSender:SendGrid:FromEmail"];
+            Constants.SendGridFromName = Configuration["EmailSender:SendGrid:FromName"];
         }
 
         private void ConfigureCustomServices(IServiceCollection services)
@@ -105,6 +122,7 @@ namespace GenesisVision.Core
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
             services.AddTransient<ITradesService, TradesService>();
+            services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddTransient<IManagerValidator, ManagerValidator>();
             services.AddTransient<IBrokerValidator, BrokerValidator>();
