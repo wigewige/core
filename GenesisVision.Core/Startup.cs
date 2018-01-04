@@ -57,9 +57,9 @@ namespace GenesisVision.Core
                                                                 ValidateLifetime = true,
                                                                 ValidateIssuerSigningKey = true,
 
-                                                                ValidIssuer = "GenesisVision.Core",
-                                                                ValidAudience = "GenesisVision.Core",
-                                                                IssuerSigningKey = JwtSecurityKey.Create(Constants.SecretKey)
+                                                                ValidIssuer = Constants.JwtValidIssuer,
+                                                                ValidAudience = Constants.JwtValidAudience,
+                                                                IssuerSigningKey = JwtSecurityKey.Create(Constants.JwtSecretKey)
                                                             };
                         //options.RequireHttpsMetadata = true; todo: enable it
                         options.SaveToken = true;
@@ -90,7 +90,13 @@ namespace GenesisVision.Core
             if (!string.IsNullOrEmpty(ipfsHost) && !string.IsNullOrWhiteSpace(ipfsHost))
                 Constants.IpfsHost = ipfsHost;
 
-            Constants.SecretKey = Configuration["SecretKey"];
+            Constants.JwtValidIssuer = Configuration["JWT:ValidIssuer"];
+            Constants.JwtValidAudience = Configuration["JWT:ValidAudience"];
+            Constants.JwtSecretKey = Configuration["JWT:SecretKey"];
+
+            var expiryInMinutesStr = Configuration["JWT:ExpiryInMinutes"];
+            if (!string.IsNullOrEmpty(expiryInMinutesStr) && int.TryParse(expiryInMinutesStr, out var expiryInMinutes))
+                Constants.JwtExpiryInMinutes = expiryInMinutes;
         }
 
         private void ConfigureCustomServices(IServiceCollection services)

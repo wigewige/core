@@ -6,25 +6,29 @@ using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GenesisVision.Core.Controllers
 {
     //[Authorize]
-    public class ManagerController : Controller
+    public class ManagerController : BaseController
     {
         private readonly ITrustManagementService trustManagementService;
         private readonly IManagerService managerService;
         private readonly IManagerValidator managerValidator;
 
-        public ManagerController(ITrustManagementService trustManagementService, IManagerService managerService, IManagerValidator managerValidator)
+        public ManagerController(ITrustManagementService trustManagementService, IManagerService managerService,
+            IManagerValidator managerValidator, UserManager<ApplicationUser> userManager)
+            : base(userManager)
         {
             this.trustManagementService = trustManagementService;
             this.managerService = managerService;
             this.managerValidator = managerValidator;
         }
-        
+
         /// <summary>
         /// Create request (from cabinet, broker)
         /// </summary>

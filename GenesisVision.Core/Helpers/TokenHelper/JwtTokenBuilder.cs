@@ -82,7 +82,7 @@ namespace GenesisVision.Core.Helpers.TokenHelper
         private void EnsureArguments()
         {
             if (securityKey == null)
-                throw new ArgumentNullException($"Security Key");
+                throw new ArgumentNullException($"Security key");
 
             if (string.IsNullOrEmpty(subject))
                 throw new ArgumentNullException($"Subject");

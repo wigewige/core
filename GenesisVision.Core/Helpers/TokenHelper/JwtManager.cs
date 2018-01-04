@@ -7,11 +7,13 @@ namespace GenesisVision.Core.Helpers.TokenHelper
         public static JwtToken GenerateToken(ApplicationUser user)
         {
             var token = new JwtTokenBuilder()
-                .AddSecurityKey(JwtSecurityKey.Create(Constants.SecretKey))
-                .AddSubject("UserName")
-                .AddIssuer("GenesisVision.Core")
-                .AddAudience("GenesisVision.Core")
-                .AddExpiry(1)
+                .AddSecurityKey(JwtSecurityKey.Create(Constants.JwtSecretKey))
+                .AddSubject(user.UserName)
+                .AddClaim("userId", user.Id.ToString())
+                .AddClaim("userName", user.UserName)
+                .AddIssuer(Constants.JwtValidIssuer)
+                .AddAudience(Constants.JwtValidAudience)
+                .AddExpiry(Constants.JwtExpiryInMinutes)
                 .Build();
 
             return token;
