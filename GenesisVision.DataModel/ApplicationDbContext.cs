@@ -1,17 +1,17 @@
 ﻿using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace GenesisVision.DataModel
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(DbContextOptions options)
             : base(options)
         {
         }
-
-        public DbSet<AspNetUsers> AspNetUsers { get; set; }
+        
         public DbSet<Brokers> Brokers { get; set; }
         public DbSet<BrokerTradeServers> BrokerTradeServers { get; set; }
         public DbSet<ManagerAccounts> ManagersAccounts { get; set; }
@@ -26,7 +26,7 @@ namespace GenesisVision.DataModel
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            
             builder.Entity<ManagerAccounts>()
                    .HasOne(x => x.User)
                    .WithMany(x => x.ManagerAccounts)
@@ -103,7 +103,7 @@ namespace GenesisVision.DataModel
                    .HasForeignKey(x => x.InvestmentProgramId);
 
 
-            builder.Entity<AspNetUsers>()
+            builder.Entity<ApplicationUser>()
                    .HasOne(x => x.InvestorAccount)
                    .WithOne(x => x.User)
                    .HasForeignKey<InvestorAccounts>(x => x.UserId);

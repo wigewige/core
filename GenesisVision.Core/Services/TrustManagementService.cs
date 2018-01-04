@@ -71,9 +71,8 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var investor = context.AspNetUsers
-                                      .Include(x => x.InvestorAccount)
-                                      .First(x => x.Id == model.UserId);
+                var investor = context.InvestorAccounts
+                                      .First(x => x.UserId == model.UserId);
 
                 var lastPeriod = context.Periods
                                         .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
@@ -90,7 +89,7 @@ namespace GenesisVision.Core.Services
                                      Status = InvestmentRequestStatus.New,
                                      Type = InvestmentRequestType.Invest,
                                      PeriodId = lastPeriod.Id,
-                                     InvestorAccountId = investor.InvestorAccount.Id
+                                     InvestorAccountId = investor.Id
                                  };
 
                 context.Add(invRequest);

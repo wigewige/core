@@ -12,7 +12,7 @@ namespace GenesisVision.DataModel.Models
         public InvestmentRequestType Type { get; set; }
         public InvestmentRequestStatus Status { get; set; }
 
-        public AspNetUsers User { get; set; }
+        public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
 
         public InvestmentPrograms InvestmentProgram { get; set; }

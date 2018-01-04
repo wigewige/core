@@ -12,9 +12,10 @@ using System;
 namespace GenesisVision.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180102151724_Auth")]
+    partial class Auth
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,6 +91,15 @@ namespace GenesisVision.Core.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("GenesisVision.DataModel.Models.AspNetUsers", b =>
+                {
+                    b.Property<Guid>("Id");
+
+                    b.HasKey("Id");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -458,6 +468,14 @@ namespace GenesisVision.Core.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("GenesisVision.DataModel.Models.AspNetUsers", b =>
+                {
+                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("AspNetUsers")
+                        .HasForeignKey("GenesisVision.DataModel.Models.AspNetUsers", "Id")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("GenesisVision.DataModel.Models.BrokerTradeServers", b =>
                 {
                     b.HasOne("GenesisVision.DataModel.Models.Brokers", "Broker")
@@ -496,7 +514,7 @@ namespace GenesisVision.Core.Migrations
                         .HasForeignKey("PeriodId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
+                    b.HasOne("GenesisVision.DataModel.Models.AspNetUsers", "User")
                         .WithMany("InvestmentRequests")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -504,7 +522,7 @@ namespace GenesisVision.Core.Migrations
 
             modelBuilder.Entity("GenesisVision.DataModel.Models.InvestorAccounts", b =>
                 {
-                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
+                    b.HasOne("GenesisVision.DataModel.Models.AspNetUsers", "User")
                         .WithOne("InvestorAccount")
                         .HasForeignKey("GenesisVision.DataModel.Models.InvestorAccounts", "UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -512,7 +530,7 @@ namespace GenesisVision.Core.Migrations
 
             modelBuilder.Entity("GenesisVision.DataModel.Models.IOTransactions", b =>
                 {
-                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
+                    b.HasOne("GenesisVision.DataModel.Models.AspNetUsers", "User")
                         .WithMany("IOTransactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -525,7 +543,7 @@ namespace GenesisVision.Core.Migrations
                         .HasForeignKey("BrokerTradeServerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
+                    b.HasOne("GenesisVision.DataModel.Models.AspNetUsers", "User")
                         .WithMany("ManagerAccountRequests")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -538,7 +556,7 @@ namespace GenesisVision.Core.Migrations
                         .HasForeignKey("BrokerTradeServerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
+                    b.HasOne("GenesisVision.DataModel.Models.AspNetUsers", "User")
                         .WithMany("ManagerAccounts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

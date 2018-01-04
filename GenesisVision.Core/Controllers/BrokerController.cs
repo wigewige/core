@@ -10,17 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GenesisVision.DataModel.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace GenesisVision.Core.Controllers
 {
     //[Authorize]
-    public class BrokerController : Controller
+    public class BrokerController : BaseController
     {
         private readonly IManagerService managerService;
         private readonly ITrustManagementService trustManagementService;
         private readonly IBrokerValidator brokerValidator;
 
-        public BrokerController(IManagerService managerService, ITrustManagementService trustManagementService, IBrokerValidator brokerValidator)
+        public BrokerController(IManagerService managerService, ITrustManagementService trustManagementService,
+            IBrokerValidator brokerValidator, UserManager<ApplicationUser> userManager)
+            : base(userManager)
         {
             this.managerService = managerService;
             this.trustManagementService = trustManagementService;

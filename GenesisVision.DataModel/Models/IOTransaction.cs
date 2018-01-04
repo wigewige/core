@@ -11,7 +11,7 @@ namespace GenesisVision.DataModel.Models
         public IOTransactionType Type { get; set; }
         public IOTransactionStatus Status { get; set; }
 
-        public AspNetUsers User { get; set; }
+        public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
 
         public UserWallets UserWallet { get; set; }

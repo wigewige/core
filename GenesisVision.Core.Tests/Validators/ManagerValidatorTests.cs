@@ -21,8 +21,8 @@ namespace GenesisVision.Core.Tests.Validators
 
         private ApplicationDbContext context;
 
+        private ApplicationUser applicationUser;
         private IPrincipal user;
-        private AspNetUsers aspNetUser;
         private Brokers broker;
         private BrokerTradeServers brokerTradeServer;
         private ManagerAccounts managerAccountWithProgram;
@@ -36,13 +36,10 @@ namespace GenesisVision.Core.Tests.Validators
             optionsBuilder.UseInMemoryDatabase("databaseManagerValidator");
             context = new ApplicationDbContext(optionsBuilder.Options);
 
-            aspNetUser = new AspNetUsers
-                         {
-                             Id = Guid.NewGuid(),
-                             AccessFailedCount = 0,
-                             Email = "test@test.com",
-                             EmailConfirmed = true,
-                         };
+            applicationUser = new ApplicationUser
+                              {
+                                  Id = Guid.NewGuid()
+                              };
             broker = new Brokers
                      {
                          Id = Guid.NewGuid(),
@@ -73,8 +70,8 @@ namespace GenesisVision.Core.Tests.Validators
                                  Login = "111111",
                                  Rating = 0m,
                                  RegistrationDate = DateTime.Now,
-                                 UserId = aspNetUser.Id
-                             };
+                                 UserId = applicationUser.Id
+            };
             managerAccountWithProgram = new ManagerAccounts
                                         {
                                             Id = Guid.NewGuid(),
@@ -87,8 +84,8 @@ namespace GenesisVision.Core.Tests.Validators
                                             Login = "111111",
                                             Rating = 0m,
                                             RegistrationDate = DateTime.Now,
-                                            UserId = aspNetUser.Id
-                                        };
+                                            UserId = applicationUser.Id
+            };
             investmentPrograms = new InvestmentPrograms
                                  {
                                      Id = Guid.NewGuid(),
@@ -104,8 +101,8 @@ namespace GenesisVision.Core.Tests.Validators
                                      InvestMinAmount = 500,
                                      InvestMaxAmount = 1500
                                  };
-
-            context.Add(aspNetUser);
+            
+            context.Add(applicationUser);
             context.Add(broker);
             context.Add(brokerTradeServer);
             context.Add(managerAccountWithProgram);
@@ -141,7 +138,7 @@ namespace GenesisVision.Core.Tests.Validators
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
-                    UserId = aspNetUser.Id
+                    UserId = applicationUser.Id
                 });
             Assert.IsTrue(res1.All(x => x != errorMsg));
 
@@ -171,7 +168,7 @@ namespace GenesisVision.Core.Tests.Validators
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
-                    UserId = aspNetUser.Id,
+                    UserId = applicationUser.Id,
                     Name = "Manager #1"
                 });
             Assert.IsTrue(res1.All(x => x != errorMsg));
@@ -180,7 +177,7 @@ namespace GenesisVision.Core.Tests.Validators
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
-                    UserId = aspNetUser.Id,
+                    UserId = applicationUser.Id,
                     Name = ""
                 });
             Assert.IsTrue(res2.Any(x => x == errorMsg));
@@ -306,21 +303,21 @@ namespace GenesisVision.Core.Tests.Validators
             Assert.IsTrue(res1.Any(x => x.Contains("Does not find request")));
 
             var requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = aspNetUser.Id, Status = ManagerRequestStatus.Declined});
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Declined});
             context.SaveChanges();
 
             var res2 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
             Assert.IsTrue(res2.Any(x => x.Contains("Could not proccess request")));
 
             requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = aspNetUser.Id, Status = ManagerRequestStatus.Processed});
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Processed});
             context.SaveChanges();
 
             var res3 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
             Assert.IsTrue(res3.Any(x => x.Contains("Could not proccess request")));
 
             requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = aspNetUser.Id, Status = ManagerRequestStatus.Created});
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Created});
             context.SaveChanges();
 
             var res4 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
