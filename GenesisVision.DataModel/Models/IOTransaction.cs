@@ -13,5 +13,11 @@ namespace GenesisVision.DataModel.Models
 
         public AspNetUsers User { get; set; }
         public Guid UserId { get; set; }
+
+        public UserWallets UserWallet { get; set; }
+        public Guid? UserWalletId { get; set; }
+
+        public DateTime CreationDate { get; set; }
+        public DateTime ConfirmationDate { get; set; }
     }
 }
