@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Helpers.TokenHelper;
+﻿using System.Linq;
+using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Models;
@@ -11,38 +12,40 @@ namespace GenesisVision.Core.Controllers
     public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IEmailSender emailSender;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender)
+        public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
             : base(userManager)
         {
             this.userManager = userManager;
-            this.signInManager = signInManager;
             this.emailSender = emailSender;
         }
 
         [HttpPost]
         public async Task<IActionResult> Authorize([FromBody]LoginViewModel model)
         {
-            if (string.IsNullOrEmpty(model?.Email) || string.IsNullOrEmpty(model?.Password))
-                return BadRequest($"Empty email/password");
-
-            var user = await userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                return BadRequest($"Wrong email/password");
-
-            if (!await userManager.IsEmailConfirmedAsync(user))
-                return BadRequest("Email does not confirmed");
-
-            var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
-            if (result.Succeeded)
+            if (ModelState.IsValid)
             {
-                var token = JwtManager.GenerateToken(user);
-                return Ok(token.Value);
+                var user = await userManager.FindByNameAsync(model.Username);
+                if (user == null)
+                    return BadRequest($"Wrong username/password");
+
+                if (!await userManager.IsEmailConfirmedAsync(user))
+                    return BadRequest("Email does not confirmed");
+
+                if (await userManager.CheckPasswordAsync(user, model.Password))
+                {
+                    var token = JwtManager.GenerateToken(user);
+                    return Ok(token.Value);
+                }
+            }
+            else
+            {
+                var errors = ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage));
+                return BadRequest(errors);
             }
 
-            return BadRequest($"Wrong email/password");
+            return BadRequest($"Wrong username/password");
         }
 
         [HttpPost]
@@ -52,19 +55,20 @@ namespace GenesisVision.Core.Controllers
             {
                 var user = new ApplicationUser {UserName = model.Username, Email = model.Email, IsEnabled = true};
                 var result = await userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors.Select(x => x.Description));
+
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
-                    var text = $"Confirmation url: {callbackUrl}";
-                    emailSender.SendEmailAsync(model.Email, "Registration", text, text);
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
+                var text = $"Confirmation url: {callbackUrl}";
+                emailSender.SendEmailAsync(model.Email, "Registration", text, text);
                     
-                    return Ok();
-                }
+                return Ok();
             }
 
-            return BadRequest();
+            var errors = ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage));
+            return BadRequest(errors);
         }
         
         public async Task<IActionResult> ConfirmEmail(string userId, string code)

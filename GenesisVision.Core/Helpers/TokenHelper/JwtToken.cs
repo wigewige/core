@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GenesisVision.Core.Helpers.TokenHelper
 {
     public sealed class JwtToken
     {
-        private readonly JwtSecurityToken token;
+        private readonly SecurityToken token;
 
-        internal JwtToken(JwtSecurityToken token)
+        internal JwtToken(SecurityToken token)
         {
             this.token = token;
         }

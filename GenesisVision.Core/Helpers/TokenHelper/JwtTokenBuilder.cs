@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 
 namespace GenesisVision.Core.Helpers.TokenHelper
 {
@@ -57,26 +58,25 @@ namespace GenesisVision.Core.Helpers.TokenHelper
             this.expiryInMinutes = expiryInMinutes;
             return this;
         }
-
+        
         public JwtToken Build()
         {
             EnsureArguments();
 
-            var claims = new List<Claim>
-                         {
-                             new Claim(JwtRegisteredClaimNames.Sub, subject),
-                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                         }
-                .Union(this.claims.Select(item => new Claim(item.Key, item.Value)));
+            var identity = new ClaimsIdentity(
+                new GenericIdentity(subject, "TokenAuth"),
+                claims.Select(item => new Claim(item.Key, item.Value)));
 
-            var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(expiryInMinutes),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256));
-
-            return new JwtToken(token);
+            var securityToken = new JwtSecurityTokenHandler()
+                .CreateToken(new SecurityTokenDescriptor
+                             {
+                                 Subject = identity,
+                                 Issuer = issuer,
+                                 Audience = audience,
+                                 SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256),
+                                 Expires = DateTime.UtcNow.AddMinutes(expiryInMinutes)
+                             });
+            return new JwtToken(securityToken);
         }
         
         private void EnsureArguments()
