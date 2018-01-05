@@ -12,6 +12,9 @@ namespace GenesisVision.DataModel.Models
         public string Description { get; set; }
         public string Avatar { get; set; }
         public string Currency { get; set; }
+        public string TokenName { get; set; }
+        public string TokenSymbol { get; set; }
+
         public ManagerRequestStatus Status { get; set; }
 
         public ApplicationUser User { get; set; }

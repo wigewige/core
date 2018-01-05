@@ -17,11 +17,13 @@ namespace GenesisVision.Core.Services
     {
         private readonly ApplicationDbContext context;
         private readonly IIpfsService ipfsService;
+        private readonly ISmartContractService smartContractService;
 
-        public ManagerService(ApplicationDbContext context, IIpfsService ipfsService)
+        public ManagerService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService)
         {
             this.context = context;
             this.ipfsService = ipfsService;
+            this.smartContractService = smartContractService;
         }
 
         public OperationResult<Guid> CreateManagerAccountRequest(NewManagerRequest request)
@@ -45,6 +47,8 @@ namespace GenesisVision.Core.Services
                               Avatar = string.Empty,
                               BrokerTradeServerId = request.BrokerTradeServerId,
                               Currency = request.Currency,
+                              TokenName = request.TokenName,
+                              TokenSymbol = request.TokenSymbol,
                               Description = request.Description,
                               Name = request.Name,
                               UserId = userId,
@@ -71,6 +75,8 @@ namespace GenesisVision.Core.Services
                                   Avatar = managerRequest.Avatar,
                                   BrokerTradeServerId = managerRequest.BrokerTradeServerId,
                                   Currency = managerRequest.Currency,
+                                  TokenName = managerRequest.TokenName,
+                                  TokenSymbol = managerRequest.TokenSymbol,
                                   Description = managerRequest.Description,
                                   Login = request.Login,
                                   Name = managerRequest.Name,
@@ -83,11 +89,21 @@ namespace GenesisVision.Core.Services
                 managerRequest.Status = ManagerRequestStatus.Processed;
                 context.SaveChanges();
 
-                var ipfsUpdate = UpdateManagerAccountInIpfs(manager.Id);
-                if (ipfsUpdate.IsSuccess)
+                var blockchainUpdate =
+                    smartContractService.RegisterManager(manager.TokenName, manager.TokenSymbol, manager.Id.ToString(), manager.Login, 
+                    manager.BrokerTradeServerId.ToString(), 0, 0); // TODO fill fees
+
+                if (blockchainUpdate.IsSuccess)
                 {
-                    manager.IpfsHash = ipfsUpdate.Data;
+                    manager.Confirmed = true;
                     context.SaveChanges();
+
+                    var ipfsUpdate = UpdateManagerAccountInIpfs(manager.Id);
+                    if (ipfsUpdate.IsSuccess)
+                    {
+                        manager.IpfsHash = ipfsUpdate.Data;
+                        context.SaveChanges();
+                    }
                 }
 
                 return manager.Id;

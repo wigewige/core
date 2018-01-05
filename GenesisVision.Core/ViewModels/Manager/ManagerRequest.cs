@@ -9,5 +9,7 @@ namespace GenesisVision.Core.ViewModels.Manager
         public string Name { get; set; }
         public string Description { get; set; }
         public string Currency { get; set; }
+        public string TokenName { get; set; }
+        public string TokenSymbol { get; set; }
     }
 }

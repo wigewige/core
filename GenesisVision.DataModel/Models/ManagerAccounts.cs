@@ -11,11 +11,15 @@ namespace GenesisVision.DataModel.Models
         public string Avatar { get; set; }
         public string Login { get; set; }
         public string Currency { get; set; }
+        public string TokenName { get; set; }
+        public string TokenSymbol { get; set; }
         public bool IsEnabled { get; set; }
         public decimal Rating { get; set; }
         public DateTime RegistrationDate { get; set; }
         public string IpfsHash { get; set; }
         
+        public bool Confirmed { get; set; }
+
         public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
 
