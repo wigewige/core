@@ -50,7 +50,7 @@ namespace GenesisVision.Core.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser {UserName = model.Username, Email = model.Email};
+                var user = new ApplicationUser {UserName = model.Username, Email = model.Email, IsEnabled = true};
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

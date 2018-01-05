@@ -12,7 +12,7 @@ namespace GenesisVision.DataModel
         {
         }
         
-        public DbSet<Brokers> Brokers { get; set; }
+        public DbSet<BrokersAccounts> BrokersAccounts { get; set; }
         public DbSet<BrokerTradeServers> BrokerTradeServers { get; set; }
         public DbSet<ManagerAccounts> ManagersAccounts { get; set; }
         public DbSet<InvestorAccounts> InvestorAccounts { get; set; }
@@ -33,10 +33,14 @@ namespace GenesisVision.DataModel
                    .HasForeignKey(x => x.UserId);
 
 
-            builder.Entity<Brokers>()
+            builder.Entity<BrokersAccounts>()
                    .HasIndex(x => x.Name)
                    .IsUnique();
 
+            builder.Entity<ApplicationUser>()
+                   .HasOne(x => x.BrokersAccount)
+                   .WithOne(x => x.User)
+                   .HasForeignKey<BrokersAccounts>(x => x.UserId);
 
             builder.Entity<BrokerTradeServers>()
                    .HasOne(x => x.Broker)

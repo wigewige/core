@@ -23,7 +23,7 @@ namespace GenesisVision.Core.Tests.Validators
 
         private ApplicationUser applicationUser;
         private IPrincipal user;
-        private Brokers broker;
+        private BrokersAccounts broker;
         private BrokerTradeServers brokerTradeServer;
         private ManagerAccounts managerAccountWithProgram;
         private ManagerAccounts managerAccount;
@@ -40,7 +40,7 @@ namespace GenesisVision.Core.Tests.Validators
                               {
                                   Id = Guid.NewGuid()
                               };
-            broker = new Brokers
+            broker = new BrokersAccounts
                      {
                          Id = Guid.NewGuid(),
                          Description = string.Empty,

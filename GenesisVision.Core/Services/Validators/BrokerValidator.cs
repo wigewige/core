@@ -1,14 +1,12 @@
-﻿using GenesisVision.DataModel;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
-using GenesisVision.DataModel.Models;
-using GenesisVision.Core.Helpers;
-using GenesisVision.Core.ViewModels.Broker;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services.Validators
 {
@@ -21,9 +19,10 @@ namespace GenesisVision.Core.Services.Validators
             this.context = context;
         }
 
-        public List<string> ValidateGetBrokerInitData(IPrincipal user, Guid brokerTradeServerId)
+        public List<string> ValidateGetBrokerInitData(ApplicationUser user, Guid brokerTradeServerId)
         {
-            var result = new List<string>();
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
 
             var tradeServer = context
                 .BrokerTradeServers
@@ -33,37 +32,43 @@ namespace GenesisVision.Core.Services.Validators
             if (tradeServer == null)
                 return new List<string> {$"Trade server id \"{brokerTradeServerId}\" does not exist"};
 
-            // todo: check trade server belongs broker
-            //if (user.UserId != brokerTradeServerId)
-            //    return new List<string> {$"Access denied"};
+            if (user.Id != tradeServer.Broker.UserId)
+                return new List<string> {ValidationMessages.AccessDenied};
 
             if (!tradeServer.IsEnabled || !tradeServer.Broker.IsEnabled)
                 return new List<string> {$"Access denied for trade server id \"{brokerTradeServerId}\""};
 
-            return result;
+            return new List<string>();
         }
 
-        public List<string> ValidateGetClosingPeriodData(IPrincipal user, Guid investmentProgramId)
+        public List<string> ValidateGetClosingPeriodData(ApplicationUser user, Guid investmentProgramId)
         {
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
+
             var result = new List<string>();
 
             var investmentProgram = context.InvestmentPrograms
                                            .Include(x => x.Periods)
+                                           .Include(x => x.ManagersAccount)
+                                           .ThenInclude(x => x.BrokerTradeServer)
+                                           .ThenInclude(x => x.Broker)
                                            .FirstOrDefault(x => x.Id == investmentProgramId);
             if (investmentProgram == null)
                 return new List<string> {$"Does not find investment program id \"{investmentProgramId}\""};
 
-            // todo: check investment program belongs broker
+            if (user.Id != investmentProgram.ManagersAccount.BrokerTradeServer.Broker.UserId)
+                return new List<string> {ValidationMessages.AccessDenied};
 
             return result;
         }
 
-        public List<string> ValidateClosePeriod(IPrincipal user, Guid investmentProgramId)
+        public List<string> ValidateClosePeriod(ApplicationUser user, Guid investmentProgramId)
         {
             var periodErrors = ValidateGetClosingPeriodData(user, investmentProgramId);
             if (periodErrors.Any())
                 return periodErrors;
-            
+
             var period = context.Periods
                                 .FirstOrDefault(x => x.InvestmentProgramId == investmentProgramId &&
                                                      x.Status == PeriodStatus.InProccess &&
@@ -74,18 +79,28 @@ namespace GenesisVision.Core.Services.Validators
             return new List<string>();
         }
 
-        public List<string> ValidateSetPeriodStartBalance(IPrincipal user, Guid periodId, decimal balance)
+        public List<string> ValidateSetPeriodStartBalance(ApplicationUser user, Guid periodId, decimal balance)
         {
-            var result = new List<string>();
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
 
             var period = context.Periods
+                                .Include(x => x.InvestmentProgram)
+                                .ThenInclude(x => x.ManagersAccount)
+                                .ThenInclude(x => x.BrokerTradeServer)
+                                .ThenInclude(x => x.Broker)
                                 .Include(x => x.InvestmentRequests)
                                 .FirstOrDefault(x => x.Id == periodId);
             if (period == null)
                 return new List<string> {$"Does not find period id \"{periodId}\""};
 
+            if (user.Id != period.InvestmentProgram.ManagersAccount.BrokerTradeServer.Broker.UserId)
+                return new List<string> {ValidationMessages.AccessDenied};
+
             if (period.Status != PeriodStatus.InProccess)
                 return new List<string> {$"Period has status {period.Status}"};
+
+            var result = new List<string>();
 
             var investmentsAmount = period.InvestmentRequests
                                           .Where(x => x.Type == InvestmentRequestType.Invest)

@@ -1,21 +1,20 @@
 ﻿using GenesisVision.Core.Models;
-using GenesisVision.Core.ViewModels.Broker;
-using GenesisVision.Core.ViewModels.Manager;
-using GenesisVision.Core.ViewModels.Investment;
-using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.Services.Interfaces;
-using GenesisVision.Core.Services.Validators;
+using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.ViewModels.Broker;
+using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenesisVision.DataModel.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace GenesisVision.Core.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class BrokerController : BaseController
     {
         private readonly IManagerService managerService;
@@ -36,7 +35,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult GetBrokerInitData(Guid brokerTradeServerId)
         {
-            var errors = brokerValidator.ValidateGetBrokerInitData(User, brokerTradeServerId);
+            var errors = brokerValidator.ValidateGetBrokerInitData(CurrentUser, brokerTradeServerId);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
@@ -63,7 +62,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult GetClosingPeriodData(Guid investmentProgramId)
         {
-            var errors = brokerValidator.ValidateGetClosingPeriodData(User, investmentProgramId);
+            var errors = brokerValidator.ValidateGetClosingPeriodData(CurrentUser, investmentProgramId);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
@@ -77,7 +76,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult ClosePeriod(Guid investmentProgramId)
         {
-            var errors = brokerValidator.ValidateClosePeriod(User, investmentProgramId);
+            var errors = brokerValidator.ValidateClosePeriod(CurrentUser, investmentProgramId);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
@@ -91,7 +90,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult SetPeriodStartBalance(Guid periodId, decimal balance)
         {
-            var errors = brokerValidator.ValidateSetPeriodStartBalance(User, periodId, balance);
+            var errors = brokerValidator.ValidateSetPeriodStartBalance(CurrentUser, periodId, balance);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 

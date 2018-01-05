@@ -14,7 +14,7 @@ namespace GenesisVision.DataModel.Models
         public bool IsEnabled { get; set; }
 
         public Guid BrokerId { get; set; }
-        public Brokers Broker { get; set; }
+        public BrokersAccounts Broker { get; set; }
 
         public ICollection<ManagerAccounts> ManagerAccounts { get; set; }
 

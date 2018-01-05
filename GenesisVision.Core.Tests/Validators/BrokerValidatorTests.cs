@@ -19,8 +19,8 @@ namespace GenesisVision.Core.Tests.Validators
 
         private ApplicationDbContext context;
 
-        private IPrincipal user;
-        private Brokers broker;
+        private ApplicationUser user;
+        private BrokersAccounts broker;
         private BrokerTradeServers brokerTradeServer;
 
         [SetUp]
@@ -30,9 +30,15 @@ namespace GenesisVision.Core.Tests.Validators
             optionsBuilder.UseInMemoryDatabase("databaseBrokerValidator");
             context = new ApplicationDbContext(optionsBuilder.Options);
 
-            broker = new Brokers
+            user = new ApplicationUser
+                   {
+                       Id = Guid.NewGuid(),
+                       IsEnabled = true
+                   };
+            broker = new BrokersAccounts
                      {
                          Id = Guid.NewGuid(),
+                         UserId = user.Id,
                          Description = string.Empty,
                          IsEnabled = true,
                          Name = "Broker #1",
@@ -52,7 +58,6 @@ namespace GenesisVision.Core.Tests.Validators
             context.Add(brokerTradeServer);
             context.SaveChanges();
 
-            user = new ClaimsPrincipal();
 
             brokerValidator = new BrokerValidator(context);
         }
@@ -72,13 +77,13 @@ namespace GenesisVision.Core.Tests.Validators
         {
             const string error = "Access denied";
 
-            context.Brokers.First().IsEnabled = false;
+            context.BrokersAccounts.First().IsEnabled = false;
             context.SaveChanges();
 
             var res1 = brokerValidator.ValidateGetBrokerInitData(user, brokerTradeServer.Id);
             Assert.IsTrue(res1.Any(x => x.Contains(error)));
 
-            context.Brokers.First().IsEnabled = true;
+            context.BrokersAccounts.First().IsEnabled = true;
             context.BrokerTradeServers.First().IsEnabled = false;
             context.SaveChanges();
 

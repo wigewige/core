@@ -97,7 +97,7 @@ namespace GenesisVision.Core.Helpers
                    };
         }
 
-        public static Broker ToBroker(this Brokers broker)
+        public static Broker ToBroker(this BrokersAccounts broker)
         {
             return new Broker
                    {
