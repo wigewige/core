@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using GenesisVision.Core.Models;
+﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
-using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
@@ -10,10 +7,12 @@ using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
 
 namespace GenesisVision.Core.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class ManagerController : BaseController
     {
         private readonly ITrustManagementService trustManagementService;
@@ -34,7 +33,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
         {
-            var errors = managerValidator.ValidateNewManagerAccountRequest(User, request);
+            var errors = managerValidator.ValidateNewManagerAccountRequest(CurrentUser, request);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
@@ -47,7 +46,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
-            var errors = managerValidator.ValidateCreateManagerAccount(User, request);
+            var errors = managerValidator.ValidateCreateManagerAccount(CurrentUser, request);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
@@ -60,7 +59,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult UpdateManagerAccount([FromBody]UpdateManagerAccount account)
         {
-            var errors = managerValidator.ValidateUpdateManagerAccount(User, account);
+            var errors = managerValidator.ValidateUpdateManagerAccount(CurrentUser, account);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
@@ -73,7 +72,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
         {
-            var errors = managerValidator.ValidateCreateInvestmentProgram(User, investment);
+            var errors = managerValidator.ValidateCreateInvestmentProgram(CurrentUser, investment);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
@@ -87,7 +86,7 @@ namespace GenesisVision.Core.Controllers
         [AllowAnonymous]
         public IActionResult Details(Guid managerId)
         {
-            var errors = managerValidator.ValidateGetManagerDetails(User, managerId);
+            var errors = managerValidator.ValidateGetManagerDetails(CurrentUser, managerId);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 

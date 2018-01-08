@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
-using GenesisVision.DataModel;
-using GenesisVision.DataModel.Models;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GenesisVision.Core.Services.Validators
 {
@@ -21,8 +21,11 @@ namespace GenesisVision.Core.Services.Validators
             this.context = context;
         }
 
-        public List<string> ValidateNewManagerAccountRequest(IPrincipal user, NewManagerRequest request)
+        public List<string> ValidateNewManagerAccountRequest(ApplicationUser user, NewManagerRequest request)
         {
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
+
             var result = new List<string>();
 
             var server = context.BrokerTradeServers.FirstOrDefault(x => x.Id == request.BrokerTradeServerId);
@@ -45,15 +48,25 @@ namespace GenesisVision.Core.Services.Validators
             return result;
         }
 
-        public List<string> ValidateCreateManagerAccount(IPrincipal user, NewManager request)
+        public List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request)
         {
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
+
             var result = new List<string>();
 
-            // todo: check request belongs broker
-
+            var broker = context.BrokersAccounts
+                                .Include(x => x.BrokerTradeServers)
+                                .FirstOrDefault(x => x.UserId == user.Id);
+            if (broker == null)
+                return new List<string> {ValidationMessages.AccessDenied};
+            
             var req = context.ManagerRequests.FirstOrDefault(x => x.Id == request.RequestId);
             if (req == null)
                 return new List<string> {$"Does not find request with id \"{request.RequestId}\""};
+
+            if (broker.BrokerTradeServers.All(x => x.Id != req.BrokerTradeServerId))
+                return new List<string> {ValidationMessages.AccessDenied};
 
             if (req.Status != ManagerRequestStatus.Created)
                 result.Add($"Could not proccess request. Request status is {req.Status}.");
@@ -61,15 +74,19 @@ namespace GenesisVision.Core.Services.Validators
             return result;
         }
 
-        public List<string> ValidateCreateInvestmentProgram(IPrincipal user, CreateInvestment investment)
+        public List<string> ValidateCreateInvestmentProgram(ApplicationUser user, CreateInvestment investment)
         {
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
+
             var result = new List<string>();
-
-            // todo: check managerAccount belongs user
-
+            
             var managerAccount = context.ManagersAccounts.FirstOrDefault(x => x.Id == investment.ManagersAccountId);
             if (managerAccount == null)
                 return new List<string> {$"Does not find manager account \"{investment.ManagersAccountId}\""};
+
+            if (managerAccount.UserId != user.Id)
+                return new List<string> {ValidationMessages.AccessDenied};
 
             var existInvestmentsPrograms = context.InvestmentPrograms
                                                   .Where(x => x.ManagersAccountId == investment.ManagersAccountId &&
@@ -113,20 +130,25 @@ namespace GenesisVision.Core.Services.Validators
             return result;
         }
 
-        public List<string> ValidateGetManagerDetails(IPrincipal user, Guid managerId)
+        public List<string> ValidateGetManagerDetails(ApplicationUser user, Guid managerId)
         {
             return context.ManagersAccounts.Any(x => x.Id == managerId)
                 ? new List<string>()
                 : new List<string> {$"Does not find manager account with id \"{managerId}\""};
         }
 
-        public List<string> ValidateUpdateManagerAccount(IPrincipal user, UpdateManagerAccount account)
+        public List<string> ValidateUpdateManagerAccount(ApplicationUser user, UpdateManagerAccount account)
         {
             var managerExistsErrors = ValidateGetManagerDetails(user, account.ManagerAccountId);
             if (managerExistsErrors.Any())
                 return managerExistsErrors;
 
-            // todo: check managerAccount belongs user
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
+
+            var managerAccount = context.ManagersAccounts.First(x => x.Id == account.ManagerAccountId);
+            if (managerAccount.UserId != user.Id)
+                return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
 

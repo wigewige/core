@@ -1,16 +1,14 @@
-﻿using GenesisVision.DataModel;
-using GenesisVision.DataModel.Models;
-using GenesisVision.Core.Services.Validators;
+﻿using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Tests.Validators
 {
@@ -22,7 +20,6 @@ namespace GenesisVision.Core.Tests.Validators
         private ApplicationDbContext context;
 
         private ApplicationUser applicationUser;
-        private IPrincipal user;
         private BrokersAccounts broker;
         private BrokerTradeServers brokerTradeServer;
         private ManagerAccounts managerAccountWithProgram;
@@ -38,11 +35,13 @@ namespace GenesisVision.Core.Tests.Validators
 
             applicationUser = new ApplicationUser
                               {
-                                  Id = Guid.NewGuid()
+                                  Id = Guid.NewGuid(),
+                                  IsEnabled = true
                               };
             broker = new BrokersAccounts
                      {
                          Id = Guid.NewGuid(),
+                         UserId = applicationUser.Id,
                          Description = string.Empty,
                          IsEnabled = true,
                          Name = "Broker #1",
@@ -110,8 +109,6 @@ namespace GenesisVision.Core.Tests.Validators
             context.Add(investmentPrograms);
             context.SaveChanges();
 
-            user = new ClaimsPrincipal();
-
             managerValidator = new ManagerValidator(context);
         }
 
@@ -120,11 +117,11 @@ namespace GenesisVision.Core.Tests.Validators
         {
             const string errorMsg = "Does not find trade server";
 
-            var res1 = managerValidator.ValidateNewManagerAccountRequest(user,
+            var res1 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
                 new NewManagerRequest {BrokerTradeServerId = Guid.NewGuid()});
             Assert.IsTrue(res1.Any(x => x.Contains(errorMsg)));
 
-            var res2 = managerValidator.ValidateNewManagerAccountRequest(user,
+            var res2 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
                 new NewManagerRequest {BrokerTradeServerId = brokerTradeServer.Id});
             Assert.IsTrue(!res2.Any(x => x.Contains(errorMsg)));
         }
@@ -134,7 +131,7 @@ namespace GenesisVision.Core.Tests.Validators
         {
             const string errorMsg = "Does not find user";
 
-            var res1 = managerValidator.ValidateNewManagerAccountRequest(user,
+            var res1 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
@@ -142,7 +139,7 @@ namespace GenesisVision.Core.Tests.Validators
                 });
             Assert.IsTrue(res1.All(x => x != errorMsg));
 
-            var res2 = managerValidator.ValidateNewManagerAccountRequest(user,
+            var res2 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
@@ -150,7 +147,7 @@ namespace GenesisVision.Core.Tests.Validators
                 });
             Assert.IsTrue(res2.Any(x => x == errorMsg));
 
-            var res3 = managerValidator.ValidateNewManagerAccountRequest(user,
+            var res3 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
@@ -164,7 +161,7 @@ namespace GenesisVision.Core.Tests.Validators
         {
             const string errorMsg = "'Name' is empty";
 
-            var res1 = managerValidator.ValidateNewManagerAccountRequest(user,
+            var res1 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
@@ -173,7 +170,7 @@ namespace GenesisVision.Core.Tests.Validators
                 });
             Assert.IsTrue(res1.All(x => x != errorMsg));
 
-            var res2 = managerValidator.ValidateNewManagerAccountRequest(user,
+            var res2 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
                 new NewManagerRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
@@ -200,7 +197,7 @@ namespace GenesisVision.Core.Tests.Validators
                                 Period = 35
                             };
 
-            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.IsEmpty(result);
         }
 
@@ -208,7 +205,7 @@ namespace GenesisVision.Core.Tests.Validators
         public void ValidateInvestWrongInvestments()
         {
             var createInv = new CreateInvestment {ManagersAccountId = Guid.NewGuid()};
-            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.IsTrue(result.Any(x => x.Contains("Does not find manager account")));
         }
 
@@ -216,7 +213,7 @@ namespace GenesisVision.Core.Tests.Validators
         public void ValidateInvestAlreadyExist()
         {
             var createInv = new CreateInvestment {ManagersAccountId = managerAccountWithProgram.Id};
-            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.IsTrue(result.Any(x => x.Contains("Manager has active investment program")));
         }
 
@@ -238,22 +235,22 @@ namespace GenesisVision.Core.Tests.Validators
                             };
 
             createInv.DateFrom = createInv.DateTo = DateTime.Now.Date;
-            var result1 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result1 = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.True(result1.Any(x => x == "DateFrom must be greater than today"));
             Assert.True(result1.Any(x => x == "DateTo must be greater DateFrom"));
             
             createInv.DateFrom = DateTime.Now.AddDays(10);
             createInv.DateTo = DateTime.Now.Date;
-            var result2 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result2 = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.IsTrue(result2.Any(x => x == "DateTo must be greater DateFrom"));
             
             createInv.DateFrom = createInv.DateTo = DateTime.Now.AddDays(10);
-            var result3 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result3 = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.IsTrue(result3.Any(x => x == "DateTo must be greater DateFrom"));
 
             createInv.DateFrom = DateTime.Now.Date.AddDays(10);
             createInv.DateTo = DateTime.Now.Date.AddDays(10).AddHours(1);
-            var result4 = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result4 = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.True(result4.Any(x => x == "Minimum duration is 1 day"));
         }
 
@@ -265,7 +262,7 @@ namespace GenesisVision.Core.Tests.Validators
                                 ManagersAccountId = managerAccount.Id,
                                 Period = -1
                             };
-            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.IsTrue(result.Any(x => x.Contains("Period must be greater than zero")));
         }
 
@@ -280,7 +277,7 @@ namespace GenesisVision.Core.Tests.Validators
                                 FeeSuccess = -10,
                                 FeeManagement = -20
                             };
-            var result = managerValidator.ValidateCreateInvestmentProgram(user, createInv);
+            var result = managerValidator.ValidateCreateInvestmentProgram(applicationUser, createInv);
             Assert.IsTrue(result.Any(x => x.Contains("FeeEntrance must be greater or equal zero")));
             Assert.IsTrue(result.Any(x => x.Contains("FeeSuccess must be greater or equal zero")));
             Assert.IsTrue(result.Any(x => x.Contains("FeeManagement must be greater or equal zero")));
@@ -289,38 +286,38 @@ namespace GenesisVision.Core.Tests.Validators
         [Test]
         public void ValidateGetManagerDetails()
         {
-            var result1 = managerValidator.ValidateGetManagerDetails(user, managerAccount.Id);
+            var result1 = managerValidator.ValidateGetManagerDetails(applicationUser, managerAccount.Id);
             Assert.IsEmpty(result1);
             
-            var result2 = managerValidator.ValidateGetManagerDetails(user, Guid.NewGuid());
+            var result2 = managerValidator.ValidateGetManagerDetails(applicationUser, Guid.NewGuid());
             Assert.IsNotEmpty(result2);
         }
 
         [Test]
         public void ValidateCreateManagerAccount()
         {
-            var res1 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = Guid.NewGuid()});
+            var res1 = managerValidator.ValidateCreateManagerAccount(applicationUser, new NewManager {Login = "xxxxx", RequestId = Guid.NewGuid()});
             Assert.IsTrue(res1.Any(x => x.Contains("Does not find request")));
 
             var requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Declined});
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Declined, BrokerTradeServerId = brokerTradeServer.Id});
             context.SaveChanges();
 
-            var res2 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            var res2 = managerValidator.ValidateCreateManagerAccount(applicationUser, new NewManager {Login = "xxxxx", RequestId = requestId});
             Assert.IsTrue(res2.Any(x => x.Contains("Could not proccess request")));
 
             requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Processed});
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Processed, BrokerTradeServerId = brokerTradeServer.Id});
             context.SaveChanges();
 
-            var res3 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            var res3 = managerValidator.ValidateCreateManagerAccount(applicationUser, new NewManager {Login = "xxxxx", RequestId = requestId});
             Assert.IsTrue(res3.Any(x => x.Contains("Could not proccess request")));
 
             requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Created});
+            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Created, BrokerTradeServerId = brokerTradeServer.Id});
             context.SaveChanges();
 
-            var res4 = managerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            var res4 = managerValidator.ValidateCreateManagerAccount(applicationUser, new NewManager {Login = "xxxxx", RequestId = requestId});
             Assert.IsEmpty(res4);
         }
     }
