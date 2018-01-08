@@ -1,15 +1,15 @@
-﻿using GenesisVision.DataModel;
-using GenesisVision.DataModel.Models;
-using GenesisVision.Core.Helpers;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services
 {

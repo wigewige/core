@@ -1,12 +1,12 @@
-﻿using GenesisVision.DataModel;
-using GenesisVision.DataModel.Models;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services.Validators
 {
@@ -19,9 +19,14 @@ namespace GenesisVision.Core.Services.Validators
             this.context = context;
         }
 
-        public List<string> ValidateInvest(IPrincipal user, Invest model)
+        public List<string> ValidateInvest(ApplicationUser user, Invest model)
         {
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
+
             var result = new List<string>();
+
+            // todo: validate investor wallet
 
             var investmentProgram = context.InvestmentPrograms
                                            .Include(x => x.Periods)
@@ -41,8 +46,11 @@ namespace GenesisVision.Core.Services.Validators
             return result;
         }
 
-        public List<string> ValidateWithdraw(IPrincipal user, Invest model)
+        public List<string> ValidateWithdraw(ApplicationUser user, Invest model)
         {
+            if (!user.IsEnabled)
+                return new List<string> {ValidationMessages.AccessDenied};
+
             var result = new List<string>();
 
             var investmentProgram = context.InvestmentPrograms

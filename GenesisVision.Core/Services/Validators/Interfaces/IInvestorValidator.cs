@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using System.Security.Principal;
-using GenesisVision.Core.ViewModels.Investment;
+﻿using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.DataModel.Models;
+using System.Collections.Generic;
 
 namespace GenesisVision.Core.Services.Validators.Interfaces
 {
     public interface IInvestorValidator
     {
-        List<string> ValidateInvest(IPrincipal user, Invest model);
+        List<string> ValidateInvest(ApplicationUser user, Invest model);
 
-        List<string> ValidateWithdraw(IPrincipal user, Invest model);
+        List<string> ValidateWithdraw(ApplicationUser user, Invest model);
     }
 }

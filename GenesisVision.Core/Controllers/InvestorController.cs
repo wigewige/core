@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using GenesisVision.Core.Models;
+﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
@@ -7,10 +6,11 @@ using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace GenesisVision.Core.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class InvestorController : BaseController
     {
         private readonly ITrustManagementService trustManagementService;
@@ -28,7 +28,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         public IActionResult Invest([FromBody]Invest model)
         {
-            var errors = investorValidator.ValidateInvest(User, model);
+            var errors = investorValidator.ValidateInvest(CurrentUser, model);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 

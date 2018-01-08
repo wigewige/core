@@ -21,7 +21,7 @@ namespace GenesisVision.Core.Tests.Validators
         private ApplicationDbContext context;
         private InvestmentPrograms investment;
 
-        private IPrincipal user;
+        private ApplicationUser user;
 
         [SetUp]
         public void Init()
@@ -30,6 +30,11 @@ namespace GenesisVision.Core.Tests.Validators
             optionsBuilder.UseInMemoryDatabase("databaseInvestorValidator");
             context = new ApplicationDbContext(optionsBuilder.Options);
 
+            user = new ApplicationUser
+                   {
+                       Id = Guid.NewGuid(),
+                       IsEnabled = true
+                   };
             investment = new InvestmentPrograms
                          {
                              Id = Guid.NewGuid(),
@@ -47,11 +52,11 @@ namespace GenesisVision.Core.Tests.Validators
                              Status = PeriodStatus.InProccess,
                              InvestmentProgramId = investment.Id
                          };
+            context.Add(user);
             context.Add(investment);
             context.Add(period);
             context.SaveChanges();
 
-            user = new ClaimsPrincipal();
 
             investorValidator = new InvestorValidator(context);
         }
