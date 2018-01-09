@@ -167,7 +167,9 @@ namespace GenesisVision.Core.Tests.Services
                                        Period = 5,
                                        ManagersAccountId = managerAccount.Id,
                                        DateFrom = DateTime.Now.AddDays(20).AddHours(15).AddMinutes(10).AddSeconds(5),
-                                       DateTo = DateTime.Now.AddDays(100)
+                                       DateTo = DateTime.Now.AddDays(100),
+                                       InvestMinAmount = 0.9999m,
+                                       InvestMaxAmount = 100000.01m
                                    };
             var result = trustManagementService.CreateInvestmentProgram(createInvestment);
             Assert.IsTrue(result.IsSuccess);
@@ -183,6 +185,8 @@ namespace GenesisVision.Core.Tests.Services
             Assert.AreEqual(createInvestment.FeeSuccess, investment.FeeSuccess);
             Assert.AreEqual(createInvestment.FeeManagement, investment.FeeManagement);
             Assert.AreEqual(createInvestment.Period, investment.Period);
+            Assert.AreEqual(createInvestment.InvestMinAmount, investment.InvestMinAmount);
+            Assert.AreEqual(createInvestment.InvestMaxAmount, investment.InvestMaxAmount);
 
             var period = context.Periods.FirstOrDefault(x => x.InvestmentProgramId == investment.Id);
             Assert.IsNotNull(period);
@@ -224,6 +228,191 @@ namespace GenesisVision.Core.Tests.Services
             Assert.IsNotNull(period);
             Assert.IsTrue(Math.Abs((DateTime.Now - period.DateFrom).TotalSeconds) < 3);
             Assert.IsTrue(Math.Abs((DateTime.Now.AddDays(createInvestment.Period) - period.DateTo).TotalSeconds) < 3);
+        }
+
+        [Test]
+        public void Invest()
+        {
+            var managerAccount = new ManagerAccounts {Id = Guid.NewGuid()};
+            var appUser = new ApplicationUser {Id = Guid.NewGuid()};
+            var investor = new InvestorAccounts {Id = Guid.NewGuid(), UserId = appUser.Id};
+            context.Add(managerAccount);
+            context.Add(appUser);
+            context.Add(investor);
+            context.SaveChanges();
+
+            var createInvestment = new CreateInvestment
+                                   {
+                                       Description = "#2 New investment program",
+                                       Period = 25,
+                                       ManagersAccountId = managerAccount.Id
+                                   };
+            var investmentId = trustManagementService.CreateInvestmentProgram(createInvestment);
+            Assert.IsTrue(investmentId.IsSuccess);
+
+            var invest = new Invest
+                         {
+                             UserId = appUser.Id,
+                             InvestmentProgramId = investmentId.Data,
+                             Amount = 2500
+                         };
+            var result = trustManagementService.Invest(invest);
+            Assert.IsTrue(result.IsSuccess);
+
+            var lastPeriod = context.Periods
+                                    .Where(x => x.InvestmentProgramId == investmentId.Data)
+                                    .OrderByDescending(x => x.Number)
+                                    .FirstOrDefault();
+            Assert.IsNotNull(lastPeriod);
+
+            var investRequest = context.InvestmentRequests
+                                       .First(x => x.UserId == appUser.Id &&
+                                                   x.InvestmentProgramtId == investmentId.Data);
+            Assert.IsNotNull(investRequest);
+
+            Assert.AreEqual(investRequest.PeriodId, lastPeriod.Id);
+            Assert.AreEqual(invest.Amount, investRequest.Amount);
+            Assert.AreEqual(InvestmentRequestStatus.New, investRequest.Status);
+            Assert.AreEqual(InvestmentRequestType.Invest, investRequest.Type);
+            Assert.IsTrue(Math.Abs((DateTime.Now - investRequest.Date).TotalSeconds) < 3);
+        }
+
+        [Test]
+        public void GetBrokerInvestmentsInitData()
+        {
+            var brokerTradeServer = new BrokerTradeServers{Id = Guid.NewGuid()};
+            var managerAccount = new ManagerAccounts {Id = Guid.NewGuid(), BrokerTradeServerId = brokerTradeServer.Id};
+            var inv1 = new InvestmentPrograms
+                       {
+                           Id = Guid.NewGuid(),
+                           IsEnabled = true,
+                           DateFrom = DateTime.Now.AddDays(-1),
+                           DateTo = DateTime.Now.AddDays(1),
+                           Period = 5,
+                           ManagersAccountId = managerAccount.Id,
+                           Description = "#1"
+                       };
+            var period1 = new Periods
+                          {
+                              Id = Guid.NewGuid(),
+                              InvestmentProgramId = inv1.Id,
+                              Status = PeriodStatus.InProccess,
+                              Number = 5
+                          };
+            var period2 = new Periods
+                          {
+                              Id = Guid.NewGuid(),
+                              InvestmentProgramId = inv1.Id,
+                              Status = PeriodStatus.Planned,
+                              Number = 6
+                          };
+            var inv2 = new InvestmentPrograms
+                       {
+                           Id = Guid.NewGuid(),
+                           IsEnabled = true,
+                           DateFrom = DateTime.Now.AddDays(-1),
+                           DateTo = DateTime.Now.AddDays(1),
+                           Period = 7,
+                           ManagersAccountId = managerAccount.Id,
+                           Description = "#2"
+                       };
+            context.Add(brokerTradeServer);
+            context.Add(managerAccount);
+            context.Add(inv1);
+            context.Add(period1);
+            context.Add(period2);
+            context.Add(inv2);
+            context.SaveChanges();
+
+            var result = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServer.Id);
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(2, result.Data.Count);
+            Assert.AreEqual(inv1.Description, result.Data.First(x => x.Id == inv1.Id).Description);
+            Assert.AreEqual(inv1.DateFrom, result.Data.First(x => x.Id == inv1.Id).DateFrom);
+            Assert.IsNotNull(result.Data.First(x => x.Id == inv1.Id).LastPeriod);
+            Assert.AreEqual(period2.Id, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Id);
+            Assert.AreEqual(period2.Number, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Number);
+            Assert.AreEqual(period2.Status, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Status);
+            Assert.AreEqual(inv2.Period, result.Data.First(x => x.Id == inv2.Id).Period);
+            Assert.AreEqual(inv2.DateTo, result.Data.First(x => x.Id == inv2.Id).DateTo);
+        }
+
+        [Test]
+        public void GetBrokerInvestmentsInitDataExpiredOrFuture()
+        {
+            var brokerTradeServer = new BrokerTradeServers {Id = Guid.NewGuid()};
+            var managerAccount = new ManagerAccounts {Id = Guid.NewGuid(), BrokerTradeServerId = brokerTradeServer.Id};
+            var inv1 = new InvestmentPrograms
+                       {
+                           Id = Guid.NewGuid(),
+                           IsEnabled = true,
+                           DateFrom = DateTime.Now.AddDays(-10),
+                           DateTo = DateTime.Now.AddDays(-3),
+                           ManagersAccountId = managerAccount.Id,
+                       };
+            var inv2 = new InvestmentPrograms
+                       {
+                           Id = Guid.NewGuid(),
+                           IsEnabled = true,
+                           DateFrom = DateTime.Now.AddDays(10),
+                           DateTo = DateTime.Now.AddDays(17),
+                           ManagersAccountId = managerAccount.Id,
+                       };
+            context.Add(brokerTradeServer);
+            context.Add(managerAccount);
+            context.Add(inv1);
+            context.Add(inv2);
+            context.SaveChanges();
+
+            var result = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServer.Id);
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(0, result.Data.Count);
+            
+            inv1.DateTo = DateTime.Now.AddMinutes(1);
+            inv2.DateFrom = DateTime.Now.AddMinutes(-1);
+            context.SaveChanges();
+            
+            result = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServer.Id);
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(2, result.Data.Count);
+        }
+
+        [Test]
+        public void GetBrokerInvestmentsInitDataDisabled()
+        {
+            var brokerTradeServer = new BrokerTradeServers {Id = Guid.NewGuid()};
+            var managerAccount = new ManagerAccounts {Id = Guid.NewGuid(), BrokerTradeServerId = brokerTradeServer.Id};
+            var inv1 = new InvestmentPrograms
+                       {
+                           Id = Guid.NewGuid(),
+                           IsEnabled = true,
+                           DateFrom = DateTime.Now.AddDays(-10),
+                           ManagersAccountId = managerAccount.Id
+                       };
+            var inv2 = new InvestmentPrograms
+                       {
+                           Id = Guid.NewGuid(),
+                           IsEnabled = false,
+                           DateFrom = DateTime.Now.AddDays(-10),
+                           ManagersAccountId = managerAccount.Id,
+                       };
+            context.Add(brokerTradeServer);
+            context.Add(managerAccount);
+            context.Add(inv1);
+            context.Add(inv2);
+            context.SaveChanges();
+
+            var result = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServer.Id);
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(1, result.Data.Count);
+            Assert.AreEqual(inv1.Id, result.Data.First().Id);
+
+            inv2.IsEnabled = true;
+            context.SaveChanges();
+
+            result = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServer.Id);
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(2, result.Data.Count);
         }
     }
 }

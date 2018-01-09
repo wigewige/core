@@ -25,7 +25,7 @@ namespace GenesisVision.Core.Helpers
                        DateTo = inv.DateTo,
                        Period = inv.Period,
                        ManagerId = inv.ManagersAccountId,
-                       LastPeriod = inv.Periods?.OrderByDescending(x => x.Number).First().ToPeriod()
+                       LastPeriod = inv.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod()
                    };
         }
 
