@@ -1,9 +1,8 @@
-﻿using GenesisVision.DataModel;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using Ipfs.Api;
 using System.IO;
-using GenesisVision.Core.Helpers;
 
 namespace GenesisVision.Core.Services
 {
@@ -30,7 +29,7 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var res = ipfs.FileSystem.AddTextAsync(text).Result;
-                return res.Hash;
+                return res.Id.Hash.ToString();
             });
         }
 
