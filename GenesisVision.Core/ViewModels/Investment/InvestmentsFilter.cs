@@ -3,7 +3,7 @@ using GenesisVision.Core.ViewModels.Other;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
-    public class InvestmentsFilter : Paging
+    public class InvestmentsFilter : PagingFilter
     {
         public Guid? ManagerId { get; set; }
         public Guid? BrokerId { get; set; }

@@ -11,5 +11,7 @@ namespace GenesisVision.Core.ViewModels.Broker
         public string Name { get; set; }
         public string Host { get; set; }
         public BrokerTradeServerType Type { get; set; }
+        public Broker Broker { get; set; }
+        public DateTime RegistrationDate { get; set; }
     }
 }

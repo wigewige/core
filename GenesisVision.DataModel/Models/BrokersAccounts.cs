@@ -10,6 +10,7 @@ namespace GenesisVision.DataModel.Models
         public string Description { get; set; }
         public DateTime RegistrationDate { get; set; }
         public bool IsEnabled { get; set; }
+        public string Logo { get; set; }
 
         public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }

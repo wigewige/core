@@ -104,5 +104,17 @@ namespace GenesisVision.Core.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get all enabled trade servers
+        /// </summary>
+        [HttpOptions]
+        [AllowAnonymous]
+        [Route("GetBrokers")]
+        public IActionResult GetBrokers([FromBody]BrokersFilter filter)
+        {
+            var result = trustManagementService.GetBrokerTradeServers(filter);
+            return Ok(result);
+        }
     }
 }

@@ -93,7 +93,9 @@ namespace GenesisVision.Core.Helpers
                        Name = server.Name,
                        Type = server.Type,
                        Host = server.Host,
-                       BrokerId = server.BrokerId
+                       RegistrationDate = server.RegistrationDate,
+                       BrokerId = server.BrokerId,
+                       Broker = server.Broker?.ToBroker()
                    };
         }
 
@@ -103,7 +105,9 @@ namespace GenesisVision.Core.Helpers
                    {
                        Id = broker.Id,
                        Description = broker.Description,
-                       Name = broker.Name
+                       Name = broker.Name,
+                       Logo = broker.Logo,
+                       RegistrationDate = broker.RegistrationDate
                    };
         }
     }

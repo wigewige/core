@@ -42,6 +42,7 @@ namespace GenesisVision.Core.Tests.Validators
                          Description = string.Empty,
                          IsEnabled = true,
                          Name = "Broker #1",
+                         Logo = "logo.png",
                          RegistrationDate = DateTime.Now
                      };
             brokerTradeServer = new BrokerTradeServers

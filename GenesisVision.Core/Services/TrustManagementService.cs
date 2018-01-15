@@ -217,5 +217,34 @@ namespace GenesisVision.Core.Services
                 context.SaveChanges();
             });
         }
+
+        public OperationResult<(List<BrokerTradeServer>, int)> GetBrokerTradeServers(BrokersFilter filter)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var query = context.BrokerTradeServers
+                                   .Include(x => x.Broker)
+                                   .Where(x => x.IsEnabled && x.Broker.IsEnabled);
+
+                if (!string.IsNullOrEmpty(filter.TradeServerName))
+                    query = query.Where(x => x.Name.ToLower().Contains(filter.TradeServerName.ToLower()));
+
+                if (filter.TradeServerType.HasValue)
+                    query = query.Where(x => x.Type == filter.TradeServerType);
+
+                if (!string.IsNullOrEmpty(filter.BrokerName))
+                    query = query.Where(x => x.Broker.Name.ToLower().Contains(filter.BrokerName.ToLower()));
+
+                var count = query.Count();
+
+                if (filter.Skip.HasValue)
+                    query = query.Skip(filter.Skip.Value);
+                if (filter.Take.HasValue)
+                    query = query.Take(filter.Take.Value);
+
+                var brokerTradeServers = query.Select(x => x.ToBrokerTradeServers()).ToList();
+                return (brokerTradeServers, count);
+            });
+        }
     }
 }

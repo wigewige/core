@@ -4,7 +4,7 @@ using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.ViewModels.Manager
 {
-    public class ManagersFilter : Paging
+    public class ManagersFilter : PagingFilter
     {
         public string Name { get; set; }
 

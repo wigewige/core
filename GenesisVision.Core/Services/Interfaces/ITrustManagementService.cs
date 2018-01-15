@@ -22,5 +22,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult ClosePeriod(Guid investmentProgramId);
 
         OperationResult SetPeriodStartBalance(Guid periodId, decimal balance);
+
+        OperationResult<(List<BrokerTradeServer>, int)> GetBrokerTradeServers(BrokersFilter filter);
     }
 }
