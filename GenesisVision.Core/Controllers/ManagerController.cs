@@ -13,6 +13,8 @@ using System.Linq;
 namespace GenesisVision.Core.Controllers
 {
     [Authorize]
+    [ApiVersion("1.0")]
+    [Route("api/manager")]
     public class ManagerController : BaseController
     {
         private readonly ITrustManagementService trustManagementService;
@@ -31,6 +33,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create request (from cabinet, broker)
         /// </summary>
+        [Route("newManagerAccountRequest")]
         public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
         {
             var errors = managerValidator.ValidateNewManagerAccountRequest(CurrentUser, request);
@@ -40,10 +43,11 @@ namespace GenesisVision.Core.Controllers
             var result = managerService.CreateManagerAccountRequest(request);
             return Ok(result);
         }
-        
+
         /// <summary>
         /// Create manager (from broker)
         /// </summary>
+        [Route("createManagerAccount")]
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
             var errors = managerValidator.ValidateCreateManagerAccount(CurrentUser, request);
@@ -57,6 +61,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Update manager account
         /// </summary>
+        [Route("updateManagerAccount")]
         public IActionResult UpdateManagerAccount([FromBody]UpdateManagerAccount account)
         {
             var errors = managerValidator.ValidateUpdateManagerAccount(CurrentUser, account);
@@ -70,6 +75,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create investment program
         /// </summary>
+        [Route("createInvestmentProgram")]
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
         {
             var errors = managerValidator.ValidateCreateInvestmentProgram(CurrentUser, investment);
@@ -84,6 +90,7 @@ namespace GenesisVision.Core.Controllers
         /// Get manager details
         /// </summary>
         [AllowAnonymous]
+        [Route("details")]
         public IActionResult Details(Guid managerId)
         {
             var errors = managerValidator.ValidateGetManagerDetails(CurrentUser, managerId);
@@ -98,6 +105,7 @@ namespace GenesisVision.Core.Controllers
         /// Get managers by filter
         /// </summary>
         [AllowAnonymous]
+        [Route("getManagers")]
         public IActionResult GetManagers([FromBody]ManagersFilter filter)
         {
             var res = managerService.GetManagersDetails(filter);

@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace GenesisVision.Core.Controllers
 {
+    [ApiVersion("1.0")]
+    [Route("api/account")]
     public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -24,6 +26,7 @@ namespace GenesisVision.Core.Controllers
         }
 
         [HttpPost]
+        [Route("authorize")]
         public async Task<IActionResult> Authorize([FromBody]LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -51,6 +54,7 @@ namespace GenesisVision.Core.Controllers
         }
 
         [Authorize]
+        [Route("updateAuthToken")]
         public IActionResult UpdateAuthToken()
         {
             var user = CurrentUser;
@@ -64,6 +68,7 @@ namespace GenesisVision.Core.Controllers
         }
 
         [HttpPost]
+        [Route("register")]
         public async Task<IActionResult> Register([FromBody]RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -85,7 +90,8 @@ namespace GenesisVision.Core.Controllers
             var errors = ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage));
             return BadRequest(errors);
         }
-        
+
+        [Route("confirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)

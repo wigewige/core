@@ -11,6 +11,8 @@ using System.Linq;
 namespace GenesisVision.Core.Controllers
 {
     [Authorize]
+    [ApiVersion("1.0")]
+    [Route("api/investor")]
     public class InvestorController : BaseController
     {
         private readonly ITrustManagementService trustManagementService;
@@ -26,6 +28,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Invest in manager
         /// </summary>
+        [Route("invest")]
         public IActionResult Invest([FromBody]Invest model)
         {
             var errors = investorValidator.ValidateInvest(CurrentUser, model);
@@ -39,6 +42,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get investments by filter
         /// </summary>
+        [Route("getInvestments")]
         public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
         {
             var res = trustManagementService.GetInvestments(filter);

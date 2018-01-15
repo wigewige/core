@@ -15,6 +15,8 @@ using System.Linq;
 namespace GenesisVision.Core.Controllers
 {
     [Authorize]
+    [ApiVersion("1.0")]
+    [Route("api/broker")]
     public class BrokerController : BaseController
     {
         private readonly IManagerService managerService;
@@ -33,6 +35,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get broker initial data
         /// </summary>
+        [Route("getBrokerInitData")]
         public IActionResult GetBrokerInitData(Guid brokerTradeServerId)
         {
             var errors = brokerValidator.ValidateGetBrokerInitData(CurrentUser, brokerTradeServerId);
@@ -60,6 +63,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get data for closing investment period
         /// </summary>
+        [Route("getClosingPeriodData")]
         public IActionResult GetClosingPeriodData(Guid investmentProgramId)
         {
             var errors = brokerValidator.ValidateGetClosingPeriodData(CurrentUser, investmentProgramId);
@@ -74,6 +78,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Close investment period
         /// </summary>
+        [Route("closePeriod")]
         public IActionResult ClosePeriod(Guid investmentProgramId)
         {
             var errors = brokerValidator.ValidateClosePeriod(CurrentUser, investmentProgramId);
@@ -88,6 +93,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Set investment period start balance
         /// </summary>
+        [Route("setPeriodStartBalance")]
         public IActionResult SetPeriodStartBalance(Guid periodId, decimal balance)
         {
             var errors = brokerValidator.ValidateSetPeriodStartBalance(CurrentUser, periodId, balance);
