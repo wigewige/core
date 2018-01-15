@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GenesisVision.Core.Controllers
@@ -46,6 +48,19 @@ namespace GenesisVision.Core.Controllers
             }
 
             return BadRequest($"Wrong username/password");
+        }
+
+        [Authorize]
+        public IActionResult UpdateAuthToken()
+        {
+            var user = CurrentUser;
+            if (user.IsEnabled)
+            {
+                var token = JwtManager.GenerateToken(user);
+                return Ok(token.Value);
+            }
+
+            return BadRequest(ValidationMessages.AccessDenied);
         }
 
         [HttpPost]
