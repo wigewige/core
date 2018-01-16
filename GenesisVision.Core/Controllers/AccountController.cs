@@ -34,12 +34,15 @@ namespace GenesisVision.Core.Controllers
                 var user = await userManager.FindByNameAsync(model.Username);
                 if (user == null)
                     return BadRequest($"Wrong username/password");
-
-                if (!await userManager.IsEmailConfirmedAsync(user))
-                    return BadRequest("Email does not confirmed");
-
+                
                 if (await userManager.CheckPasswordAsync(user, model.Password))
                 {
+                    if (!await userManager.IsEmailConfirmedAsync(user))
+                        return BadRequest("Email does not confirmed");
+
+                    if (!user.IsEnabled)
+                        return BadRequest("User is disabled");
+
                     var token = JwtManager.GenerateToken(user);
                     return Ok(token.Value);
                 }
@@ -65,6 +68,20 @@ namespace GenesisVision.Core.Controllers
             }
 
             return BadRequest(ValidationMessages.AccessDenied);
+        }
+
+        [Authorize]
+        [Route("details")]
+        public IActionResult Details()
+        {
+            var user = CurrentUser;
+            var model = new AccountViewModel
+                        {
+                            UserName = user.UserName,
+                            Email = user.Email,
+                            Balance = 0m
+                        };
+            return Ok(model);
         }
 
         [HttpPost]

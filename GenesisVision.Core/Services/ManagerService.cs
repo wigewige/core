@@ -201,6 +201,20 @@ namespace GenesisVision.Core.Services
             });
         }
 
+        public OperationResult<List<ManagerAccount>> GetUserManagersAccounts(Guid userId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var managers = context.ManagersAccounts
+                                      .Include(x => x.BrokerTradeServer)
+                                      .ThenInclude(x => x.Broker)
+                                      .Where(x => x.UserId == userId)
+                                      .Select(x => x.ToManagerAccount())
+                                      .ToList();
+                return managers;
+            });
+        }
+
         private OperationResult<string> UpdateManagerAccountInIpfs(Guid managerId)
         {
             var account = GetManagerDetails(managerId);

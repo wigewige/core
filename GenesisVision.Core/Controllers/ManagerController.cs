@@ -102,6 +102,23 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
+        /// Get all managers account by user
+        /// </summary>
+        [AllowAnonymous]
+        [Route("userManagersAccounts")]
+        public IActionResult GetUserManagersAccounts(Guid? userId)
+        {
+            if (!userId.HasValue && CurrentUserId.HasValue)
+                userId = CurrentUserId;
+
+            if (!userId.HasValue)
+                return BadRequest();
+
+            var managers = managerService.GetUserManagersAccounts(userId.Value);
+            return Ok(managers);
+        }
+
+        /// <summary>
         /// Get managers by filter
         /// </summary>
         [AllowAnonymous]

@@ -13,5 +13,6 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult<List<ManagerRequest>> GetNewRequests(Guid brokerTradeServerId);
         OperationResult<ManagerAccount> GetManagerDetails(Guid managerId);
         OperationResult<(List<ManagerAccount>, int)> GetManagersDetails(ManagersFilter filter);
+        OperationResult<List<ManagerAccount>> GetUserManagersAccounts(Guid userId);
     }
 }
