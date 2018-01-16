@@ -21,7 +21,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateInvest(ApplicationUser user, Invest model)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Investor)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
@@ -48,7 +48,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateWithdraw(ApplicationUser user, Invest model)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Investor)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();

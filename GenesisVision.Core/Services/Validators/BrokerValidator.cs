@@ -21,7 +21,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateGetBrokerInitData(ApplicationUser user, Guid brokerTradeServerId)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Broker)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var tradeServer = context
@@ -43,7 +43,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateGetClosingPeriodData(ApplicationUser user, Guid investmentProgramId)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Broker)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
@@ -81,7 +81,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateSetPeriodStartBalance(ApplicationUser user, Guid periodId, decimal balance)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Broker)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var period = context.Periods

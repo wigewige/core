@@ -2,6 +2,7 @@
 using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
+using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -85,18 +86,54 @@ namespace GenesisVision.Core.Controllers
         }
 
         [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromBody]RegisterViewModel model)
+        [Route("registerManager")]
+        public async Task<IActionResult> RegisterManager([FromBody]RegisterManagerViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser {UserName = model.Username, Email = model.Email, IsEnabled = true};
+                var user = new ApplicationUser
+                           {
+                               UserName = model.Username,
+                               Email = model.Email,
+                               IsEnabled = true,
+                               Type = UserType.Manager
+                           };
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
                     return BadRequest(result.Errors.Select(x => x.Description));
 
                 var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                    
+
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
+                var text = $"Confirmation url: {callbackUrl}";
+                emailSender.SendEmailAsync(model.Email, "Registration", text, text);
+
+                return Ok();
+            }
+
+            var errors = ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage));
+            return BadRequest(errors);
+        }
+
+        [HttpPost]
+        [Route("registerInvestor")]
+        public async Task<IActionResult> RegisterInvestor([FromBody]RegisterInvestorViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser
+                           {
+                               UserName = model.Username,
+                               Email = model.Email,
+                               IsEnabled = true,
+                               Type = UserType.Investor
+                           };
+                var result = await userManager.CreateAsync(user, model.Password);
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors.Select(x => x.Description));
+
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
                 var text = $"Confirmation url: {callbackUrl}";
                 emailSender.SendEmailAsync(model.Email, "Registration", text, text);

@@ -36,7 +36,8 @@ namespace GenesisVision.Core.Tests.Validators
             applicationUser = new ApplicationUser
                               {
                                   Id = Guid.NewGuid(),
-                                  IsEnabled = true
+                                  IsEnabled = true,
+                                  Type = UserType.Manager
                               };
             broker = new BrokersAccounts
                      {

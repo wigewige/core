@@ -1,15 +1,13 @@
-﻿using GenesisVision.DataModel;
-using GenesisVision.DataModel.Models;
-using GenesisVision.Core.Services.Validators;
+﻿using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Tests.Validators
 {
@@ -33,7 +31,8 @@ namespace GenesisVision.Core.Tests.Validators
             user = new ApplicationUser
                    {
                        Id = Guid.NewGuid(),
-                       IsEnabled = true
+                       IsEnabled = true,
+                       Type = UserType.Investor
                    };
             investment = new InvestmentPrograms
                          {

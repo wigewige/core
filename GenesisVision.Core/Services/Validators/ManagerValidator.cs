@@ -23,7 +23,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateNewManagerAccountRequest(ApplicationUser user, NewManagerRequest request)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Manager)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
@@ -50,7 +50,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Manager)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
@@ -76,7 +76,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateCreateInvestmentProgram(ApplicationUser user, CreateInvestment investment)
         {
-            if (!user.IsEnabled)
+            if (!user.IsEnabled || user.Type != UserType.Manager)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();

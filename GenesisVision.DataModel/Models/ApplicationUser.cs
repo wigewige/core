@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GenesisVision.DataModel.Enums;
 using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
 
 namespace GenesisVision.DataModel.Models
 {
@@ -19,5 +20,7 @@ namespace GenesisVision.DataModel.Models
         public BrokersAccounts BrokersAccount { get; set; }
 
         public bool IsEnabled { get; set; }
+
+        public UserType Type { get; set; }
     }
 }
