@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace GenesisVision.Core.Controllers
 {
     //[Authorize]
+    [Route("api")]
     [ApiVersion("1.0")]
-    [Route("api/trades")]
     public class TradesController : BaseController
     {
         private readonly IIpfsService ipfsService;
@@ -24,7 +24,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get trades by IPFS hash id
         /// </summary>
-        [Route("getTrades")]
+        [Route("trades/ipfsGet")]
         public IActionResult GetTrades(string ipfsHashId)
         {
             var text = ipfsService.GetIpfsText(ipfsHashId);

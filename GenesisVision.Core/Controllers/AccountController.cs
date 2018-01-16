@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 
 namespace GenesisVision.Core.Controllers
 {
+    [Route("api")]
     [ApiVersion("1.0")]
-    [Route("api/account")]
     public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -27,7 +27,9 @@ namespace GenesisVision.Core.Controllers
         }
 
         [HttpPost]
-        [Route("authorize")]
+        [Route("manager/auth/signIn")]
+        [Route("investor/auth/signIn")]
+        [Route("broker/auth/signIn")]
         public async Task<IActionResult> Authorize([FromBody]LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -58,7 +60,9 @@ namespace GenesisVision.Core.Controllers
         }
 
         [Authorize]
-        [Route("updateAuthToken")]
+        [Route("manager/auth/updateToken")]
+        [Route("investor/auth/updateToken")]
+        [Route("broker/auth/updateToken")]
         public IActionResult UpdateAuthToken()
         {
             var user = CurrentUser;
@@ -72,7 +76,8 @@ namespace GenesisVision.Core.Controllers
         }
 
         [Authorize]
-        [Route("details")]
+        [Route("manager")]
+        [Route("investor")]
         public IActionResult Details()
         {
             var user = CurrentUser;
@@ -86,7 +91,7 @@ namespace GenesisVision.Core.Controllers
         }
 
         [HttpPost]
-        [Route("registerManager")]
+        [Route("manager/auth/signUp")]
         public async Task<IActionResult> RegisterManager([FromBody]RegisterManagerViewModel model)
         {
             if (ModelState.IsValid)
@@ -116,7 +121,7 @@ namespace GenesisVision.Core.Controllers
         }
 
         [HttpPost]
-        [Route("registerInvestor")]
+        [Route("investor/auth/signUp")]
         public async Task<IActionResult> RegisterInvestor([FromBody]RegisterInvestorViewModel model)
         {
             if (ModelState.IsValid)
@@ -145,7 +150,8 @@ namespace GenesisVision.Core.Controllers
             return BadRequest(errors);
         }
 
-        [Route("confirmEmail")]
+        [Route("manager/auth/confirmEmail")]
+        [Route("investor/auth/confirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)

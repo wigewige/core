@@ -13,8 +13,8 @@ using System.Linq;
 namespace GenesisVision.Core.Controllers
 {
     [Authorize]
+    [Route("api")]
     [ApiVersion("1.0")]
-    [Route("api/manager")]
     public class ManagerController : BaseController
     {
         private readonly ITrustManagementService trustManagementService;
@@ -33,7 +33,8 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create request (from cabinet, broker)
         /// </summary>
-        [Route("newManagerAccountRequest")]
+        [Route("manager/account/newRequest")]
+        //[Route("broker/account/newRequest")]
         public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
         {
             var errors = managerValidator.ValidateNewManagerAccountRequest(CurrentUser, request);
@@ -47,7 +48,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create manager (from broker)
         /// </summary>
-        [Route("createManagerAccount")]
+        [Route("broker/account/create")]
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
             var errors = managerValidator.ValidateCreateManagerAccount(CurrentUser, request);
@@ -61,7 +62,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Update manager account
         /// </summary>
-        [Route("updateManagerAccount")]
+        [Route("manager/account/update")]
         public IActionResult UpdateManagerAccount([FromBody]UpdateManagerAccount account)
         {
             var errors = managerValidator.ValidateUpdateManagerAccount(CurrentUser, account);
@@ -75,7 +76,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create investment program
         /// </summary>
-        [Route("createInvestmentProgram")]
+        [Route("manager/investment/create")]
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
         {
             var errors = managerValidator.ValidateCreateInvestmentProgram(CurrentUser, investment);
@@ -90,7 +91,7 @@ namespace GenesisVision.Core.Controllers
         /// Get manager details
         /// </summary>
         [AllowAnonymous]
-        [Route("details")]
+        [Route("manager/account")]
         public IActionResult Details(Guid managerId)
         {
             var errors = managerValidator.ValidateGetManagerDetails(CurrentUser, managerId);
@@ -105,7 +106,7 @@ namespace GenesisVision.Core.Controllers
         /// Get all managers account by user
         /// </summary>
         [AllowAnonymous]
-        [Route("userManagersAccounts")]
+        [Route("manager/account/user")]
         public IActionResult GetUserManagersAccounts(Guid? userId)
         {
             if (!userId.HasValue && CurrentUserId.HasValue)
@@ -122,7 +123,7 @@ namespace GenesisVision.Core.Controllers
         /// Get managers by filter
         /// </summary>
         [AllowAnonymous]
-        [Route("getManagers")]
+        [Route("manager/account/search")]
         public IActionResult GetManagers([FromBody]ManagersFilter filter)
         {
             var res = managerService.GetManagersDetails(filter);
