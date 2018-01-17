@@ -35,6 +35,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get broker initial data
         /// </summary>
+        [HttpGet]
         [Route("broker/initData")]
         public IActionResult GetBrokerInitData(Guid brokerTradeServerId)
         {
@@ -63,6 +64,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get data for closing investment period
         /// </summary>
+        [HttpGet]
         [Route("broker/period/сlosingData")]
         public IActionResult GetClosingPeriodData(Guid investmentProgramId)
         {
@@ -78,6 +80,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Close investment period
         /// </summary>
+        [HttpGet]
         [Route("broker/period/close")]
         public IActionResult ClosePeriod(Guid investmentProgramId)
         {
@@ -93,6 +96,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Set investment period start balance
         /// </summary>
+        [HttpGet]
         [Route("broker/period/setStartBalance")]
         public IActionResult SetPeriodStartBalance(Guid periodId, decimal balance)
         {

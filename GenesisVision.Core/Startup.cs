@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -94,6 +95,7 @@ namespace GenesisVision.Core
                     });
 
             services.AddMvcCore()
+                    .AddApiExplorer()
                     .AddAuthorization()
                     .AddDataAnnotations()
                     .AddJsonFormatters();
@@ -107,6 +109,11 @@ namespace GenesisVision.Core
             });
 
             ConfigureCustomServices(services);
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info {Title = "Core API", Version = "v1"});
+            });
         }
 
         private void ConfigureConstants()
@@ -171,6 +178,12 @@ namespace GenesisVision.Core
             app.UseAuthentication();
 
             app.UseMvcWithDefaultRoute();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Core API v1");
+            });
         }
     }
 }

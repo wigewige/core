@@ -59,6 +59,7 @@ namespace GenesisVision.Core.Controllers
             return BadRequest($"Wrong username/password");
         }
 
+        [HttpGet]
         [Authorize]
         [Route("manager/auth/updateToken")]
         [Route("investor/auth/updateToken")]
@@ -75,6 +76,7 @@ namespace GenesisVision.Core.Controllers
             return BadRequest(ValidationMessages.AccessDenied);
         }
 
+        [HttpGet]
         [Authorize]
         [Route("manager")]
         [Route("investor")]
@@ -150,6 +152,7 @@ namespace GenesisVision.Core.Controllers
             return BadRequest(errors);
         }
 
+        [HttpGet]
         [Route("manager/auth/confirmEmail")]
         [Route("investor/auth/confirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)

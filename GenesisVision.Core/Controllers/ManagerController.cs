@@ -33,6 +33,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create request (from cabinet, broker)
         /// </summary>
+        [HttpPost]
         [Route("manager/account/newRequest")]
         //[Route("broker/account/newRequest")]
         public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
@@ -48,6 +49,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create manager (from broker)
         /// </summary>
+        [HttpPost]
         [Route("broker/account/create")]
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
@@ -62,6 +64,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Update manager account
         /// </summary>
+        [HttpPost]
         [Route("manager/account/update")]
         public IActionResult UpdateManagerAccount([FromBody]UpdateManagerAccount account)
         {
@@ -76,6 +79,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Create investment program
         /// </summary>
+        [HttpPost]
         [Route("manager/investment/create")]
         public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
         {
@@ -90,6 +94,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Close existing investment program
         /// </summary>
+        [HttpGet]
         [Route("manager/investment/close")]
         public IActionResult CloseInvestmentProgram(Guid investmentProgramId)
         {
@@ -104,6 +109,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get manager details
         /// </summary>
+        [HttpGet]
         [AllowAnonymous]
         [Route("manager/account")]
         public IActionResult Details(Guid managerId)
@@ -119,6 +125,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get all managers account by user
         /// </summary>
+        [HttpGet]
         [AllowAnonymous]
         [Route("manager/account/user")]
         public IActionResult GetUserManagersAccounts(Guid? userId)
@@ -136,6 +143,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get managers by filter
         /// </summary>
+        [HttpPost]
         [AllowAnonymous]
         [Route("manager/account/search")]
         public IActionResult GetManagers([FromBody]ManagersFilter filter)

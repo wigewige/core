@@ -24,6 +24,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get trades by IPFS hash id
         /// </summary>
+        [HttpGet]
         [Route("trades/ipfsGet")]
         public IActionResult GetTrades(string ipfsHashId)
         {

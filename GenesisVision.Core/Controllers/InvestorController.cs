@@ -28,6 +28,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Invest in manager
         /// </summary>
+        [HttpPost]
         [Route("investor/investment/invest")]
         public IActionResult Invest([FromBody]Invest model)
         {
@@ -42,6 +43,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Get investments by filter
         /// </summary>
+        [HttpPost]
         [Route("investor/investment/search")]
         public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
         {
