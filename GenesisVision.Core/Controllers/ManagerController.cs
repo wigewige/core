@@ -88,6 +88,20 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
+        /// Close existing investment program
+        /// </summary>
+        [Route("manager/investment/close")]
+        public IActionResult CloseInvestmentProgram(Guid investmentProgramId)
+        {
+            var errors = managerValidator.ValidateCloseInvestmentProgram(CurrentUser, investmentProgramId);
+            if (errors.Any())
+                return BadRequest(OperationResult.Failed(errors));
+
+            var result = trustManagementService.CloseInvestmentProgram(investmentProgramId);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Get manager details
         /// </summary>
         [AllowAnonymous]

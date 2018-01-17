@@ -130,6 +130,28 @@ namespace GenesisVision.Core.Services.Validators
             return result;
         }
 
+        public List<string> ValidateCloseInvestmentProgram(ApplicationUser user, Guid investmentProgramId)
+        {
+            if (!user.IsEnabled || user.Type != UserType.Manager)
+                return new List<string> {ValidationMessages.AccessDenied};
+
+            var result = new List<string>();
+
+            var investment = context.InvestmentPrograms
+                                    .Include(x => x.ManagersAccount)
+                                    .FirstOrDefault(x => x.Id == investmentProgramId);
+            if (investment == null)
+                return new List<string> {$"Does not find investment \"{investmentProgramId}\""};
+
+            if (investment.ManagersAccount.UserId != user.Id)
+                return new List<string> {ValidationMessages.AccessDenied};
+
+            if (investment.DateTo.HasValue && investment.DateTo < DateTime.Now)
+                result.Add("Investment already closed");
+
+            return result;
+        }
+
         public List<string> ValidateGetManagerDetails(ApplicationUser user, Guid managerId)
         {
             return context.ManagersAccounts.Any(x => x.Id == managerId)

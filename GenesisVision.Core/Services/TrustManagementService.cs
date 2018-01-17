@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GenesisVision.DataModel;
-using GenesisVision.DataModel.Models;
-using GenesisVision.Core.Helpers;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
-using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GenesisVision.Core.Services
 {
@@ -64,6 +63,26 @@ namespace GenesisVision.Core.Services
                 context.SaveChanges();
 
                 return inv.Id;
+            });
+        }
+
+        public OperationResult CloseInvestmentProgram(Guid invProgramId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var investment = context.InvestmentPrograms
+                                        .Include(x => x.Periods)
+                                        .First(x => x.Id == invProgramId);
+
+                investment.DateTo = DateTime.Now;
+
+                var plannedPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
+                if (plannedPeriod != null)
+                {
+                    plannedPeriod.Status = PeriodStatus.Closed;
+                }
+
+                context.SaveChanges();
             });
         }
 
@@ -188,6 +207,21 @@ namespace GenesisVision.Core.Services
                                                 .ToList();
                     nextPeriod.StartBalance = investments.Sum(x => x.Amount);
                     investments.ForEach(x => x.Status = InvestmentRequestStatus.Executed);
+                }
+
+                var cancelledPeriod = investment.Periods.FirstOrDefault(x =>
+                    x.Status == PeriodStatus.Closed &&
+                    x.Number == currentPeriod.Number + 1);
+                if (cancelledPeriod != null)
+                {
+                    var pendingInvests = cancelledPeriod.InvestmentRequests.Where(x =>
+                        x.Type == InvestmentRequestType.Invest &&
+                        x.Status == InvestmentRequestStatus.New);
+
+                    if (pendingInvests.Any())
+                    {
+                        // todo: return money
+                    }
                 }
 
                 if (!investment.DateTo.HasValue || DateTime.Now < investment.DateTo.Value)
