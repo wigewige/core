@@ -238,6 +238,11 @@ namespace GenesisVision.Core.Services
                     context.Add(newPeriod);
                 }
 
+                if (investment.DateTo.HasValue && investment.DateTo < DateTime.Now)
+                {
+                    investment.IsEnabled = false;
+                }
+
                 context.SaveChanges();
             });
         }

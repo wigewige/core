@@ -22,5 +22,7 @@ namespace GenesisVision.DataModel.Models
         public bool IsEnabled { get; set; }
 
         public UserType Type { get; set; }
+
+        public Profiles Profile { get; set; }
     }
 }

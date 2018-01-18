@@ -144,6 +144,7 @@ namespace GenesisVision.Core
         private void ConfigureCustomServices(IServiceCollection services)
         {
             services.AddTransient<ITrustManagementService, TrustManagementService>();
+            services.AddTransient<IUserService, UserService>();
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
             services.AddTransient<ITradesService, TradesService>();

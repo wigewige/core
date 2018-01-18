@@ -18,12 +18,14 @@ namespace GenesisVision.Core.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailSender emailSender;
+        private readonly IUserService userService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IUserService userService)
             : base(userManager)
         {
             this.userManager = userManager;
             this.emailSender = emailSender;
+            this.userService = userService;
         }
 
         [HttpPost]
@@ -78,18 +80,32 @@ namespace GenesisVision.Core.Controllers
 
         [HttpGet]
         [Authorize]
-        [Route("manager")]
-        [Route("investor")]
-        public IActionResult Details()
+        [Route("manager/profile")]
+        [Route("investor/profile")]
+        public IActionResult ProfileShort()
         {
-            var user = CurrentUser;
-            var model = new AccountViewModel
-                        {
-                            UserName = user.UserName,
-                            Email = user.Email,
-                            Balance = 0m
-                        };
+            var model = CurrentUser.ToProfileShort();
             return Ok(model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("manager/profile/full")]
+        [Route("investor/profile/full")]
+        public IActionResult ProfileFull()
+        {
+            var user = userService.GetUserProfile(CurrentUserId.Value);
+            return Ok(user);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("manager/profile/update")]
+        [Route("investor/profile/update")]
+        public IActionResult UpdateProfile([FromBody]ProfileFullViewModel model)
+        {
+            userService.UpdateUserProfile(CurrentUserId.Value, model);
+            return Ok();
         }
 
         [HttpPost]
@@ -103,7 +119,8 @@ namespace GenesisVision.Core.Controllers
                                UserName = model.Username,
                                Email = model.Email,
                                IsEnabled = true,
-                               Type = UserType.Manager
+                               Type = UserType.Manager,
+                               Profile = new Profiles()
                            };
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
@@ -133,7 +150,8 @@ namespace GenesisVision.Core.Controllers
                                UserName = model.Username,
                                Email = model.Email,
                                IsEnabled = true,
-                               Type = UserType.Investor
+                               Type = UserType.Investor,
+                               Profile = new Profiles()
                            };
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)

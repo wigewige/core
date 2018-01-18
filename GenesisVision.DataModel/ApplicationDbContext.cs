@@ -12,6 +12,7 @@ namespace GenesisVision.DataModel
         {
         }
         
+        public DbSet<Profiles> Profiles { get; set; }
         public DbSet<BrokersAccounts> BrokersAccounts { get; set; }
         public DbSet<BrokerTradeServers> BrokerTradeServers { get; set; }
         public DbSet<ManagerAccounts> ManagersAccounts { get; set; }
@@ -41,6 +42,14 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.BrokersAccount)
                    .WithOne(x => x.User)
                    .HasForeignKey<BrokersAccounts>(x => x.UserId);
+
+            builder.Entity<ApplicationUser>()
+                   .HasOne(x => x.Profile)
+                   .WithOne(x => x.User)
+                   .HasForeignKey<Profiles>(x => x.UserId);
+
+            builder.Entity<Profiles>()
+                   .HasKey(x => x.UserId);
 
             builder.Entity<BrokerTradeServers>()
                    .HasOne(x => x.Broker)
