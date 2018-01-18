@@ -9,7 +9,7 @@ namespace GenesisVision.Core.Services.Interfaces
     {
         OperationResult<Guid> CreateManagerAccount(NewManager request);
         OperationResult UpdateManagerAccount(UpdateManagerAccount account);
-        OperationResult<Guid> CreateManagerAccountRequest(NewManagerRequest request);
+        OperationResult<Guid> CreateNewInvestmentRequest(NewInvestmentRequest request);
         OperationResult<List<ManagerRequest>> GetNewRequests(Guid brokerTradeServerId);
         OperationResult<ManagerAccount> GetManagerDetails(Guid managerId);
         OperationResult<(List<ManagerAccount>, int)> GetManagersDetails(ManagersFilter filter);

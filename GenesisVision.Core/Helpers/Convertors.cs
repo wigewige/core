@@ -45,7 +45,7 @@ namespace GenesisVision.Core.Helpers
                    };
         }
 
-        public static ManagerRequest ToManagerRequest(this ManagerAccountRequests x)
+        public static ManagerRequest ToManagerRequest(this ManagerRequests x)
         {
             return new ManagerRequest
                    {

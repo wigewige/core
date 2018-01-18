@@ -118,12 +118,12 @@ namespace GenesisVision.Core.Tests.Validators
         {
             const string errorMsg = "Does not find trade server";
 
-            var res1 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
-                new NewManagerRequest {BrokerTradeServerId = Guid.NewGuid()});
+            var res1 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
+                new NewInvestmentRequest {BrokerTradeServerId = Guid.NewGuid()});
             Assert.IsTrue(res1.Any(x => x.Contains(errorMsg)));
 
-            var res2 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
-                new NewManagerRequest {BrokerTradeServerId = brokerTradeServer.Id});
+            var res2 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
+                new NewInvestmentRequest {BrokerTradeServerId = brokerTradeServer.Id});
             Assert.IsTrue(!res2.Any(x => x.Contains(errorMsg)));
         }
 
@@ -132,24 +132,24 @@ namespace GenesisVision.Core.Tests.Validators
         {
             const string errorMsg = "Does not find user";
 
-            var res1 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
-                new NewManagerRequest
+            var res1 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
+                new NewInvestmentRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
                     UserId = applicationUser.Id
                 });
             Assert.IsTrue(res1.All(x => x != errorMsg));
 
-            var res2 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
-                new NewManagerRequest
+            var res2 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
+                new NewInvestmentRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
                     UserId = Guid.NewGuid()
                 });
             Assert.IsTrue(res2.Any(x => x == errorMsg));
 
-            var res3 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
-                new NewManagerRequest
+            var res3 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
+                new NewInvestmentRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
                     UserId = null
@@ -162,8 +162,8 @@ namespace GenesisVision.Core.Tests.Validators
         {
             const string errorMsg = "'Name' is empty";
 
-            var res1 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
-                new NewManagerRequest
+            var res1 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
+                new NewInvestmentRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
                     UserId = applicationUser.Id,
@@ -171,8 +171,8 @@ namespace GenesisVision.Core.Tests.Validators
                 });
             Assert.IsTrue(res1.All(x => x != errorMsg));
 
-            var res2 = managerValidator.ValidateNewManagerAccountRequest(applicationUser,
-                new NewManagerRequest
+            var res2 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
+                new NewInvestmentRequest
                 {
                     BrokerTradeServerId = brokerTradeServer.Id,
                     UserId = applicationUser.Id,
@@ -301,21 +301,21 @@ namespace GenesisVision.Core.Tests.Validators
             Assert.IsTrue(res1.Any(x => x.Contains("Does not find request")));
 
             var requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Declined, BrokerTradeServerId = brokerTradeServer.Id});
+            context.Add(new ManagerRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Declined, BrokerTradeServerId = brokerTradeServer.Id});
             context.SaveChanges();
 
             var res2 = managerValidator.ValidateCreateManagerAccount(applicationUser, new NewManager {Login = "xxxxx", RequestId = requestId});
             Assert.IsTrue(res2.Any(x => x.Contains("Could not proccess request")));
 
             requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Processed, BrokerTradeServerId = brokerTradeServer.Id});
+            context.Add(new ManagerRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Processed, BrokerTradeServerId = brokerTradeServer.Id});
             context.SaveChanges();
 
             var res3 = managerValidator.ValidateCreateManagerAccount(applicationUser, new NewManager {Login = "xxxxx", RequestId = requestId});
             Assert.IsTrue(res3.Any(x => x.Contains("Could not proccess request")));
 
             requestId = Guid.NewGuid();
-            context.Add(new ManagerAccountRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Created, BrokerTradeServerId = brokerTradeServer.Id});
+            context.Add(new ManagerRequests {Id = requestId, UserId = applicationUser.Id, Status = ManagerRequestStatus.Created, BrokerTradeServerId = brokerTradeServer.Id});
             context.SaveChanges();
 
             var res4 = managerValidator.ValidateCreateManagerAccount(applicationUser, new NewManager {Login = "xxxxx", RequestId = requestId});

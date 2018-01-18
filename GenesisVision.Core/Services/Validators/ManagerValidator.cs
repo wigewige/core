@@ -21,7 +21,7 @@ namespace GenesisVision.Core.Services.Validators
             this.context = context;
         }
 
-        public List<string> ValidateNewManagerAccountRequest(ApplicationUser user, NewManagerRequest request)
+        public List<string> ValidateNewInvestmentRequest(ApplicationUser user, NewInvestmentRequest request)
         {
             if (!user.IsEnabled || user.Type != UserType.Manager)
                 return new List<string> {ValidationMessages.AccessDenied};
@@ -32,14 +32,10 @@ namespace GenesisVision.Core.Services.Validators
             if (server == null)
                 result.Add($"Does not find trade server id \"{request.BrokerTradeServerId}\"");
 
-            if (request.UserId.HasValue)
+            if (context.Users.Any(x => x.Id == request.UserId))
             {
-                var aspNetUser = context.Users.FirstOrDefault(x => x.Id == request.UserId.Value);
-                if (aspNetUser == null)
-                {
-                    result.Add("Does not find user");
-                    return result;
-                }
+                result.Add("Does not find user");
+                return result;
             }
 
             if (string.IsNullOrEmpty(request.Name))

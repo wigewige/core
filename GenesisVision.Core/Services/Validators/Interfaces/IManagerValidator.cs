@@ -8,7 +8,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
 {
     public interface IManagerValidator
     {
-        List<string> ValidateNewManagerAccountRequest(ApplicationUser user, NewManagerRequest request);
+        List<string> ValidateNewInvestmentRequest(ApplicationUser user, NewInvestmentRequest request);
 
         List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request);
 

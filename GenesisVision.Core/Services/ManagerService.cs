@@ -26,35 +26,33 @@ namespace GenesisVision.Core.Services
             this.smartContractService = smartContractService;
         }
 
-        public OperationResult<Guid> CreateManagerAccountRequest(NewManagerRequest request)
+        public OperationResult<Guid> CreateNewInvestmentRequest(NewInvestmentRequest request)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                Guid userId;
-                if (request.UserId.HasValue)
-                {
-                    userId = request.UserId.Value;
-                }
-                else
-                {
-                    // todo: create new default AspNetUser
-                    throw new Exception("User does not exist");
-                }
-
-                var req = new ManagerAccountRequests
+                var req = new ManagerRequests
                           {
                               Id = Guid.NewGuid(),
-                              Avatar = string.Empty,
-                              BrokerTradeServerId = request.BrokerTradeServerId,
-                              Currency = request.Currency,
-                              TokenName = request.TokenName,
-                              TokenSymbol = request.TokenSymbol,
-                              Description = request.Description,
-                              Name = request.Name,
-                              UserId = userId,
+                              UserId = request.UserId,
                               Date = DateTime.Now,
                               Type = ManagerRequestType.FromCabinet,
-                              Status = ManagerRequestStatus.Created
+                              Status = ManagerRequestStatus.Created,
+                              BrokerTradeServerId = request.BrokerTradeServerId,
+                              DepositAmount = request.DepositAmount,
+                              TradePlatformPassword = request.TradePlatformPassword,
+                              TradePlatformCurrency = "USD",
+                              TokenName = request.TokenName,
+                              TokenSymbol = request.TokenSymbol,
+                              Logo = request.Logo,
+                              Description = request.Description,
+                              DateFrom = request.DateFrom ?? DateTime.Now,
+                              DateTo = request.DateTo,
+                              Period = request.Period,
+                              FeeSuccess = request.FeeSuccess,
+                              FeeManagement = request.FeeManagement,
+                              FeeEntrance = request.FeeEntrance,
+                              InvestMaxAmount = request.InvestMaxAmount,
+                              InvestMinAmount = request.InvestMinAmount
                           };
                 context.Add(req);
                 context.SaveChanges();

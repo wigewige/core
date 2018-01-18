@@ -36,7 +36,7 @@ namespace GenesisVision.Core.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByNameAsync(model.Username);
+                var user = await userManager.FindByNameAsync(model.Email);
                 if (user == null)
                     return BadRequest($"Wrong username/password");
                 
@@ -116,11 +116,12 @@ namespace GenesisVision.Core.Controllers
             {
                 var user = new ApplicationUser
                            {
-                               UserName = model.Username,
+                               UserName = model.Email,
                                Email = model.Email,
                                IsEnabled = true,
                                Type = UserType.Manager,
-                               Profile = new Profiles()
+                               Profile = new Profiles(),
+                               Wallet = new Wallets()
                            };
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
@@ -147,11 +148,12 @@ namespace GenesisVision.Core.Controllers
             {
                 var user = new ApplicationUser
                            {
-                               UserName = model.Username,
+                               UserName = model.Email,
                                Email = model.Email,
                                IsEnabled = true,
                                Type = UserType.Investor,
-                               Profile = new Profiles()
+                               Profile = new Profiles(),
+                               Wallet = new Wallets()
                            };
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)

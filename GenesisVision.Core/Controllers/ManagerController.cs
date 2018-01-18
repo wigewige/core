@@ -31,18 +31,18 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Create request (from cabinet, broker)
+        /// Create new investment request (from cabinet, broker)
         /// </summary>
         [HttpPost]
         [Route("manager/account/newRequest")]
         //[Route("broker/account/newRequest")]
-        public IActionResult NewManagerAccountRequest([FromBody]NewManagerRequest request)
+        public IActionResult NewInvestmentRequest([FromBody]NewInvestmentRequest request)
         {
-            var errors = managerValidator.ValidateNewManagerAccountRequest(CurrentUser, request);
+            var errors = managerValidator.ValidateNewInvestmentRequest(CurrentUser, request);
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
-            var result = managerService.CreateManagerAccountRequest(request);
+            var result = managerService.CreateNewInvestmentRequest(request);
             return Ok(result);
         }
 

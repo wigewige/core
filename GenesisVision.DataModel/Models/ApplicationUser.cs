@@ -11,7 +11,7 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 
-        public ICollection<ManagerAccountRequests> ManagerAccountRequests { get; set; }
+        public ICollection<ManagerRequests> ManagerAccountRequests { get; set; }
 
         public ICollection<IOTransactions> IOTransactions { get; set; }
 
@@ -24,5 +24,7 @@ namespace GenesisVision.DataModel.Models
         public UserType Type { get; set; }
 
         public Profiles Profile { get; set; }
+
+        public Wallets Wallet { get; set; }
     }
 }

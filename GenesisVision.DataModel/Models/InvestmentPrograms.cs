@@ -7,6 +7,8 @@ namespace GenesisVision.DataModel.Models
     {
         public Guid Id { get; set; }
         public string Description { get; set; }
+        public string Logo { get; set; }
+        public decimal Rating { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
         public bool IsEnabled { get; set; }
@@ -17,8 +19,8 @@ namespace GenesisVision.DataModel.Models
         public decimal InvestMinAmount { get; set; }
         public decimal? InvestMaxAmount { get; set; }
 
-        public ManagerAccounts ManagersAccount { get; set; }
-        public Guid ManagersAccountId { get; set; }
+        public ManagerAccounts ManagerAccount { get; set; }
+        public Guid ManagerAccountId { get; set; }
 
         public ManagerTokens Tokens { get; set; }
         public Guid ManagerTokensId { get; set; }

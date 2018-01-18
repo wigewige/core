@@ -18,6 +18,6 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<ManagerAccounts> ManagerAccounts { get; set; }
 
-        public ICollection<ManagerAccountRequests> ManagerAccountRequests { get; set; }
+        public ICollection<ManagerRequests> ManagerAccountRequests { get; set; }
     }
 }
