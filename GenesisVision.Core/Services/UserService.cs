@@ -17,7 +17,15 @@ namespace GenesisVision.Core.Services
             this.context = context;
         }
 
-        public ProfileFullViewModel GetUserProfile(Guid userId)
+        public ProfileShortViewModel GetUserProfileShort(Guid userId)
+        {
+            var user = context.Users
+                              .Include(x => x.Wallet)
+                              .First(x => x.Id == userId);
+            return user.ToProfileShort();
+        }
+
+        public ProfileFullViewModel GetUserProfileFull(Guid userId)
         {
             var user = context.Users
                               .Include(x => x.Profile)

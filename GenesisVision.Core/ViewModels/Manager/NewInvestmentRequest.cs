@@ -8,7 +8,6 @@ namespace GenesisVision.Core.ViewModels.Manager
         public Guid BrokerTradeServerId { get; set; }
 
         public string TradePlatformPassword { get; set; }
-        public string TradePlatformCurrency { get; set; }
         public decimal DepositAmount { get; set; }
 
         public string TokenName { get; set; }

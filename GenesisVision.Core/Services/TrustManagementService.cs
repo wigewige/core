@@ -110,8 +110,9 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var brokerInvestments = context.InvestmentPrograms
-                                               .Include(x => x.Periods)
                                                .Include(x => x.ManagerAccount)
+                                               .Include(x => x.Token)
+                                               .Include(x => x.Periods)
                                                .Where(x =>
                                                    x.ManagerAccount.BrokerTradeServerId == brokerTradeServerId &&
                                                    x.IsEnabled &&

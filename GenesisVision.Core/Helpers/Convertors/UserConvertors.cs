@@ -11,7 +11,7 @@ namespace GenesisVision.Core.Helpers.Convertors
             return new ProfileShortViewModel
                    {
                        Email = user.Email,
-                       Balance = 0
+                       Balance = user.Wallet?.Amount ?? 0
                    };
         }
 

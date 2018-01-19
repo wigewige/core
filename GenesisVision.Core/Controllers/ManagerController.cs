@@ -57,7 +57,10 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(OperationResult.Failed(errors));
 
             var result = managerService.CreateManagerAccount(request);
-            return Ok(result);
+            if (!result.IsSuccess)
+                return BadRequest(OperationResult.Failed(result.Errors));
+
+            return Ok(result.Data);
         }
         
         /// <summary>

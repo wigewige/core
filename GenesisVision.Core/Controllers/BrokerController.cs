@@ -43,22 +43,20 @@ namespace GenesisVision.Core.Controllers
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
-            var result = InvokeOperations.InvokeOperation(() =>
-            {
-                var requests = managerService.GetCreateAccountRequests(brokerTradeServerId);
-                var investments = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServerId);
+            var requests = managerService.GetCreateAccountRequests(brokerTradeServerId);
+            if (!requests.IsSuccess)
+                return BadRequest(OperationResult.Failed(requests.Errors));
 
-                return new BrokerInitData
+            var investments = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServerId);
+            if (!investments.IsSuccess)
+                return BadRequest(OperationResult.Failed(investments.Errors));
+
+            var data = new BrokerInitData
                        {
-                           NewManagerRequest = requests.IsSuccess
-                               ? requests.Data
-                               : new List<ManagerRequest>(),
-                           Investments = investments.IsSuccess
-                               ? investments.Data
-                               : new List<InvestmentProgram>()
+                           NewManagerRequest = requests.Data,
+                           Investments = investments.Data
                        };
-            });
-            return Ok(result);
+            return Ok(data);
         }
 
         /// <summary>
@@ -72,9 +70,11 @@ namespace GenesisVision.Core.Controllers
             if (errors.Any())
                 return BadRequest(OperationResult.Failed(errors));
 
-            var result = trustManagementService.GetClosingPeriodData(investmentProgramId);
+            var data = trustManagementService.GetClosingPeriodData(investmentProgramId);
+            if (!data.IsSuccess)
+                return BadRequest(OperationResult.Failed(data.Errors));
 
-            return Ok(result);
+            return Ok(data.Data);
         }
 
         /// <summary>
@@ -89,8 +89,10 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(OperationResult.Failed(errors));
 
             var result = trustManagementService.ClosePeriod(investmentProgramId);
+            if (!result.IsSuccess)
+                return BadRequest(OperationResult.Failed(result.Errors));
 
-            return Ok(result);
+            return Ok();
         }
 
         /// <summary>
@@ -105,8 +107,10 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(OperationResult.Failed(errors));
 
             var result = trustManagementService.SetPeriodStartBalance(periodId, balance);
+            if (!result.IsSuccess)
+                return BadRequest(OperationResult.Failed(result.Errors));
 
-            return Ok(result);
+            return Ok();
         }
 
         /// <summary>

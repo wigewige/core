@@ -77,7 +77,8 @@ namespace GenesisVision.Core.Services
                                   RegistrationDate = DateTime.Now,
                                   Login = request.Login,
                                   Currency = managerRequest.TradePlatformCurrency,
-                                  IsConfirmed = false
+                                  IsConfirmed = false,
+                                  IpfsHash = string.Empty
                               };
                 var token = new ManagerTokens
                             {
@@ -102,7 +103,7 @@ namespace GenesisVision.Core.Services
                               Period = managerRequest.Period,
                               ManagerTokensId = token.Id,
                               Logo = managerRequest.Logo,
-                              Rating = 0
+                              Rating = 0,
                           };
                 var firstPeriod = new Periods
                                   {
@@ -128,7 +129,7 @@ namespace GenesisVision.Core.Services
                     manager.IsConfirmed = true;
                     context.SaveChanges();
 
-                    var ipfsUpdate = UpdateManagerAccountInIpfs(manager.Id);
+                    var ipfsUpdate = UpdateInvestmentInIpfs(inv.Id);
                     if (ipfsUpdate.IsSuccess)
                     {
                         manager.IpfsHash = ipfsUpdate.Data;
@@ -154,14 +155,15 @@ namespace GenesisVision.Core.Services
             });
         }
         
-        private OperationResult<string> UpdateManagerAccountInIpfs(Guid managerId)
+        private OperationResult<string> UpdateInvestmentInIpfs(Guid investmentId)
         {
-            var manager = context.ManagersAccounts
-                                 .Include(x => x.BrokerTradeServer)
-                                 .ThenInclude(x => x.Broker)
-                                 .First(x => x.Id == managerId);
+            var investmentProgram = context.InvestmentPrograms
+                                           .Include(x => x.ManagerAccount)
+                                           .Include(x => x.Token)
+                                           .Include(x => x.Periods)
+                                           .First(x => x.Id == investmentId);
 
-            var json = JsonConvert.SerializeObject(manager);
+            var json = JsonConvert.SerializeObject(investmentProgram.ToInvestmentProgram());
 
             return ipfsService.WriteIpfsText(json);
         }

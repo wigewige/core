@@ -85,8 +85,8 @@ namespace GenesisVision.Core.Controllers
         [Route("investor/profile")]
         public IActionResult ProfileShort()
         {
-            var model = CurrentUser.ToProfileShort();
-            return Ok(model);
+            var user = userService.GetUserProfileShort(CurrentUserId.Value);
+            return Ok(user);
         }
 
         [HttpGet]
@@ -95,7 +95,7 @@ namespace GenesisVision.Core.Controllers
         [Route("investor/profile/full")]
         public IActionResult ProfileFull()
         {
-            var user = userService.GetUserProfile(CurrentUserId.Value);
+            var user = userService.GetUserProfileFull(CurrentUserId.Value);
             return Ok(user);
         }
 
