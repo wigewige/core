@@ -50,14 +50,14 @@ namespace GenesisVision.Core.Services.Validators
 
             var investmentProgram = context.InvestmentPrograms
                                            .Include(x => x.Periods)
-                                           .Include(x => x.ManagersAccount)
+                                           .Include(x => x.ManagerAccount)
                                            .ThenInclude(x => x.BrokerTradeServer)
                                            .ThenInclude(x => x.Broker)
                                            .FirstOrDefault(x => x.Id == investmentProgramId);
             if (investmentProgram == null)
                 return new List<string> {$"Does not find investment program id \"{investmentProgramId}\""};
 
-            if (user.Id != investmentProgram.ManagersAccount.BrokerTradeServer.Broker.UserId)
+            if (user.Id != investmentProgram.ManagerAccount.BrokerTradeServer.Broker.UserId)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             return result;
@@ -86,7 +86,7 @@ namespace GenesisVision.Core.Services.Validators
 
             var period = context.Periods
                                 .Include(x => x.InvestmentProgram)
-                                .ThenInclude(x => x.ManagersAccount)
+                                .ThenInclude(x => x.ManagerAccount)
                                 .ThenInclude(x => x.BrokerTradeServer)
                                 .ThenInclude(x => x.Broker)
                                 .Include(x => x.InvestmentRequests)
@@ -94,7 +94,7 @@ namespace GenesisVision.Core.Services.Validators
             if (period == null)
                 return new List<string> {$"Does not find period id \"{periodId}\""};
 
-            if (user.Id != period.InvestmentProgram.ManagersAccount.BrokerTradeServer.Broker.UserId)
+            if (user.Id != period.InvestmentProgram.ManagerAccount.BrokerTradeServer.Broker.UserId)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             if (period.Status != PeriodStatus.InProccess)

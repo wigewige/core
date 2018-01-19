@@ -9,15 +9,13 @@ namespace GenesisVision.Core.Services.Interfaces
 {
     public interface ITrustManagementService
     {
-        OperationResult<Guid> CreateInvestmentProgram(CreateInvestment investment);
-
         OperationResult Invest(Invest model);
 
         OperationResult CloseInvestmentProgram(Guid invProgramId);
 
-        OperationResult<(List<Investment>, int)> GetInvestments(InvestmentsFilter filter);
+        OperationResult<(List<InvestmentProgram>, int)> GetInvestments(InvestmentsFilter filter);
 
-        OperationResult<List<Investment>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
+        OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
 
         OperationResult<ClosePeriodData> GetClosingPeriodData(Guid investmentProgramId);
 

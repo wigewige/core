@@ -1,6 +1,5 @@
 ﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Validators.Interfaces;
-using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
@@ -23,7 +22,7 @@ namespace GenesisVision.Core.Services.Validators
 
         public List<string> ValidateNewInvestmentRequest(ApplicationUser user, NewInvestmentRequest request)
         {
-            if (!user.IsEnabled || user.Type != UserType.Manager)
+            if (!user.IsEnabled || user.Type != UserType.Manager || user.Id != request.UserId)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
@@ -31,22 +30,54 @@ namespace GenesisVision.Core.Services.Validators
             var server = context.BrokerTradeServers.FirstOrDefault(x => x.Id == request.BrokerTradeServerId);
             if (server == null)
                 result.Add($"Does not find trade server id \"{request.BrokerTradeServerId}\"");
+            
+            if (context.ManagerTokens.Any(x => x.TokenName == request.TokenName))
+                result.Add("Token name is already exist");
 
-            if (context.Users.Any(x => x.Id == request.UserId))
+            if (context.ManagerTokens.Any(x => x.TokenSymbol == request.TokenSymbol))
+                result.Add("Token symbol is already exist");
+
+            var wallet = context.Wallets.FirstOrDefault(x => x.UserId == user.Id);
+            if (wallet == null || wallet.Amount < request.DepositAmount)
+                result.Add("Not enough money");
+
+            if (request.DateFrom.HasValue && request.DateFrom.Value.Date <= DateTime.Now.Date)
+                result.Add("DateFrom must be greater than today");
+
+            if (request.DateFrom.HasValue && request.DateTo.HasValue)
             {
-                result.Add("Does not find user");
-                return result;
-            }
+                if (request.DateFrom.Value >= request.DateTo.Value)
+                    result.Add("DateTo must be greater DateFrom");
+                else if ((request.DateTo.Value.Date - request.DateFrom.Value.Date).TotalDays < 1)
+                    result.Add("Minimum duration is 1 day");
 
-            if (string.IsNullOrEmpty(request.Name))
-                result.Add("'Name' is empty");
+                if (request.Period > 0 && request.DateFrom.Value.Date.AddDays(request.Period) > request.DateTo.Value.Date)
+                    result.Add("DateTo must be greater first period");
+            }
+            else if (request.DateTo.HasValue && request.DateTo.Value.Date <= DateTime.Now.Date.AddDays(1))
+                result.Add("DateTo must be greater than today");
+
+            if (request.FeeEntrance < 0)
+                result.Add("FeeEntrance must be greater or equal zero");
+
+            if (request.FeeSuccess < 0)
+                result.Add("FeeSuccess must be greater or equal zero");
+
+            if (request.FeeManagement < 0)
+                result.Add("FeeManagement must be greater or equal zero");
+
+            if (string.IsNullOrEmpty(request.Description))
+                result.Add("'Description' is empty");
+
+            if (request.Period <= 0)
+                result.Add("Period must be greater than zero");
 
             return result;
         }
 
         public List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request)
         {
-            if (!user.IsEnabled || user.Type != UserType.Manager)
+            if (!user.IsEnabled || user.Type != UserType.Broker)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
@@ -69,63 +100,7 @@ namespace GenesisVision.Core.Services.Validators
 
             return result;
         }
-
-        public List<string> ValidateCreateInvestmentProgram(ApplicationUser user, CreateInvestment investment)
-        {
-            if (!user.IsEnabled || user.Type != UserType.Manager)
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            var result = new List<string>();
-            
-            var managerAccount = context.ManagersAccounts.FirstOrDefault(x => x.Id == investment.ManagersAccountId);
-            if (managerAccount == null)
-                return new List<string> {$"Does not find manager account \"{investment.ManagersAccountId}\""};
-
-            if (managerAccount.UserId != user.Id)
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            var existInvestmentsPrograms = context.InvestmentPrograms
-                                                  .Where(x => x.ManagersAccountId == investment.ManagersAccountId &&
-                                                              x.IsEnabled &&
-                                                              (x.DateFrom <= DateTime.Now && (x.DateTo == null || x.DateTo > DateTime.Now)))
-                                                  .ToList();
-            if (existInvestmentsPrograms.Any())
-                return new List<string> {"Manager has active investment program"};
-
-            if (investment.DateFrom.HasValue && investment.DateFrom.Value.Date <= DateTime.Now.Date)
-                result.Add("DateFrom must be greater than today");
-
-            if (investment.DateFrom.HasValue && investment.DateTo.HasValue)
-            {
-                if (investment.DateFrom.Value >= investment.DateTo.Value)
-                    result.Add("DateTo must be greater DateFrom");
-                else if ((investment.DateTo.Value.Date - investment.DateFrom.Value.Date).TotalDays < 1)
-                    result.Add("Minimum duration is 1 day");
-
-                if (investment.Period > 0 && investment.DateFrom.Value.Date.AddDays(investment.Period) > investment.DateTo.Value.Date)
-                    result.Add("DateTo must be greater first period");
-            }
-            else if (investment.DateTo.HasValue && investment.DateTo.Value.Date <= DateTime.Now.Date.AddDays(1))
-                result.Add("DateTo must be greater than today");
-            
-            if (investment.FeeEntrance < 0)
-                result.Add("FeeEntrance must be greater or equal zero");
-
-            if (investment.FeeSuccess < 0)
-                result.Add("FeeSuccess must be greater or equal zero");
-
-            if (investment.FeeManagement < 0)
-                result.Add("FeeManagement must be greater or equal zero");
-
-            if (string.IsNullOrEmpty(investment.Description))
-                result.Add("'Description' is empty");
-
-            if (investment.Period <= 0)
-                result.Add("Period must be greater than zero");
-
-            return result;
-        }
-
+        
         public List<string> ValidateCloseInvestmentProgram(ApplicationUser user, Guid investmentProgramId)
         {
             if (!user.IsEnabled || user.Type != UserType.Manager)
@@ -134,12 +109,12 @@ namespace GenesisVision.Core.Services.Validators
             var result = new List<string>();
 
             var investment = context.InvestmentPrograms
-                                    .Include(x => x.ManagersAccount)
+                                    .Include(x => x.ManagerAccount)
                                     .FirstOrDefault(x => x.Id == investmentProgramId);
             if (investment == null)
                 return new List<string> {$"Does not find investment \"{investmentProgramId}\""};
 
-            if (investment.ManagersAccount.UserId != user.Id)
+            if (investment.ManagerAccount.UserId != user.Id)
                 return new List<string> {ValidationMessages.AccessDenied};
 
             if (investment.DateTo.HasValue && investment.DateTo < DateTime.Now)
@@ -153,30 +128,6 @@ namespace GenesisVision.Core.Services.Validators
             return context.ManagersAccounts.Any(x => x.Id == managerId)
                 ? new List<string>()
                 : new List<string> {$"Does not find manager account with id \"{managerId}\""};
-        }
-
-        public List<string> ValidateUpdateManagerAccount(ApplicationUser user, UpdateManagerAccount account)
-        {
-            var managerExistsErrors = ValidateGetManagerDetails(user, account.ManagerAccountId);
-            if (managerExistsErrors.Any())
-                return managerExistsErrors;
-
-            if (!user.IsEnabled)
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            var managerAccount = context.ManagersAccounts.First(x => x.Id == account.ManagerAccountId);
-            if (managerAccount.UserId != user.Id)
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            var result = new List<string>();
-
-            if (string.IsNullOrEmpty(account.Description))
-                result.Add("'Description' is empty");
-
-            if (string.IsNullOrEmpty(account.Name))
-                result.Add("'Name' is empty");
-
-            return result;
         }
     }
 }

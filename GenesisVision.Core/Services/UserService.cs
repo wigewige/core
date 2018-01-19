@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Helpers;
+﻿using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel;

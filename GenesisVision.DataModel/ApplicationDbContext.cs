@@ -151,7 +151,7 @@ namespace GenesisVision.DataModel
 
             builder.Entity<ManagerTokens>()
                    .HasOne(x => x.InvestmentProgram)
-                   .WithOne(x => x.Tokens)
+                   .WithOne(x => x.Token)
                    .HasForeignKey<InvestmentPrograms>(x => x.ManagerTokensId);
         }
     }

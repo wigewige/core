@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Helpers;
+﻿using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
@@ -21,51 +21,7 @@ namespace GenesisVision.Core.Services
         {
             this.context = context;
         }
-
-        public OperationResult<Guid> CreateInvestmentProgram(CreateInvestment investment)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                var token = new ManagerTokens
-                            {
-                                Id = Guid.NewGuid(),
-                                TokenAddress = string.Empty,
-                                TokenSymbol = string.Empty
-                            };
-                var inv = new InvestmentPrograms
-                          {
-                              Id = Guid.NewGuid(),
-                              DateFrom = investment.DateFrom ?? DateTime.Now,
-                              DateTo = investment.DateTo,
-                              Description = investment.Description,
-                              FeeEntrance = investment.FeeEntrance,
-                              FeeManagement = investment.FeeManagement,
-                              FeeSuccess = investment.FeeSuccess,
-                              InvestMaxAmount = investment.InvestMaxAmount,
-                              InvestMinAmount = investment.InvestMinAmount,
-                              IsEnabled = true,
-                              ManagersAccountId = investment.ManagersAccountId,
-                              Period = investment.Period,
-                              ManagerTokensId = token.Id
-                          };
-                var firstPeriod = new Periods
-                                  {
-                                      Id = Guid.NewGuid(),
-                                      DateFrom = inv.DateFrom,
-                                      DateTo = inv.DateFrom.AddDays(inv.Period),
-                                      Status = PeriodStatus.InProccess,
-                                      InvestmentProgramId = inv.Id,
-                                      Number = 1
-                                  };
-                context.Add(inv);
-                context.Add(firstPeriod);
-                context.Add(token);
-                context.SaveChanges();
-
-                return inv.Id;
-            });
-        }
-
+        
         public OperationResult CloseInvestmentProgram(Guid invProgramId)
         {
             return InvokeOperations.InvokeOperation(() =>
@@ -116,18 +72,22 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult<(List<Investment>, int)> GetInvestments(InvestmentsFilter filter)
+        public OperationResult<(List<InvestmentProgram>, int)> GetInvestments(InvestmentsFilter filter)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var query = context.InvestmentPrograms.AsQueryable();
+                var query = context.InvestmentPrograms
+                                   .Include(x => x.ManagerAccount)
+                                   .Include(x => x.Token)
+                                   .Include(x => x.Periods)
+                                   .AsQueryable();
 
                 if (filter.ManagerId.HasValue)
-                    query = query.Where(x => x.ManagersAccountId == filter.ManagerId);
+                    query = query.Where(x => x.ManagerAccountId == filter.ManagerId);
                 if (filter.BrokerId.HasValue)
-                    query = query.Where(x => x.ManagersAccount.BrokerTradeServer.BrokerId == filter.BrokerId);
+                    query = query.Where(x => x.ManagerAccount.BrokerTradeServer.BrokerId == filter.BrokerId);
                 if (filter.BrokerTradeServerId.HasValue)
-                    query = query.Where(x => x.ManagersAccount.BrokerTradeServerId == filter.BrokerTradeServerId);
+                    query = query.Where(x => x.ManagerAccount.BrokerTradeServerId == filter.BrokerTradeServerId);
                 if (filter.InvestMaxAmountFrom.HasValue)
                     query = query.Where(x => x.InvestMinAmount >= filter.InvestMaxAmountFrom);
                 if (filter.InvestMaxAmountTo.HasValue)
@@ -140,23 +100,24 @@ namespace GenesisVision.Core.Services
                 if (filter.Take.HasValue)
                     query = query.Take(filter.Take.Value);
 
-                var investments = query.Select(x => x.ToInvestment()).ToList();
+                var investments = query.Select(x => x.ToInvestmentProgram()).ToList();
                 return (investments, count);
             });
         }
 
-        public OperationResult<List<Investment>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId)
+        public OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
                 var brokerInvestments = context.InvestmentPrograms
                                                .Include(x => x.Periods)
+                                               .Include(x => x.ManagerAccount)
                                                .Where(x =>
-                                                   x.ManagersAccount.BrokerTradeServerId == brokerTradeServerId &&
+                                                   x.ManagerAccount.BrokerTradeServerId == brokerTradeServerId &&
                                                    x.IsEnabled &&
                                                    x.DateFrom < DateTime.Now &&
                                                    (x.DateTo == null || x.DateTo > DateTime.Now))
-                                               .Select(x => x.ToInvestment())
+                                               .Select(x => x.ToInvestmentProgram())
                                                .ToList();
                 return brokerInvestments;
             });

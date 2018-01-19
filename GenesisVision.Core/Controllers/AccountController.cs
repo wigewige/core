@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
+using GenesisVision.Core.Helpers.Convertors;
 
 namespace GenesisVision.Core.Controllers
 {

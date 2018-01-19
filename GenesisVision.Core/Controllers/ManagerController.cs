@@ -31,11 +31,10 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Create new investment request (from cabinet, broker)
+        /// Create new investment request
         /// </summary>
         [HttpPost]
         [Route("manager/account/newRequest")]
-        //[Route("broker/account/newRequest")]
         public IActionResult NewInvestmentRequest([FromBody]NewInvestmentRequest request)
         {
             var errors = managerValidator.ValidateNewInvestmentRequest(CurrentUser, request);
@@ -60,37 +59,7 @@ namespace GenesisVision.Core.Controllers
             var result = managerService.CreateManagerAccount(request);
             return Ok(result);
         }
-
-        /// <summary>
-        /// Update manager account
-        /// </summary>
-        [HttpPost]
-        [Route("manager/account/update")]
-        public IActionResult UpdateManagerAccount([FromBody]UpdateManagerAccount account)
-        {
-            var errors = managerValidator.ValidateUpdateManagerAccount(CurrentUser, account);
-            if (errors.Any())
-                return BadRequest(OperationResult.Failed(errors));
-
-            var details = managerService.UpdateManagerAccount(account);
-            return Ok(details);
-        }
-
-        /// <summary>
-        /// Create investment program
-        /// </summary>
-        [HttpPost]
-        [Route("manager/investment/create")]
-        public IActionResult CreateInvestmentProgram([FromBody]CreateInvestment investment)
-        {
-            var errors = managerValidator.ValidateCreateInvestmentProgram(CurrentUser, investment);
-            if (errors.Any())
-                return BadRequest(OperationResult.Failed(errors));
-
-            var result = trustManagementService.CreateInvestmentProgram(investment);
-            return Ok(result);
-        }
-
+        
         /// <summary>
         /// Close existing investment program
         /// </summary>
@@ -104,52 +73,6 @@ namespace GenesisVision.Core.Controllers
 
             var result = trustManagementService.CloseInvestmentProgram(investmentProgramId);
             return Ok(result);
-        }
-
-        /// <summary>
-        /// Get manager details
-        /// </summary>
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("manager/account")]
-        public IActionResult Details(Guid managerId)
-        {
-            var errors = managerValidator.ValidateGetManagerDetails(CurrentUser, managerId);
-            if (errors.Any())
-                return BadRequest(OperationResult.Failed(errors));
-
-            var details = managerService.GetManagerDetails(managerId);
-            return Ok(details);
-        }
-
-        /// <summary>
-        /// Get all managers account by user
-        /// </summary>
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("manager/account/user")]
-        public IActionResult GetUserManagersAccounts(Guid? userId)
-        {
-            if (!userId.HasValue && CurrentUserId.HasValue)
-                userId = CurrentUserId;
-
-            if (!userId.HasValue)
-                return BadRequest();
-
-            var managers = managerService.GetUserManagersAccounts(userId.Value);
-            return Ok(managers);
-        }
-
-        /// <summary>
-        /// Get managers by filter
-        /// </summary>
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("manager/account/search")]
-        public IActionResult GetManagers([FromBody]ManagersFilter filter)
-        {
-            var res = managerService.GetManagersDetails(filter);
-            return Ok(res);
         }
     }
 }

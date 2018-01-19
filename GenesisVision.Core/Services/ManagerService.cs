@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Helpers;
+﻿using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
@@ -66,34 +66,66 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var managerRequest = context.ManagerRequests.First(x => x.Id == request.RequestId && x.Status == ManagerRequestStatus.Created);
+                managerRequest.TradePlatformPassword = null;
+                managerRequest.Status = ManagerRequestStatus.Processed;
 
                 var manager = new ManagerAccounts
                               {
                                   Id = Guid.NewGuid(),
-                                  Avatar = managerRequest.Avatar,
                                   BrokerTradeServerId = managerRequest.BrokerTradeServerId,
-                                  Currency = managerRequest.Currency,
-                                  TokenName = managerRequest.TokenName,
-                                  TokenSymbol = managerRequest.TokenSymbol,
-                                  Description = managerRequest.Description,
-                                  Login = request.Login,
-                                  Name = managerRequest.Name,
-                                  IsEnabled = true,
-                                  Rating = 0,
                                   UserId = managerRequest.UserId,
-                                  RegistrationDate = DateTime.Now
+                                  RegistrationDate = DateTime.Now,
+                                  Login = request.Login,
+                                  Currency = managerRequest.TradePlatformCurrency,
+                                  IsConfirmed = false
                               };
+                var token = new ManagerTokens
+                            {
+                                Id = Guid.NewGuid(),
+                                TokenAddress = string.Empty,
+                                TokenName = managerRequest.TokenName,
+                                TokenSymbol = managerRequest.TokenSymbol
+                            };
+                var inv = new InvestmentPrograms
+                          {
+                              Id = Guid.NewGuid(),
+                              DateFrom = managerRequest.DateFrom,
+                              DateTo = managerRequest.DateTo,
+                              Description = managerRequest.Description,
+                              FeeEntrance = managerRequest.FeeEntrance,
+                              FeeManagement = managerRequest.FeeManagement,
+                              FeeSuccess = managerRequest.FeeSuccess,
+                              InvestMaxAmount = managerRequest.InvestMaxAmount,
+                              InvestMinAmount = managerRequest.InvestMinAmount,
+                              IsEnabled = true,
+                              ManagerAccountId = manager.Id,
+                              Period = managerRequest.Period,
+                              ManagerTokensId = token.Id,
+                              Logo = managerRequest.Logo,
+                              Rating = 0
+                          };
+                var firstPeriod = new Periods
+                                  {
+                                      Id = Guid.NewGuid(),
+                                      DateFrom = inv.DateFrom,
+                                      DateTo = inv.DateFrom.AddDays(inv.Period),
+                                      Status = PeriodStatus.InProccess,
+                                      InvestmentProgramId = inv.Id,
+                                      Number = 1
+                                  };
                 context.Add(manager);
-                managerRequest.Status = ManagerRequestStatus.Processed;
+                context.Add(token);
+                context.Add(inv);
+                context.Add(firstPeriod);
                 context.SaveChanges();
 
-                var blockchainUpdate =
-                    smartContractService.RegisterManager(manager.TokenName, manager.TokenSymbol, manager.Id.ToString(), manager.Login, 
-                    manager.BrokerTradeServerId.ToString(), 0, 0); // TODO fill fees
+                var blockchainUpdate = smartContractService.RegisterManager(token.TokenName, token.TokenSymbol,
+                    manager.Id.ToString(), manager.Login,
+                    manager.BrokerTradeServerId.ToString(), inv.FeeManagement, inv.FeeSuccess);
 
                 if (blockchainUpdate.IsSuccess)
                 {
-                    manager.Confirmed = true;
+                    manager.IsConfirmed = true;
                     context.SaveChanges();
 
                     var ipfsUpdate = UpdateManagerAccountInIpfs(manager.Id);
@@ -108,118 +140,28 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult UpdateManagerAccount(UpdateManagerAccount account)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                var manager = context.ManagersAccounts.First(x => x.Id == account.ManagerAccountId);
-
-                manager.Avatar = account.Avatar;
-                manager.Name = account.Name;
-                manager.Description = account.Description;
-
-                context.SaveChanges();
-
-                var ipfsUpdate = UpdateManagerAccountInIpfs(account.ManagerAccountId);
-                if (ipfsUpdate.IsSuccess)
-                {
-                    manager.IpfsHash = ipfsUpdate.Data;
-                    context.SaveChanges();
-                }
-            });
-        }
-
-        public OperationResult<List<ManagerRequest>> GetNewRequests(Guid brokerTradeServerId)
+        public OperationResult<List<ManagerRequest>> GetCreateAccountRequests(Guid brokerTradeServerId)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
                 var result = context.ManagerRequests
+                                    .Include(x => x.User)
+                                    .ThenInclude(x => x.Profile)
                                     .Where(x => x.BrokerTradeServerId == brokerTradeServerId && x.Status == ManagerRequestStatus.Created)
                                     .Select(x => x.ToManagerRequest())
                                     .ToList();
                 return result;
             });
         }
-
-        public OperationResult<ManagerAccount> GetManagerDetails(Guid managerId)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                var manager = context.ManagersAccounts
-                                     .Include(x => x.BrokerTradeServer)
-                                     .ThenInclude(x => x.Broker)
-                                     .First(x => x.Id == managerId);
-                return manager.ToManagerAccount();
-            });
-        }
-
-        public OperationResult<(List<ManagerAccount>, int)> GetManagersDetails(ManagersFilter filter)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                var query = context.ManagersAccounts
-                                   .Include(x => x.BrokerTradeServer)
-                                   .ThenInclude(x => x.Broker)
-                                   .AsQueryable();
-
-                if (!string.IsNullOrEmpty(filter.Name))
-                {
-                    var str = filter.Name.Trim().ToLower();
-                    query = query.Where(x => x.Name.ToLower().Contains(str) ||
-                                             x.Description.ToLower().Contains(str) ||
-                                             x.Login.ToLower().Contains(str) ||
-                                             x.Id.ToString().ToLower().Contains(str));
-                }
-                if (!string.IsNullOrEmpty(filter.BrokerName))
-                {
-                    var str = filter.BrokerName.Trim().ToLower();
-                    query = query.Where(x => x.BrokerTradeServer.Broker.Name.ToLower().Contains(str) ||
-                                             x.BrokerTradeServer.Broker.Description.ToLower().Contains(str) ||
-                                             x.BrokerTradeServer.Broker.Id.ToString().ToLower().Contains(str));
-                }
-                if (!string.IsNullOrEmpty(filter.BrokerTradeServerName))
-                {
-                    var str = filter.BrokerTradeServerName.Trim().ToLower();
-                    query = query.Where(x => x.BrokerTradeServer.Name.ToLower().Contains(str) ||
-                                             x.BrokerTradeServer.Host.ToLower().Contains(str) ||
-                                             x.BrokerTradeServer.Id.ToString().ToLower().Contains(str));
-                }
-                if (filter.BrokerTradeServerType.HasValue)
-                    query = query.Where(x => x.BrokerTradeServer.Type == filter.BrokerTradeServerType.Value);
-
-                var count = query.Count();
-
-                if (filter.Skip.HasValue)
-                    query = query.Skip(filter.Skip.Value);
-                if (filter.Take.HasValue)
-                    query = query.Take(filter.Take.Value);
-
-                var managers = query.Select(x => x.ToManagerAccount()).ToList();
-                return (managers, count);
-            });
-        }
-
-        public OperationResult<List<ManagerAccount>> GetUserManagersAccounts(Guid userId)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                var managers = context.ManagersAccounts
-                                      .Include(x => x.BrokerTradeServer)
-                                      .ThenInclude(x => x.Broker)
-                                      .Where(x => x.UserId == userId)
-                                      .Select(x => x.ToManagerAccount())
-                                      .ToList();
-                return managers;
-            });
-        }
-
+        
         private OperationResult<string> UpdateManagerAccountInIpfs(Guid managerId)
         {
-            var account = GetManagerDetails(managerId);
-            if (!account.IsSuccess)
-                return OperationResult<string>.Failed();
+            var manager = context.ManagersAccounts
+                                 .Include(x => x.BrokerTradeServer)
+                                 .ThenInclude(x => x.Broker)
+                                 .First(x => x.Id == managerId);
 
-            var json = JsonConvert.SerializeObject(account.Data);
+            var json = JsonConvert.SerializeObject(manager);
 
             return ipfsService.WriteIpfsText(json);
         }

@@ -175,7 +175,7 @@ namespace GenesisVision.Core.Tests.Services
             Assert.IsTrue(result.IsSuccess);
 
             var investment = context.InvestmentPrograms
-                                    .Include(x => x.Tokens)
+                                    .Include(x => x.Token)
                                     .FirstOrDefault(x => x.Id == result.Data);
             Assert.IsNotNull(investment);
             Assert.AreEqual(createInvestment.Description, investment.Description);
@@ -195,7 +195,7 @@ namespace GenesisVision.Core.Tests.Services
             Assert.IsTrue(Math.Abs((createInvestment.DateFrom.Value - period.DateFrom).TotalSeconds) < 3);
             Assert.IsTrue(Math.Abs((createInvestment.DateFrom.Value.AddDays(createInvestment.Period) - period.DateTo).TotalSeconds) < 3);
 
-            var token = investment.Tokens;
+            var token = investment.Token;
             Assert.IsNotNull(token);
         }
 

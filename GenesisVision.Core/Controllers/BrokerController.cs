@@ -45,7 +45,7 @@ namespace GenesisVision.Core.Controllers
 
             var result = InvokeOperations.InvokeOperation(() =>
             {
-                var requests = managerService.GetNewRequests(brokerTradeServerId);
+                var requests = managerService.GetCreateAccountRequests(brokerTradeServerId);
                 var investments = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServerId);
 
                 return new BrokerInitData
@@ -55,7 +55,7 @@ namespace GenesisVision.Core.Controllers
                                : new List<ManagerRequest>(),
                            Investments = investments.IsSuccess
                                ? investments.Data
-                               : new List<Investment>()
+                               : new List<InvestmentProgram>()
                        };
             });
             return Ok(result);

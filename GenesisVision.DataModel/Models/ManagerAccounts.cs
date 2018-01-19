@@ -9,6 +9,7 @@ namespace GenesisVision.DataModel.Models
         public string Currency { get; set; }
         public DateTime RegistrationDate { get; set; }
         public string IpfsHash { get; set; }
+        public bool IsConfirmed { get; set; }
 
         public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
