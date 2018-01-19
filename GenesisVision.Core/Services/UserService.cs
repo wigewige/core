@@ -21,6 +21,7 @@ namespace GenesisVision.Core.Services
         {
             var user = context.Users
                               .Include(x => x.Profile)
+                              .Include(x => x.Wallet)
                               .First(x => x.Id == userId);
             return user.ToProfileFull();
         }

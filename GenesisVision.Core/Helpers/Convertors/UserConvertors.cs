@@ -20,7 +20,7 @@ namespace GenesisVision.Core.Helpers.Convertors
             var model = new ProfileFullViewModel
                         {
                             Email = user.Email,
-                            Balance = 0
+                            Balance = user.Wallet?.Amount ?? 0
                         };
             if (user.Profile != null)
             {

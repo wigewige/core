@@ -34,7 +34,7 @@ namespace GenesisVision.Core.Controllers
         /// Create new investment request
         /// </summary>
         [HttpPost]
-        [Route("manager/account/newRequest")]
+        [Route("manager/account/newInvestmentRequest")]
         public IActionResult NewInvestmentRequest([FromBody]NewInvestmentRequest request)
         {
             var errors = managerValidator.ValidateNewInvestmentRequest(CurrentUser, request);
