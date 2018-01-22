@@ -87,9 +87,10 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Get investment program by id
+        /// Get investment program with statistic by id
         /// </summary>
         [HttpGet]
+        [AllowAnonymous]
         [Route("manager/investment")]
         public IActionResult GetInvestmentProgram(Guid investmentProgramId)
         {

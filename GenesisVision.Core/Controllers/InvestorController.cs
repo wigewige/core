@@ -47,6 +47,7 @@ namespace GenesisVision.Core.Controllers
         /// Get investments by filter
         /// </summary>
         [HttpPost]
+        [AllowAnonymous]
         [Route("investor/investments")]
         public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
         {

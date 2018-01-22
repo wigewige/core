@@ -114,6 +114,20 @@ namespace GenesisVision.Core.Services
                                       InvestmentProgramId = inv.Id,
                                       Number = 1
                                   };
+                if (!inv.DateTo.HasValue || inv.DateTo < inv.DateFrom.AddDays(inv.Period))
+                {
+                    var plannedPeriod = new Periods
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            DateFrom = firstPeriod.DateTo,
+                                            DateTo = firstPeriod.DateTo.AddDays(inv.Period),
+                                            Status = PeriodStatus.Planned,
+                                            InvestmentProgramId = inv.Id,
+                                            Number = 2
+                                        };
+                    context.Add(plannedPeriod);
+                }
+
                 context.Add(manager);
                 context.Add(token);
                 context.Add(inv);
