@@ -93,6 +93,35 @@ namespace GenesisVision.Core.Services
                 if (filter.InvestMaxAmountTo.HasValue)
                     query = query.Where(x => x.InvestMaxAmount < filter.InvestMaxAmountTo);
 
+                if (filter.Sorting.HasValue)
+                {
+                    switch (filter.Sorting.Value)
+                    {
+                        case Sorting.ByRatingAsc:
+                            query = query.OrderBy(x => x.Rating);
+                            break;
+                        case Sorting.ByRatingDesc:
+                            query = query.OrderByDescending(x => x.Rating);
+                            break;
+                        case Sorting.ByOrdersAsc:
+                            query = query.OrderBy(x => x.OrdersCount);
+                            break;
+                        case Sorting.ByOrdersDesc:
+                            query = query.OrderByDescending(x => x.OrdersCount);
+                            break;
+                        case Sorting.ByProfitAsc:
+                            query = query.OrderBy(x => x.TotalProfit);
+                            break;
+                        case Sorting.ByProfitDesc:
+                            query = query.OrderByDescending(x => x.TotalProfit);
+                            break;
+                    }
+                }
+                else
+                {
+                    query = query.OrderByDescending(x => x.Rating);
+                }
+
                 var count = query.Count();
 
                 if (filter.Skip.HasValue)

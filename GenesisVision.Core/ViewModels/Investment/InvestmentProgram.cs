@@ -29,6 +29,9 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal InvestMinAmount { get; set; }
         public decimal? InvestMaxAmount { get; set; }
         public Period LastPeriod { get; set; }
+        public decimal Rating { get; set; }
+        public int OrdersCount { get; set; }
+        public decimal TotalProfit { get; set; }
     }
 
     public class ManagerAccount

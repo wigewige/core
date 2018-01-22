@@ -1,4 +1,5 @@
 ﻿using GenesisVision.Core.Helpers.Convertors;
+using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel;
@@ -17,41 +18,50 @@ namespace GenesisVision.Core.Services
             this.context = context;
         }
 
-        public ProfileShortViewModel GetUserProfileShort(Guid userId)
+        public OperationResult<ProfileShortViewModel> GetUserProfileShort(Guid userId)
         {
-            var user = context.Users
-                              .Include(x => x.Wallet)
-                              .First(x => x.Id == userId);
-            return user.ToProfileShort();
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var user = context.Users
+                                  .Include(x => x.Wallet)
+                                  .First(x => x.Id == userId);
+                return user.ToProfileShort();
+            });
         }
 
-        public ProfileFullViewModel GetUserProfileFull(Guid userId)
+        public OperationResult<ProfileFullViewModel> GetUserProfileFull(Guid userId)
         {
-            var user = context.Users
-                              .Include(x => x.Profile)
-                              .Include(x => x.Wallet)
-                              .First(x => x.Id == userId);
-            return user.ToProfileFull();
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var user = context.Users
+                                  .Include(x => x.Profile)
+                                  .Include(x => x.Wallet)
+                                  .First(x => x.Id == userId);
+                return user.ToProfileFull();
+            });
         }
 
-        public void UpdateUserProfile(Guid userId, ProfileFullViewModel profile)
+        public OperationResult UpdateUserProfile(Guid userId, ProfileFullViewModel profile)
         {
-            var user = context.Profiles.First(x => x.UserId == userId);
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var user = context.Profiles.First(x => x.UserId == userId);
 
-            user.Avatar = profile.Avatar;
-            user.Address = profile.Address;
-            user.Birthday = profile.Birthday;
-            user.City = profile.City;
-            user.Country = profile.Country;
-            user.DocumentNumber = profile.DocumentNumber;
-            user.DocumentType = profile.DocumentType;
-            user.FirstName = profile.FirstName;
-            user.Gender = profile.Gender;
-            user.LastName = profile.LastName;
-            user.MiddleName = profile.MiddleName;
-            user.Phone = profile.Phone;
+                user.Avatar = profile.Avatar;
+                user.Address = profile.Address;
+                user.Birthday = profile.Birthday;
+                user.City = profile.City;
+                user.Country = profile.Country;
+                user.DocumentNumber = profile.DocumentNumber;
+                user.DocumentType = profile.DocumentType;
+                user.FirstName = profile.FirstName;
+                user.Gender = profile.Gender;
+                user.LastName = profile.LastName;
+                user.MiddleName = profile.MiddleName;
+                user.Phone = profile.Phone;
 
-            context.SaveChanges();
+                context.SaveChanges();
+            });
         }
     }
 }

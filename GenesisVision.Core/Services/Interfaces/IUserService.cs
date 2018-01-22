@@ -1,15 +1,15 @@
-﻿using GenesisVision.Core.ViewModels.Account;
-using GenesisVision.DataModel.Models;
+﻿using GenesisVision.Core.Models;
+using GenesisVision.Core.ViewModels.Account;
 using System;
 
 namespace GenesisVision.Core.Services.Interfaces
 {
     public interface IUserService
     {
-        ProfileShortViewModel GetUserProfileShort(Guid userId);
+        OperationResult<ProfileShortViewModel> GetUserProfileShort(Guid userId);
 
-        ProfileFullViewModel GetUserProfileFull(Guid userId);
+        OperationResult<ProfileFullViewModel> GetUserProfileFull(Guid userId);
 
-        void UpdateUserProfile(Guid userId, ProfileFullViewModel profile);
+        OperationResult UpdateUserProfile(Guid userId, ProfileFullViewModel profile);
     }
 }

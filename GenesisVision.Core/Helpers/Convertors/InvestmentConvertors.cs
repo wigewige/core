@@ -77,6 +77,9 @@ namespace GenesisVision.Core.Helpers.Convertors
                                         ManagerAccountId = inv.ManagerAccountId,
                                         ManagerTokensId = inv.ManagerTokensId,
                                         Logo = inv.Logo,
+                                        Rating = inv.Rating,
+                                        OrdersCount = inv.OrdersCount,
+                                        TotalProfit = inv.TotalProfit,
                                         LastPeriod = inv.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod()
                                     },
                        Token = new ManagerToken

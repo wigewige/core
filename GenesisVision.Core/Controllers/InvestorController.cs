@@ -29,7 +29,7 @@ namespace GenesisVision.Core.Controllers
         /// Invest in manager
         /// </summary>
         [HttpPost]
-        [Route("investor/investment/invest")]
+        [Route("investor/investments/invest")]
         public IActionResult Invest([FromBody]Invest model)
         {
             var errors = investorValidator.ValidateInvest(CurrentUser, model);
@@ -37,18 +37,29 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(OperationResult.Failed(errors));
 
             var res = trustManagementService.Invest(model);
-            return Ok(res);
+            if (!res.IsSuccess)
+                return BadRequest(OperationResult.Failed(res.Errors));
+
+            return Ok();
         }
 
         /// <summary>
         /// Get investments by filter
         /// </summary>
         [HttpPost]
-        [Route("investor/investment/search")]
+        [Route("investor/investments")]
         public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
         {
-            var res = trustManagementService.GetInvestments(filter);
-            return Ok(res);
+            var data = trustManagementService.GetInvestments(filter);
+
+            if (!data.IsSuccess)
+                return BadRequest(data.Errors);
+
+            return Ok(new
+                      {
+                          Investments = data.Data.Item1,
+                          Total = data.Data.Item2
+                      });
         }
     }
 }

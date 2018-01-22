@@ -121,8 +121,16 @@ namespace GenesisVision.Core.Controllers
         [Route("manager/brokers")]
         public IActionResult GetBrokers([FromBody]BrokersFilter filter)
         {
-            var result = trustManagementService.GetBrokerTradeServers(filter);
-            return Ok(result);
+            var data = trustManagementService.GetBrokerTradeServers(filter);
+
+            if (!data.IsSuccess)
+                return BadRequest(data.Errors);
+
+            return Ok(new
+                      {
+                          Brokers = data.Data.Item1,
+                          Total = data.Data.Item2
+                      });
         }
     }
 }

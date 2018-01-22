@@ -42,7 +42,10 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(OperationResult.Failed(errors));
 
             var result = managerService.CreateNewInvestmentRequest(request);
-            return Ok(result);
+            if (!result.IsSuccess)
+                return BadRequest(result.Errors);
+            
+            return Ok(result.Data);
         }
 
         /// <summary>
@@ -58,7 +61,7 @@ namespace GenesisVision.Core.Controllers
 
             var result = managerService.CreateManagerAccount(request);
             if (!result.IsSuccess)
-                return BadRequest(OperationResult.Failed(result.Errors));
+                return BadRequest(result.Errors);
 
             return Ok(result.Data);
         }
@@ -75,7 +78,10 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(OperationResult.Failed(errors));
 
             var result = trustManagementService.CloseInvestmentProgram(investmentProgramId);
-            return Ok(result);
+            if (!result.IsSuccess)
+                return BadRequest(result.Errors);
+
+            return Ok();
         }
     }
 }

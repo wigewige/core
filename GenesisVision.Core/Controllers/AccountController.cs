@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
-using GenesisVision.Core.Helpers.Convertors;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -86,7 +85,10 @@ namespace GenesisVision.Core.Controllers
         public IActionResult ProfileShort()
         {
             var user = userService.GetUserProfileShort(CurrentUserId.Value);
-            return Ok(user);
+            if (!user.IsSuccess)
+                return BadRequest(user.Errors);
+
+            return Ok(user.Data);
         }
 
         [HttpGet]
@@ -96,7 +98,10 @@ namespace GenesisVision.Core.Controllers
         public IActionResult ProfileFull()
         {
             var user = userService.GetUserProfileFull(CurrentUserId.Value);
-            return Ok(user);
+            if (!user.IsSuccess)
+                return BadRequest(user.Errors);
+
+            return Ok(user.Data);
         }
 
         [HttpPost]
@@ -105,7 +110,10 @@ namespace GenesisVision.Core.Controllers
         [Route("investor/profile/update")]
         public IActionResult UpdateProfile([FromBody]ProfileFullViewModel model)
         {
-            userService.UpdateUserProfile(CurrentUserId.Value, model);
+            var res = userService.UpdateUserProfile(CurrentUserId.Value, model);
+            if (!res.IsSuccess)
+                return BadRequest(res.Errors);
+
             return Ok();
         }
 
