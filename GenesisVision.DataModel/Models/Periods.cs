@@ -18,5 +18,7 @@ namespace GenesisVision.DataModel.Models
         public Guid InvestmentProgramId { get; set; }
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
+
+        public ICollection<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
     }
 }

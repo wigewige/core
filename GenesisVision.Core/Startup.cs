@@ -150,6 +150,7 @@ namespace GenesisVision.Core
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
+            services.AddTransient<IStatisticService, StatisticService>();
             services.AddTransient<ITradesService, TradesService>();
             services.AddTransient<IEmailSender, EmailSender>();
 

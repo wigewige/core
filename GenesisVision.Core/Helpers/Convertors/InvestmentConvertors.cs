@@ -91,5 +91,15 @@ namespace GenesisVision.Core.Helpers.Convertors
                                }
                    };
         }
+
+        public static InvestmentProgramStatistic ToInvestmentProgramStatistic(this ManagersAccountsStatistics statistic)
+        {
+            return new InvestmentProgramStatistic
+                   {
+                       Date = statistic.Date,
+                       CurrentBalance = statistic.CurrentBalance,
+                       Profit = statistic.Profit
+                   };
+        }
     }
 }

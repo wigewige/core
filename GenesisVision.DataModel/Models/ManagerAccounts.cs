@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GenesisVision.DataModel.Models
 {
@@ -18,5 +19,7 @@ namespace GenesisVision.DataModel.Models
         public Guid BrokerTradeServerId { get; set; }
 
         public InvestmentPrograms InvestmentProgram { get; set; }
+
+        public ICollection<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
     }
 }

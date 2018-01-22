@@ -30,5 +30,7 @@ namespace GenesisVision.DataModel.Models
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 
         public ICollection<Periods> Periods { get; set; }
+
+        public ICollection<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
     }
 }

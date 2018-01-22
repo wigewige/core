@@ -134,6 +134,20 @@ namespace GenesisVision.Core.Services
             });
         }
 
+        public OperationResult<InvestmentProgram> GetInvestment(Guid investmentId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var program = context.InvestmentPrograms
+                                     .Include(x => x.ManagerAccount)
+                                     .Include(x => x.Token)
+                                     .Include(x => x.Periods)
+                                     .First(x => x.Id == investmentId);
+
+                return program.ToInvestmentProgram();
+            });
+        }
+
         public OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId)
         {
             return InvokeOperations.InvokeOperation(() =>

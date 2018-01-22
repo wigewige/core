@@ -18,14 +18,16 @@ namespace GenesisVision.Core.Controllers
     public class ManagerController : BaseController
     {
         private readonly ITrustManagementService trustManagementService;
+        private readonly IStatisticService statisticService;
         private readonly IManagerService managerService;
         private readonly IManagerValidator managerValidator;
 
-        public ManagerController(ITrustManagementService trustManagementService, IManagerService managerService,
+        public ManagerController(ITrustManagementService trustManagementService, IStatisticService statisticService, IManagerService managerService,
             IManagerValidator managerValidator, UserManager<ApplicationUser> userManager)
             : base(userManager)
         {
             this.trustManagementService = trustManagementService;
+            this.statisticService = statisticService;
             this.managerService = managerService;
             this.managerValidator = managerValidator;
         }
@@ -82,6 +84,28 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(result.Errors);
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Get investment program by id
+        /// </summary>
+        [HttpGet]
+        [Route("manager/investment")]
+        public IActionResult GetInvestmentProgram(Guid investmentProgramId)
+        {
+            var investment = trustManagementService.GetInvestment(investmentProgramId);
+            if (!investment.IsSuccess)
+                return BadRequest(investment.Errors);
+
+            var statistic = statisticService.GetInvestmentProgramStatistic(investmentProgramId);
+            if (!statistic.IsSuccess)
+                return BadRequest(statistic.Errors);
+
+            return Ok(new
+                      {
+                          InvestmentProgram = investment.Data,
+                          Statistic = statistic.Data
+                      });
         }
     }
 }

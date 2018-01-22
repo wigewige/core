@@ -9,6 +9,8 @@ namespace GenesisVision.DataModel.Models
     {
         public ICollection<ManagerAccounts> ManagerAccounts { get; set; }
 
+        public ICollection<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
+
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 
         public ICollection<ManagerRequests> ManagerAccountRequests { get; set; }
