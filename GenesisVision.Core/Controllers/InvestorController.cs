@@ -2,10 +2,13 @@
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.Core.ViewModels.Other;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 
 namespace GenesisVision.Core.Controllers
@@ -30,15 +33,17 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpPost]
         [Route("investor/investments/invest")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult Invest([FromBody]Invest model)
         {
             var errors = investorValidator.ValidateInvest(CurrentUser, model);
             if (errors.Any())
-                return BadRequest(OperationResult.Failed(errors));
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
             var res = trustManagementService.Invest(model);
             if (!res.IsSuccess)
-                return BadRequest(OperationResult.Failed(res.Errors));
+                return BadRequest(ErrorResult.GetResult(res.Errors));
 
             return Ok();
         }
@@ -49,14 +54,15 @@ namespace GenesisVision.Core.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("investor/investments")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramsViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
         {
             var data = trustManagementService.GetInvestments(filter);
-
             if (!data.IsSuccess)
-                return BadRequest(data.Errors);
+                return BadRequest(ErrorResult.GetResult(data));
 
-            return Ok(new
+            return Ok(new InvestmentProgramsViewModel
                       {
                           Investments = data.Data.Item1,
                           Total = data.Data.Item2

@@ -1,12 +1,15 @@
-﻿using GenesisVision.Core.Services.Interfaces;
+﻿using GenesisVision.Core.Models;
+using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.ViewModels.Other;
+using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.DataModel.Models;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GenesisVision.Core.Controllers
 {
-    //[Authorize]
     [Route("api")]
     [ApiVersion("1.0")]
     public class TradesController : BaseController
@@ -26,17 +29,22 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpGet]
         [Route("trades/ipfsGet")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TradesViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetTrades(string ipfsHashId)
         {
             var text = ipfsService.GetIpfsText(ipfsHashId);
             if (!text.IsSuccess)
-                return BadRequest();
+                return BadRequest(ErrorResult.GetResult(text));
 
             var trades = tradesServer.ConvertMetaTraderOrdersFromCsv(text.Data);
             if (!trades.IsSuccess)
-                return BadRequest(trades.Errors);
+                return BadRequest(ErrorResult.GetResult(trades));
 
-            return Ok(new {Trades = trades.Data});
+            return Ok(new TradesViewModel
+                      {
+                          Trades = trades.Data
+                      });
         }
     }
 }

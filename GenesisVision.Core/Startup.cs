@@ -21,11 +21,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace GenesisVision.Core
 {

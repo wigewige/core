@@ -1,13 +1,16 @@
 ﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Helpers.TokenHelper;
+using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
+using GenesisVision.Core.ViewModels.Other;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Threading.Tasks;
 
 namespace GenesisVision.Core.Controllers
@@ -32,33 +35,30 @@ namespace GenesisVision.Core.Controllers
         [Route("manager/auth/signIn")]
         [Route("investor/auth/signIn")]
         [Route("broker/auth/signIn")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(string))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public async Task<IActionResult> Authorize([FromBody]LoginViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = await userManager.FindByNameAsync(model.Email);
-                if (user == null)
-                    return BadRequest($"Wrong username/password");
-                
-                if (await userManager.CheckPasswordAsync(user, model.Password))
-                {
-                    if (!await userManager.IsEmailConfirmedAsync(user))
-                        return BadRequest("Email does not confirmed");
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
 
-                    if (!user.IsEnabled)
-                        return BadRequest("User is disabled");
+            var user = await userManager.FindByNameAsync(model.Email);
+            if (user == null)
+                return BadRequest(ErrorResult.GetResult($"Wrong username/password"));
 
-                    var token = JwtManager.GenerateToken(user);
-                    return Ok(token.Value);
-                }
-            }
-            else
+            if (await userManager.CheckPasswordAsync(user, model.Password))
             {
-                var errors = ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(errors);
+                if (!await userManager.IsEmailConfirmedAsync(user))
+                    return BadRequest(ErrorResult.GetResult("Email does not confirmed"));
+
+                if (!user.IsEnabled)
+                    return BadRequest(ErrorResult.GetResult("User is disabled"));
+
+                var token = JwtManager.GenerateToken(user);
+                return Ok(token.Value);
             }
 
-            return BadRequest($"Wrong username/password");
+            return BadRequest(ErrorResult.GetResult("Wrong username/password"));
         }
 
         [HttpGet]
@@ -66,27 +66,31 @@ namespace GenesisVision.Core.Controllers
         [Route("manager/auth/updateToken")]
         [Route("investor/auth/updateToken")]
         [Route("broker/auth/updateToken")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(string))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult UpdateAuthToken()
         {
             var user = CurrentUser;
-            if (user.IsEnabled)
+            if (user.IsEnabled && user.EmailConfirmed)
             {
                 var token = JwtManager.GenerateToken(user);
                 return Ok(token.Value);
             }
 
-            return BadRequest(ValidationMessages.AccessDenied);
+            return BadRequest(ErrorResult.GetResult(ValidationMessages.AccessDenied));
         }
 
         [HttpGet]
         [Authorize]
         [Route("manager/profile")]
         [Route("investor/profile")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfileShortViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult ProfileShort()
         {
             var user = userService.GetUserProfileShort(CurrentUserId.Value);
             if (!user.IsSuccess)
-                return BadRequest(user.Errors);
+                return BadRequest(ErrorResult.GetResult(user));
 
             return Ok(user.Data);
         }
@@ -95,11 +99,13 @@ namespace GenesisVision.Core.Controllers
         [Authorize]
         [Route("manager/profile/full")]
         [Route("investor/profile/full")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfileFullViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult ProfileFull()
         {
             var user = userService.GetUserProfileFull(CurrentUserId.Value);
             if (!user.IsSuccess)
-                return BadRequest(user.Errors);
+                return BadRequest(ErrorResult.GetResult(user));
 
             return Ok(user.Data);
         }
@@ -108,93 +114,95 @@ namespace GenesisVision.Core.Controllers
         [Authorize]
         [Route("manager/profile/update")]
         [Route("investor/profile/update")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult UpdateProfile([FromBody]ProfileFullViewModel model)
         {
             var res = userService.UpdateUserProfile(CurrentUserId.Value, model);
             if (!res.IsSuccess)
-                return BadRequest(res.Errors);
+                return BadRequest(ErrorResult.GetResult(res));
 
             return Ok();
         }
 
         [HttpPost]
         [Route("manager/auth/signUp")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public async Task<IActionResult> RegisterManager([FromBody]RegisterManagerViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser
-                           {
-                               UserName = model.Email,
-                               Email = model.Email,
-                               IsEnabled = true,
-                               Type = UserType.Manager,
-                               Profile = new Profiles(),
-                               Wallet = new Wallets()
-                           };
-                var result = await userManager.CreateAsync(user, model.Password);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors.Select(x => x.Description));
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
 
-                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            var user = new ApplicationUser
+                       {
+                           UserName = model.Email,
+                           Email = model.Email,
+                           IsEnabled = true,
+                           Type = UserType.Manager,
+                           Profile = new Profiles(),
+                           Wallet = new Wallets()
+                       };
+            var result = await userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return BadRequest(ErrorResult.GetResult(result));
 
-                var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
-                var text = $"Confirmation url: {callbackUrl}";
-                emailSender.SendEmailAsync(model.Email, "Registration", text, text);
+            var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
-                return Ok();
-            }
+            var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
+            var text = $"Confirmation url: {callbackUrl}";
+            emailSender.SendEmailAsync(model.Email, "Registration", text, text);
 
-            var errors = ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage));
-            return BadRequest(errors);
+            return Ok();
         }
 
         [HttpPost]
         [Route("investor/auth/signUp")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public async Task<IActionResult> RegisterInvestor([FromBody]RegisterInvestorViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser
-                           {
-                               UserName = model.Email,
-                               Email = model.Email,
-                               IsEnabled = true,
-                               Type = UserType.Investor,
-                               Profile = new Profiles(),
-                               Wallet = new Wallets()
-                           };
-                var result = await userManager.CreateAsync(user, model.Password);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors.Select(x => x.Description));
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
 
-                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            var user = new ApplicationUser
+                       {
+                           UserName = model.Email,
+                           Email = model.Email,
+                           IsEnabled = true,
+                           Type = UserType.Investor,
+                           Profile = new Profiles(),
+                           Wallet = new Wallets()
+                       };
+            var result = await userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return BadRequest(ErrorResult.GetResult(result));
 
-                var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
-                var text = $"Confirmation url: {callbackUrl}";
-                emailSender.SendEmailAsync(model.Email, "Registration", text, text);
+            var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
+            var text = $"Confirmation url: {callbackUrl}";
+            emailSender.SendEmailAsync(model.Email, "Registration", text, text);
                     
-                return Ok();
-            }
-
-            var errors = ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage));
-            return BadRequest(errors);
+            return Ok();
         }
 
         [HttpGet]
         [Route("manager/auth/confirmEmail")]
         [Route("investor/auth/confirmEmail")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)
-                return BadRequest($"Empty userId/code");
+                return BadRequest(ErrorResult.GetResult("Empty userId/code"));
 
             var user = await userManager.FindByIdAsync(userId);
             var result = await userManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
-                return Ok();
+                return BadRequest(ErrorResult.GetResult(result));
 
-            return BadRequest();
+            return Ok();
         }
     }
 }

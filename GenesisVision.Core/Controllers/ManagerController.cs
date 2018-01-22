@@ -3,10 +3,13 @@ using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.Core.ViewModels.Other;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
 
@@ -37,15 +40,17 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpPost]
         [Route("manager/account/newInvestmentRequest")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult NewInvestmentRequest([FromBody]NewInvestmentRequest request)
         {
             var errors = managerValidator.ValidateNewInvestmentRequest(CurrentUser, request);
             if (errors.Any())
-                return BadRequest(OperationResult.Failed(errors));
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
             var result = managerService.CreateNewInvestmentRequest(request);
             if (!result.IsSuccess)
-                return BadRequest(result.Errors);
+                return BadRequest(ErrorResult.GetResult(result));
             
             return Ok(result.Data);
         }
@@ -55,15 +60,17 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpPost]
         [Route("broker/account/create")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult CreateManagerAccount([FromBody]NewManager request)
         {
             var errors = managerValidator.ValidateCreateManagerAccount(CurrentUser, request);
             if (errors.Any())
-                return BadRequest(OperationResult.Failed(errors));
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
             var result = managerService.CreateManagerAccount(request);
             if (!result.IsSuccess)
-                return BadRequest(result.Errors);
+                return BadRequest(ErrorResult.GetResult(result));
 
             return Ok(result.Data);
         }
@@ -73,15 +80,17 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpGet]
         [Route("manager/investment/close")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult CloseInvestmentProgram(Guid investmentProgramId)
         {
             var errors = managerValidator.ValidateCloseInvestmentProgram(CurrentUser, investmentProgramId);
             if (errors.Any())
-                return BadRequest(OperationResult.Failed(errors));
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
             var result = trustManagementService.CloseInvestmentProgram(investmentProgramId);
             if (!result.IsSuccess)
-                return BadRequest(result.Errors);
+                return BadRequest(ErrorResult.GetResult(result));
 
             return Ok();
         }
@@ -92,17 +101,19 @@ namespace GenesisVision.Core.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("manager/investment")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestmentProgram(Guid investmentProgramId)
         {
             var investment = trustManagementService.GetInvestment(investmentProgramId);
             if (!investment.IsSuccess)
-                return BadRequest(investment.Errors);
+                return BadRequest(ErrorResult.GetResult(investment));
 
             var statistic = statisticService.GetInvestmentProgramStatistic(investmentProgramId);
             if (!statistic.IsSuccess)
-                return BadRequest(statistic.Errors);
+                return BadRequest(ErrorResult.GetResult(statistic));
 
-            return Ok(new
+            return Ok(new InvestmentProgramViewModel
                       {
                           InvestmentProgram = investment.Data,
                           Statistic = statistic.Data
