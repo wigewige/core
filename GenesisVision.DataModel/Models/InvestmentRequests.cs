@@ -21,5 +21,8 @@ namespace GenesisVision.DataModel.Models
 
         public Periods Period { get; set; }
         public Guid PeriodId { get; set; }
+
+        public WalletTransactions WalletTransaction { get; set; }
+        public Guid? WalletTransactionId { get; set; }
     }
 }

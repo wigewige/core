@@ -157,6 +157,7 @@ namespace GenesisVision.Core
         {
             services.AddTransient<ITrustManagementService, TrustManagementService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IWalletService, WalletService>();
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<ISmartContractService, SmartContractService>();
             services.AddTransient<IStatisticService, StatisticService>();

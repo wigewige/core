@@ -17,6 +17,8 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<IOTransactions> IOTransactions { get; set; }
 
+        public ICollection<WalletTransactions> WalletTransactions { get; set; }
+
         public InvestorAccounts InvestorAccount { get; set; }
 
         public BrokersAccounts BrokersAccount { get; set; }

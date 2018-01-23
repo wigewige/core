@@ -54,7 +54,21 @@ namespace GenesisVision.Core.Services
                               InvestMaxAmount = request.InvestMaxAmount,
                               InvestMinAmount = request.InvestMinAmount
                           };
+
+                var wallet = context.Wallets.First(x => x.UserId == request.UserId);
+                wallet.Amount -= req.DepositAmount;
+
+                var tx = new WalletTransactions
+                         {
+                             Id = Guid.NewGuid(),
+                             Type = WalletTransactionsType.OpenProgram,
+                             UserId = request.UserId,
+                             Amount = request.DepositAmount,
+                             Date = DateTime.Now
+                         };
+
                 context.Add(req);
+                context.Add(tx);
                 context.SaveChanges();
 
                 return req.Id;

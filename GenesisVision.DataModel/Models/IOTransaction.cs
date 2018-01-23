@@ -10,14 +10,16 @@ namespace GenesisVision.DataModel.Models
         public string Currency { get; set; }
         public IOTransactionType Type { get; set; }
         public IOTransactionStatus Status { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime ConfirmationDate { get; set; }
 
         public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
 
-        public Wallets UserWallet { get; set; }
-        public Guid? UserWalletId { get; set; }
+        public Wallets Wallet { get; set; }
+        public Guid WalletId { get; set; }
 
-        public DateTime CreationDate { get; set; }
-        public DateTime ConfirmationDate { get; set; }
+        public WalletTransactions WalletTransaction { get; set; }
+        public Guid WalletTransactionId { get; set; }
     }
 }

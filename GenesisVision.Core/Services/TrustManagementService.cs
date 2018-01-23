@@ -36,6 +36,30 @@ namespace GenesisVision.Core.Services
                 if (plannedPeriod != null)
                 {
                     plannedPeriod.Status = PeriodStatus.Closed;
+
+                    var pendingInvests = plannedPeriod.InvestmentRequests
+                                                      .Where(x => x.Type == InvestmentRequestType.Invest &&
+                                                                  x.Status == InvestmentRequestStatus.New)
+                                                      .ToList();
+                    if (pendingInvests.Any())
+                    {
+                        foreach (var request in pendingInvests)
+                        {
+                            var wallet = context.Wallets.First(x => x.UserId == request.UserId);
+                            wallet.Amount += request.Amount;
+
+                            var tx = new WalletTransactions
+                                     {
+                                         Id = Guid.NewGuid(),
+                                         Type = WalletTransactionsType.WithdrawFromProgram,
+                                         UserId = request.UserId,
+                                         Amount = request.Amount,
+                                         Date = DateTime.Now
+                                     };
+                            context.Add(tx);
+                        }
+                        pendingInvests.ForEach(x => x.Status = InvestmentRequestStatus.Executed);
+                    }
                 }
 
                 context.SaveChanges();
@@ -47,12 +71,23 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var investor = context.InvestorAccounts
+                                      .Include(x => x.User)
+                                      .ThenInclude(x => x.Wallet)
                                       .First(x => x.UserId == model.UserId);
 
                 var lastPeriod = context.Periods
                                         .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
                                         .OrderByDescending(x => x.Number)
                                         .First();
+
+                var tx = new WalletTransactions
+                         {
+                             Id = Guid.NewGuid(),
+                             Type = WalletTransactionsType.InvestToProgram,
+                             UserId = model.UserId,
+                             Amount = model.Amount,
+                             Date = DateTime.Now
+                         };
 
                 var invRequest = new InvestmentRequests
                                  {
@@ -63,10 +98,14 @@ namespace GenesisVision.Core.Services
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
                                      Type = InvestmentRequestType.Invest,
-                                     PeriodId = lastPeriod.Id
+                                     PeriodId = lastPeriod.Id,
+                                     WalletTransactionId = tx.Id
                                  };
 
+                investor.User.Wallet.Amount -= model.Amount;
+                
                 context.Add(invRequest);
+                context.Add(tx);
                 context.SaveChanges();
             });
         }
@@ -242,22 +281,6 @@ namespace GenesisVision.Core.Services
                                                             x.Status == InvestmentRequestStatus.New)
                                                 .ToList();
                     nextPeriod.StartBalance = investments.Sum(x => x.Amount);
-                    investments.ForEach(x => x.Status = InvestmentRequestStatus.Executed);
-                }
-
-                var cancelledPeriod = investment.Periods.FirstOrDefault(x =>
-                    x.Status == PeriodStatus.Closed &&
-                    x.Number == currentPeriod.Number + 1);
-                if (cancelledPeriod != null)
-                {
-                    var pendingInvests = cancelledPeriod.InvestmentRequests.Where(x =>
-                        x.Type == InvestmentRequestType.Invest &&
-                        x.Status == InvestmentRequestStatus.New);
-
-                    if (pendingInvests.Any())
-                    {
-                        // todo: return money
-                    }
                 }
 
                 if (!investment.DateTo.HasValue || DateTime.Now < investment.DateTo.Value)

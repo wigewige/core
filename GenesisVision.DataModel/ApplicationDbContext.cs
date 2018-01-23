@@ -25,6 +25,8 @@ namespace GenesisVision.DataModel
         public DbSet<ManagerTokens> ManagerTokens { get; set; }
         public DbSet<Portfolios> Portfolios { get; set; }
         public DbSet<Wallets> Wallets { get; set; }
+        public DbSet<IOTransactions> IOTransactions { get; set; }
+        public DbSet<WalletTransactions> WalletTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -177,6 +179,36 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.InvestmentProgram)
                    .WithOne(x => x.Token)
                    .HasForeignKey<InvestmentPrograms>(x => x.ManagerTokensId);
+
+            builder.Entity<IOTransactions>()
+                   .HasOne(x => x.User)
+                   .WithMany(x => x.IOTransactions)
+                   .HasForeignKey(x => x.UserId);
+
+            builder.Entity<IOTransactions>()
+                   .HasOne(x => x.Wallet)
+                   .WithMany(x => x.IOTransactions)
+                   .HasForeignKey(x => x.WalletId);
+
+            builder.Entity<WalletTransactions>()
+                   .HasOne(x => x.IOTransaction)
+                   .WithOne(x => x.WalletTransaction)
+                   .HasForeignKey<IOTransactions>(x => x.WalletTransactionId);
+
+            builder.Entity<WalletTransactions>()
+                   .HasOne(x => x.User)
+                   .WithMany(x => x.WalletTransactions)
+                   .HasForeignKey(x => x.UserId);
+
+            builder.Entity<WalletTransactions>()
+                   .HasOne(x => x.Wallet)
+                   .WithMany(x => x.WalletTransactions)
+                   .HasForeignKey(x => x.UserId);
+
+            builder.Entity<WalletTransactions>()
+                   .HasOne(x => x.InvestmentRequest)
+                   .WithOne(x => x.WalletTransaction)
+                   .HasForeignKey<InvestmentRequests>(x => x.WalletTransactionId);
         }
     }
 }
