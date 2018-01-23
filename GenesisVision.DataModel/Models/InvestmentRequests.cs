@@ -13,6 +13,7 @@ namespace GenesisVision.DataModel.Models
         public InvestmentRequestStatus Status { get; set; }
 
         public ApplicationUser User { get; set; }
+        public InvestorAccounts InvestorAccount { get; set; }
         public Guid UserId { get; set; }
 
         public InvestmentPrograms InvestmentProgram { get; set; }
@@ -20,8 +21,5 @@ namespace GenesisVision.DataModel.Models
 
         public Periods Period { get; set; }
         public Guid PeriodId { get; set; }
-
-        public InvestorAccounts InvestorAccount { get; set; }
-        public Guid InvestorAccountId { get; set; }
     }
 }

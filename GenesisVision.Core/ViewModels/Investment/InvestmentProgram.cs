@@ -12,23 +12,27 @@ namespace GenesisVision.Core.ViewModels.Investment
         public ManagerToken Token { get; set; }
     }
 
-    public class Investment
+    public class Investment : InvestmentShort
     {
-        public Guid Id { get; set; }
-        public Guid ManagerAccountId { get; set; }
-        public Guid ManagerTokensId { get; set; }
-        public string Logo { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
-        public string Description { get; set; }
-        public bool IsEnabled { get; set; }
+        public Period LastPeriod { get; set; }
         public int Period { get; set; }
         public decimal FeeSuccess { get; set; }
         public decimal FeeManagement { get; set; }
         public decimal FeeEntrance { get; set; }
         public decimal InvestMinAmount { get; set; }
         public decimal? InvestMaxAmount { get; set; }
-        public Period LastPeriod { get; set; }
+    }
+
+    public class InvestmentShort
+    {
+        public Guid Id { get; set; }
+        public Guid ManagerAccountId { get; set; }
+        public Guid ManagerTokensId { get; set; }
+        public string Logo { get; set; }
+        public string Description { get; set; }
+        public bool IsEnabled { get; set; }
         public decimal Rating { get; set; }
         public int OrdersCount { get; set; }
         public decimal TotalProfit { get; set; }

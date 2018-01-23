@@ -28,5 +28,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult<(List<BrokerTradeServer>, int)> GetBrokerTradeServers(BrokersFilter filter);
 
         OperationResult<InvestmentProgram> GetInvestment(Guid investmentId);
+
+        OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId);
     }
 }

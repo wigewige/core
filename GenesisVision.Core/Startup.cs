@@ -95,6 +95,15 @@ namespace GenesisVision.Core
                                          };
                     });
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                      .AllowAnyHeader()
+                                      .AllowCredentials());
+            });
+
             services.AddMvcCore()
                     .AddApiExplorer()
                     .AddAuthorization()
@@ -180,6 +189,8 @@ namespace GenesisVision.Core
                                            SupportedCultures = supportedCultures,
                                            SupportedUICultures = supportedCultures
                                        });
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthentication();
 

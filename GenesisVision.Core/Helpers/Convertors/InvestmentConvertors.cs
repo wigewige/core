@@ -61,27 +61,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                                      IsConfirmed = inv.ManagerAccount.IsConfirmed,
                                      BrokerTradeServer = inv.ManagerAccount.BrokerTradeServer?.ToBrokerTradeServers(),
                                  },
-                       Investment = new Investment
-                                    {
-                                        Id = inv.Id,
-                                        InvestMinAmount = inv.InvestMinAmount,
-                                        InvestMaxAmount = inv.InvestMaxAmount,
-                                        Description = inv.Description,
-                                        IsEnabled = inv.IsEnabled,
-                                        FeeEntrance = inv.FeeEntrance,
-                                        FeeSuccess = inv.FeeSuccess,
-                                        FeeManagement = inv.FeeManagement,
-                                        DateFrom = inv.DateFrom,
-                                        DateTo = inv.DateTo,
-                                        Period = inv.Period,
-                                        ManagerAccountId = inv.ManagerAccountId,
-                                        ManagerTokensId = inv.ManagerTokensId,
-                                        Logo = inv.Logo,
-                                        Rating = inv.Rating,
-                                        OrdersCount = inv.OrdersCount,
-                                        TotalProfit = inv.TotalProfit,
-                                        LastPeriod = inv.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod()
-                                    },
+                       Investment = inv.ToInvestment(),
                        Token = new ManagerToken
                                {
                                    Id = inv.Token.Id,
@@ -89,6 +69,47 @@ namespace GenesisVision.Core.Helpers.Convertors
                                    TokenAddress = inv.Token.TokenAddress,
                                    TokenName = inv.Token.TokenName
                                }
+                   };
+        }
+
+        public static Investment ToInvestment(this InvestmentPrograms inv)
+        {
+            return new Investment
+                   {
+                       Id = inv.Id,
+                       InvestMinAmount = inv.InvestMinAmount,
+                       InvestMaxAmount = inv.InvestMaxAmount,
+                       Description = inv.Description,
+                       IsEnabled = inv.IsEnabled,
+                       FeeEntrance = inv.FeeEntrance,
+                       FeeSuccess = inv.FeeSuccess,
+                       FeeManagement = inv.FeeManagement,
+                       DateFrom = inv.DateFrom,
+                       DateTo = inv.DateTo,
+                       Period = inv.Period,
+                       ManagerAccountId = inv.ManagerAccountId,
+                       ManagerTokensId = inv.ManagerTokensId,
+                       Logo = inv.Logo,
+                       Rating = inv.Rating,
+                       OrdersCount = inv.OrdersCount,
+                       TotalProfit = inv.TotalProfit,
+                       LastPeriod = inv.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod()
+                   };
+        }
+
+        public static InvestmentShort ToInvestmentShort(this InvestmentPrograms inv)
+        {
+            return new InvestmentShort
+                   {
+                       Id = inv.Id,
+                       Description = inv.Description,
+                       IsEnabled = inv.IsEnabled,
+                       ManagerAccountId = inv.ManagerAccountId,
+                       ManagerTokensId = inv.ManagerTokensId,
+                       Logo = inv.Logo,
+                       Rating = inv.Rating,
+                       OrdersCount = inv.OrdersCount,
+                       TotalProfit = inv.TotalProfit
                    };
         }
 

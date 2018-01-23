@@ -119,7 +119,7 @@ namespace GenesisVision.DataModel
             builder.Entity<InvestmentRequests>()
                    .HasOne(x => x.InvestorAccount)
                    .WithMany(x => x.InvestmentRequests)
-                   .HasForeignKey(x => x.InvestorAccountId);
+                   .HasForeignKey(x => x.UserId);
 
             builder.Entity<InvestmentRequests>()
                    .HasOne(x => x.InvestmentProgram)
@@ -157,12 +157,14 @@ namespace GenesisVision.DataModel
                    .HasForeignKey(x => x.InvestmentProgramId);
 
 
+            builder.Entity<InvestorAccounts>()
+                   .HasKey(x => x.UserId);
+
             builder.Entity<ApplicationUser>()
                    .HasOne(x => x.InvestorAccount)
                    .WithOne(x => x.User)
                    .HasForeignKey<InvestorAccounts>(x => x.UserId);
-
-
+            
             builder.Entity<InvestorAccounts>()
                    .HasOne(x => x.Portfolio)
                    .WithOne(x => x.InvestorAccount)

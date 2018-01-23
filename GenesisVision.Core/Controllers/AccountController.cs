@@ -179,7 +179,8 @@ namespace GenesisVision.Core.Controllers
                            IsEnabled = true,
                            Type = UserType.Investor,
                            Profile = new Profiles(),
-                           Wallet = new Wallets()
+                           Wallet = new Wallets(),
+                           InvestorAccount = new InvestorAccounts()
                        };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)

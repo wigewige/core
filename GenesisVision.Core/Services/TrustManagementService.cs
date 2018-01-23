@@ -63,8 +63,7 @@ namespace GenesisVision.Core.Services
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
                                      Type = InvestmentRequestType.Invest,
-                                     PeriodId = lastPeriod.Id,
-                                     InvestorAccountId = investor.Id
+                                     PeriodId = lastPeriod.Id
                                  };
 
                 context.Add(invRequest);
@@ -96,8 +95,7 @@ namespace GenesisVision.Core.Services
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
                                      Type = InvestmentRequestType.Withdrawal,
-                                     PeriodId = period.Id,
-                                     InvestorAccountId = investor.Id
+                                     PeriodId = period.Id
                                  };
 
                 context.Add(invRequest);
@@ -321,6 +319,31 @@ namespace GenesisVision.Core.Services
 
                 var brokerTradeServers = query.Select(x => x.ToBrokerTradeServers()).ToList();
                 return (brokerTradeServers, count);
+            });
+        }
+
+        public OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var requests = context.InvestmentRequests
+                                      .Include(x => x.InvestmentProgram)
+                                      .Where(x => x.InvestorAccount.UserId == investorUserId)
+                                      .ToList()
+                                      .GroupBy(x => x.InvestmentProgram,
+                                          (program, reqs) => new InvestorProgram
+                                                             {
+                                                                 InvestmentProgram = program.ToInvestmentShort(),
+                                                                 Requests = reqs.Select(x => x.ToInvestmentRequest()).ToList()
+                                                             })
+                                      .ToList();
+
+                var result = new InvestorDashboard
+                             {
+                                 Programs = requests
+                             };
+
+                return result;
             });
         }
     }

@@ -88,5 +88,22 @@ namespace GenesisVision.Core.Controllers
                           Total = data.Data.Item2
                       });
         }
+
+
+        /// <summary>
+        /// Get investor dashboard
+        /// </summary>
+        [HttpGet]
+        [Route("investor/dashboard")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestorDashboard))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult InvestorDashboard()
+        {
+            var data = trustManagementService.GetInvestorDashboard(CurrentUserId.Value);
+            if (!data.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(data));
+
+            return Ok(data.Data);
+        }
     }
 }
