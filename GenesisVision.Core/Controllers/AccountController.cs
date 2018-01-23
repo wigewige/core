@@ -149,11 +149,18 @@ namespace GenesisVision.Core.Controllers
 
             var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
-            var text = $"Confirmation url: {callbackUrl}";
-            emailSender.SendEmailAsync(model.Email, "Registration", text, text);
-
-            return Ok();
+            if (Constants.IsDevelopment)
+            {
+                await userManager.ConfirmEmailAsync(user, code);
+                return Ok();
+            }
+            else
+            {
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
+                var text = $"Confirmation url: {callbackUrl}";
+                emailSender.SendEmailAsync(model.Email, "Registration", text, text);
+                return Ok();
+            }
         }
 
         [HttpPost]
@@ -180,11 +187,18 @@ namespace GenesisVision.Core.Controllers
 
             var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
-            var text = $"Confirmation url: {callbackUrl}";
-            emailSender.SendEmailAsync(model.Email, "Registration", text, text);
-                    
-            return Ok();
+            if (Constants.IsDevelopment)
+            {
+                await userManager.ConfirmEmailAsync(user, code);
+                return Ok();
+            }
+            else
+            {
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new {userId = user.Id, code}, HttpContext.Request.Scheme);
+                var text = $"Confirmation url: {callbackUrl}";
+                emailSender.SendEmailAsync(model.Email, "Registration", text, text);
+                return Ok();
+            }
         }
 
         [HttpGet]

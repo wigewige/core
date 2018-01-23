@@ -11,6 +11,8 @@ namespace GenesisVision.Core.Services.Interfaces
     {
         OperationResult Invest(Invest model);
 
+        OperationResult RequestForWithdraw(Invest model);
+
         OperationResult CloseInvestmentProgram(Guid invProgramId);
 
         OperationResult<(List<InvestmentProgram>, int)> GetInvestments(InvestmentsFilter filter);

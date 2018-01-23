@@ -2,6 +2,12 @@
 {
     public static class Constants
     {
+        #region Platform
+
+        public static bool IsDevelopment = false;
+
+        #endregion
+
         #region Ipfs
 
         public static string IpfsHost = "http://localhost:5001";

@@ -72,6 +72,39 @@ namespace GenesisVision.Core.Services
             });
         }
 
+        public OperationResult RequestForWithdraw(Invest model)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var investor = context.InvestorAccounts
+                                      .First(x => x.UserId == model.UserId);
+
+                var period = context.Periods
+                                    .FirstOrDefault(x => x.InvestmentProgramId == model.InvestmentProgramId &&
+                                                         x.Status == PeriodStatus.InProccess) ??
+                             context.Periods
+                                    .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
+                                    .OrderByDescending(x => x.Number)
+                                    .First();
+
+                var invRequest = new InvestmentRequests
+                                 {
+                                     Id = Guid.NewGuid(),
+                                     UserId = model.UserId,
+                                     Amount = model.Amount,
+                                     Date = DateTime.Now,
+                                     InvestmentProgramtId = model.InvestmentProgramId,
+                                     Status = InvestmentRequestStatus.New,
+                                     Type = InvestmentRequestType.Withdrawal,
+                                     PeriodId = period.Id,
+                                     InvestorAccountId = investor.Id
+                                 };
+
+                context.Add(invRequest);
+                context.SaveChanges();
+            });
+        }
+
         public OperationResult<(List<InvestmentProgram>, int)> GetInvestments(InvestmentsFilter filter)
         {
             return InvokeOperations.InvokeOperation(() =>

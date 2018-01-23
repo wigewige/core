@@ -22,6 +22,7 @@ using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GenesisVision.Core
@@ -113,6 +114,8 @@ namespace GenesisVision.Core
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info {Title = "Core API", Version = "v1"});
+                c.DescribeAllEnumsAsStrings();
+                c.TagActionsBy(x => $"/{string.Join("/", x.RelativePath.Split("/").Take(2))}");
             });
         }
 
@@ -163,6 +166,7 @@ namespace GenesisVision.Core
         {
             if (env.IsDevelopment())
             {
+                Constants.IsDevelopment = true;
                 app.UseDeveloperExceptionPage();
             }
 

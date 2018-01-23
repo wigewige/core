@@ -49,6 +49,26 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
+        /// Withdraw from investment program
+        /// </summary>
+        [HttpPost]
+        [Route("investor/investments/withdraw")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult RequestForWithdraw([FromBody]Invest model)
+        {
+            var errors = investorValidator.ValidateWithdraw(CurrentUser, model);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var res = trustManagementService.RequestForWithdraw(model);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res.Errors));
+
+            return Ok();
+        }
+
+        /// <summary>
         /// Get investments by filter
         /// </summary>
         [HttpPost]
