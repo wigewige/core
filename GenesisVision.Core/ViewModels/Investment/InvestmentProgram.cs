@@ -45,6 +45,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public string Currency { get; set; }
         public string IpfsHash { get; set; }
         public bool IsConfirmed { get; set; }
+        public DateTime RegistrationDate { get; set; }
         public BrokerTradeServer BrokerTradeServer { get; set; }
     }
 

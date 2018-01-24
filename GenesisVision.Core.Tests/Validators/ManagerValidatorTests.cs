@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Services.Validators;
+﻿using GenesisVision.Core.Helpers;
+using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
 using GenesisVision.DataModel;
@@ -8,8 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using GenesisVision.Core.Helpers;
-using GenesisVision.Core.ViewModels.Broker;
 
 namespace GenesisVision.Core.Tests.Validators
 {

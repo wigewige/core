@@ -5,7 +5,6 @@ using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -18,8 +17,6 @@ namespace GenesisVision.Core.Tests.Services
         private ApplicationDbContext context;
 
         private IManagerService managerService;
-        private Mock<ISmartContractService> smartContractService;
-        private Mock<IIpfsService> ipfsService;
 
         [SetUp]
         public void Init()
@@ -27,11 +24,8 @@ namespace GenesisVision.Core.Tests.Services
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("databaseManagerService");
             context = new ApplicationDbContext(optionsBuilder.Options);
-
-            smartContractService = new Mock<ISmartContractService>();
-            ipfsService = new Mock<IIpfsService>();
-
-            managerService = new ManagerService(context, ipfsService.Object, smartContractService.Object);
+            
+            managerService = new ManagerService(context);
         }
 
 

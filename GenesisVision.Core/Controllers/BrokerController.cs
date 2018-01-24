@@ -74,7 +74,7 @@ namespace GenesisVision.Core.Controllers
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
-            var result = managerService.CreateManagerAccount(request);
+            var result = trustManagementService.CreateInvestmentProgram(request);
             if (!result.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(result));
 

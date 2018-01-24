@@ -15,6 +15,8 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult CloseInvestmentProgram(Guid invProgramId);
 
+        OperationResult<Guid> CreateInvestmentProgram(NewManager request);
+
         OperationResult<(List<InvestmentProgram>, int)> GetInvestments(InvestmentsFilter filter);
 
         OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);

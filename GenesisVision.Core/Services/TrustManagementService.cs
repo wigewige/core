@@ -7,6 +7,7 @@ using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,14 @@ namespace GenesisVision.Core.Services
     public class TrustManagementService : ITrustManagementService
     {
         private readonly ApplicationDbContext context;
+        private readonly IIpfsService ipfsService;
+        private readonly ISmartContractService smartContractService;
 
-        public TrustManagementService(ApplicationDbContext context)
+        public TrustManagementService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService)
         {
             this.context = context;
+            this.ipfsService = ipfsService;
+            this.smartContractService = smartContractService;
         }
         
         public OperationResult CloseInvestmentProgram(Guid invProgramId)
@@ -63,6 +68,101 @@ namespace GenesisVision.Core.Services
                 }
 
                 context.SaveChanges();
+            });
+        }
+
+
+        public OperationResult<Guid> CreateInvestmentProgram(NewManager request)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var managerRequest = context.ManagerRequests.First(x => x.Id == request.RequestId && x.Status == ManagerRequestStatus.Created);
+                managerRequest.TradePlatformPassword = null;
+                managerRequest.Status = ManagerRequestStatus.Processed;
+
+                var manager = new ManagerAccounts
+                              {
+                                  Id = Guid.NewGuid(),
+                                  BrokerTradeServerId = managerRequest.BrokerTradeServerId,
+                                  UserId = managerRequest.UserId,
+                                  RegistrationDate = DateTime.Now,
+                                  Login = request.Login,
+                                  Currency = managerRequest.TradePlatformCurrency,
+                                  IsConfirmed = false,
+                                  IpfsHash = string.Empty
+                              };
+                var token = new ManagerTokens
+                            {
+                                Id = Guid.NewGuid(),
+                                TokenAddress = string.Empty,
+                                TokenName = managerRequest.TokenName,
+                                TokenSymbol = managerRequest.TokenSymbol
+                            };
+                var inv = new InvestmentPrograms
+                          {
+                              Id = Guid.NewGuid(),
+                              DateFrom = managerRequest.DateFrom,
+                              DateTo = managerRequest.DateTo,
+                              Description = managerRequest.Description,
+                              FeeEntrance = managerRequest.FeeEntrance,
+                              FeeManagement = managerRequest.FeeManagement,
+                              FeeSuccess = managerRequest.FeeSuccess,
+                              InvestMaxAmount = managerRequest.InvestMaxAmount,
+                              InvestMinAmount = managerRequest.InvestMinAmount,
+                              IsEnabled = true,
+                              ManagerAccountId = manager.Id,
+                              Period = managerRequest.Period,
+                              ManagerTokensId = token.Id,
+                              Logo = managerRequest.Logo,
+                              Rating = 0,
+                          };
+                var firstPeriod = new Periods
+                                  {
+                                      Id = Guid.NewGuid(),
+                                      DateFrom = inv.DateFrom,
+                                      DateTo = inv.DateFrom.AddDays(inv.Period),
+                                      Status = PeriodStatus.InProccess,
+                                      InvestmentProgramId = inv.Id,
+                                      Number = 1
+                                  };
+                if (!inv.DateTo.HasValue || inv.DateTo > inv.DateFrom.AddDays(inv.Period))
+                {
+                    var plannedPeriod = new Periods
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            DateFrom = firstPeriod.DateTo,
+                                            DateTo = firstPeriod.DateTo.AddDays(inv.Period),
+                                            Status = PeriodStatus.Planned,
+                                            InvestmentProgramId = inv.Id,
+                                            Number = 2
+                                        };
+                    context.Add(plannedPeriod);
+                }
+
+                context.Add(manager);
+                context.Add(token);
+                context.Add(inv);
+                context.Add(firstPeriod);
+                context.SaveChanges();
+
+                var blockchainUpdate = smartContractService.RegisterManager(token.TokenName, token.TokenSymbol,
+                    manager.Id.ToString(), manager.Login,
+                    manager.BrokerTradeServerId.ToString(), inv.FeeManagement, inv.FeeSuccess);
+
+                if (blockchainUpdate.IsSuccess)
+                {
+                    manager.IsConfirmed = true;
+                    context.SaveChanges();
+
+                    var ipfsUpdate = UpdateInvestmentInIpfs(inv.Id);
+                    if (ipfsUpdate.IsSuccess)
+                    {
+                        manager.IpfsHash = ipfsUpdate.Data;
+                        context.SaveChanges();
+                    }
+                }
+
+                return manager.Id;
             });
         }
 
@@ -368,6 +468,19 @@ namespace GenesisVision.Core.Services
 
                 return result;
             });
+        }
+
+        private OperationResult<string> UpdateInvestmentInIpfs(Guid investmentId)
+        {
+            var investmentProgram = context.InvestmentPrograms
+                                           .Include(x => x.ManagerAccount)
+                                           .Include(x => x.Token)
+                                           .Include(x => x.Periods)
+                                           .First(x => x.Id == investmentId);
+
+            var json = JsonConvert.SerializeObject(investmentProgram.ToInvestmentProgram());
+
+            return ipfsService.WriteIpfsText(json);
         }
     }
 }

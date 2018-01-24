@@ -59,6 +59,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                                      Currency = inv.ManagerAccount.Currency,
                                      IpfsHash = inv.ManagerAccount.IpfsHash,
                                      IsConfirmed = inv.ManagerAccount.IsConfirmed,
+                                     RegistrationDate = inv.ManagerAccount.RegistrationDate,
                                      BrokerTradeServer = inv.ManagerAccount.BrokerTradeServer?.ToBrokerTradeServers(),
                                  },
                        Investment = inv.ToInvestment(),
