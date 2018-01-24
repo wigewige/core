@@ -1,4 +1,5 @@
-﻿using GenesisVision.DataModel.Models;
+﻿using GenesisVision.Core.ViewModels.Broker;
+using GenesisVision.DataModel.Models;
 using System;
 using System.Collections.Generic;
 
@@ -11,6 +12,8 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateGetClosingPeriodData(ApplicationUser user, Guid investmentProgramId);
 
         List<string> ValidateClosePeriod(ApplicationUser user, Guid investmentProgramId);
+
+        List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request);
 
         List<string> ValidateSetPeriodStartBalance(ApplicationUser user, Guid periodId, decimal balance);
     }

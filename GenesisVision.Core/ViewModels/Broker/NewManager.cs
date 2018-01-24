@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenesisVision.Core.ViewModels.Manager
+namespace GenesisVision.Core.ViewModels.Broker
 {
     public class NewManager
     {

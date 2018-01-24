@@ -1,5 +1,6 @@
 ﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
@@ -77,6 +78,32 @@ namespace GenesisVision.Core.Services.Validators
                 return new List<string> {"Does not find period for closing"};
 
             return new List<string>();
+        }
+
+        public List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request)
+        {
+            if (!user.IsEnabled || user.Type != UserType.Broker)
+                return new List<string> {ValidationMessages.AccessDenied};
+
+            var result = new List<string>();
+
+            var broker = context.BrokersAccounts
+                                .Include(x => x.BrokerTradeServers)
+                                .FirstOrDefault(x => x.UserId == user.Id);
+            if (broker == null)
+                return new List<string> {ValidationMessages.AccessDenied};
+
+            var req = context.ManagerRequests.FirstOrDefault(x => x.Id == request.RequestId);
+            if (req == null)
+                return new List<string> {$"Does not find request with id \"{request.RequestId}\""};
+
+            if (broker.BrokerTradeServers.All(x => x.Id != req.BrokerTradeServerId))
+                return new List<string> {ValidationMessages.AccessDenied};
+
+            if (req.Status != ManagerRequestStatus.Created)
+                result.Add($"Could not proccess request. Request status is {req.Status}.");
+
+            return result;
         }
 
         public List<string> ValidateSetPeriodStartBalance(ApplicationUser user, Guid periodId, decimal balance)

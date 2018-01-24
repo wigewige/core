@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Services.Validators;
+﻿using GenesisVision.Core.Helpers;
+using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.DataModel;
@@ -32,7 +33,8 @@ namespace GenesisVision.Core.Tests.Validators
                    {
                        Id = Guid.NewGuid(),
                        IsEnabled = true,
-                       Type = UserType.Investor
+                       Type = UserType.Investor,
+                       Wallet = new Wallets {Amount = 1000m}
                    };
             investment = new InvestmentPrograms
                          {
@@ -55,39 +57,41 @@ namespace GenesisVision.Core.Tests.Validators
             context.Add(investment);
             context.Add(period);
             context.SaveChanges();
-
-
+            
             investorValidator = new InvestorValidator(context);
         }
 
         [Test]
         public void ValidateInvest()
         {
-            var res1 = investorValidator.ValidateInvest(user, new Invest {InvestmentProgramId = Guid.NewGuid()});
+            var res1 = investorValidator.ValidateInvest(user, new Invest {UserId = user.Id, Amount = 100m, InvestmentProgramId = Guid.NewGuid()});
             Assert.IsTrue(res1.Any(x => x.Contains("Does not find investment program")));
             Assert.AreEqual(1, res1.Count);
 
             const string error = "There are no new period";
             context.Periods.First().Status = PeriodStatus.InProccess;
             context.SaveChanges();
-            var res2 = investorValidator.ValidateInvest(user, new Invest {InvestmentProgramId = investment.Id});
+            var res2 = investorValidator.ValidateInvest(user, new Invest {UserId = user.Id, Amount = 100m, InvestmentProgramId = investment.Id});
             Assert.IsTrue(res2.Any(x => x.Contains(error)));
             Assert.AreEqual(1, res1.Count);
 
             context.Periods.First().Status = PeriodStatus.Closed;
             context.SaveChanges();
-            var res3 = investorValidator.ValidateInvest(user, new Invest {InvestmentProgramId = investment.Id});
+            var res3 = investorValidator.ValidateInvest(user, new Invest {UserId = user.Id, Amount = 100m, InvestmentProgramId = investment.Id});
             Assert.IsTrue(res3.Any(x => x.Contains(error)));
             Assert.AreEqual(1, res1.Count);
 
             context.Periods.First().Status = PeriodStatus.Planned;
             context.SaveChanges();
-            var res4 = investorValidator.ValidateInvest(user, new Invest {InvestmentProgramId = investment.Id, Amount = 0});
+            var res4 = investorValidator.ValidateInvest(user, new Invest {UserId = user.Id, InvestmentProgramId = investment.Id, Amount = 0});
             Assert.IsTrue(res4.Any(x => x == "Amount must be greater than zero"));
             Assert.AreEqual(1, res1.Count);
 
-            var res5 = investorValidator.ValidateInvest(user, new Invest {InvestmentProgramId = investment.Id, Amount = 500});
+            var res5 = investorValidator.ValidateInvest(user, new Invest {UserId = user.Id, InvestmentProgramId = investment.Id, Amount = 500});
             Assert.IsEmpty(res5);
+
+            var res6 = investorValidator.ValidateInvest(user, new Invest {UserId = user.Id, InvestmentProgramId = investment.Id, Amount = 5000});
+            Assert.IsTrue(res6.Any(x => x.Contains(ValidationMessages.NotEnoughMoney)));
         }
     }
 }

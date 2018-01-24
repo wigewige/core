@@ -1,14 +1,14 @@
-﻿using GenesisVision.DataModel;
-using GenesisVision.DataModel.Models;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Validators;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.ViewModels.Broker;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Tests.Validators
 {
@@ -77,20 +77,46 @@ namespace GenesisVision.Core.Tests.Validators
         [Test]
         public void ValidateGetBrokerInitDataServerEnable()
         {
-            const string error = "Access denied";
-
-            context.BrokersAccounts.First().IsEnabled = false;
+            context.BrokersAccounts.First(x => x.Id == broker.Id).IsEnabled = false;
             context.SaveChanges();
 
             var res1 = brokerValidator.ValidateGetBrokerInitData(user, brokerTradeServer.Id);
-            Assert.IsTrue(res1.Any(x => x.Contains(error)));
+            Assert.IsTrue(res1.Any(x => x.Contains(ValidationMessages.AccessDenied)));
 
-            context.BrokersAccounts.First().IsEnabled = true;
-            context.BrokerTradeServers.First().IsEnabled = false;
+            context.BrokersAccounts.First(x => x.Id == broker.Id).IsEnabled = true;
+            context.BrokerTradeServers.First(x => x.Id == brokerTradeServer.Id).IsEnabled = false;
             context.SaveChanges();
 
             var res2 = brokerValidator.ValidateGetBrokerInitData(user, brokerTradeServer.Id);
-            Assert.IsTrue(res2.Any(x => x.Contains(error)));
+            Assert.IsTrue(res2.Any(x => x.Contains(ValidationMessages.AccessDenied)));
+        }
+
+        [Test]
+        public void ValidateCreateManagerAccount()
+        {
+            var res1 = brokerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = Guid.NewGuid()});
+            Assert.IsTrue(res1.Any(x => x.Contains("Does not find request")));
+
+            var requestId = Guid.NewGuid();
+            context.Add(new ManagerRequests {Id = requestId, UserId = user.Id, Status = ManagerRequestStatus.Declined, BrokerTradeServerId = brokerTradeServer.Id});
+            context.SaveChanges();
+
+            var res2 = brokerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            Assert.IsTrue(res2.Any(x => x.Contains("Could not proccess request")));
+
+            requestId = Guid.NewGuid();
+            context.Add(new ManagerRequests {Id = requestId, UserId = user.Id, Status = ManagerRequestStatus.Processed, BrokerTradeServerId = brokerTradeServer.Id});
+            context.SaveChanges();
+
+            var res3 = brokerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            Assert.IsTrue(res3.Any(x => x.Contains("Could not proccess request")));
+
+            requestId = Guid.NewGuid();
+            context.Add(new ManagerRequests {Id = requestId, UserId = user.Id, Status = ManagerRequestStatus.Created, BrokerTradeServerId = brokerTradeServer.Id});
+            context.SaveChanges();
+
+            var res4 = brokerValidator.ValidateCreateManagerAccount(user, new NewManager {Login = "xxxxx", RequestId = requestId});
+            Assert.IsEmpty(res4);
         }
     }
 }

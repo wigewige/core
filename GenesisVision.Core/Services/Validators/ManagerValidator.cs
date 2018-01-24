@@ -39,7 +39,7 @@ namespace GenesisVision.Core.Services.Validators
 
             var wallet = context.Wallets.FirstOrDefault(x => x.UserId == user.Id);
             if (wallet == null || wallet.Amount < request.DepositAmount)
-                result.Add("Not enough money");
+                result.Add(ValidationMessages.NotEnoughMoney);
 
             if (request.DateFrom.HasValue && request.DateFrom.Value.Date <= DateTime.Now.Date)
                 result.Add("DateFrom must be greater than today");
@@ -71,32 +71,6 @@ namespace GenesisVision.Core.Services.Validators
 
             if (request.Period <= 0)
                 result.Add("Period must be greater than zero");
-
-            return result;
-        }
-
-        public List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request)
-        {
-            if (!user.IsEnabled || user.Type != UserType.Broker)
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            var result = new List<string>();
-
-            var broker = context.BrokersAccounts
-                                .Include(x => x.BrokerTradeServers)
-                                .FirstOrDefault(x => x.UserId == user.Id);
-            if (broker == null)
-                return new List<string> {ValidationMessages.AccessDenied};
-            
-            var req = context.ManagerRequests.FirstOrDefault(x => x.Id == request.RequestId);
-            if (req == null)
-                return new List<string> {$"Does not find request with id \"{request.RequestId}\""};
-
-            if (broker.BrokerTradeServers.All(x => x.Id != req.BrokerTradeServerId))
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            if (req.Status != ManagerRequestStatus.Created)
-                result.Add($"Could not proccess request. Request status is {req.Status}.");
 
             return result;
         }

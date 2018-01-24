@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GenesisVision.Core.ViewModels.Broker;
 
 namespace GenesisVision.Core.Services
 {

@@ -28,7 +28,7 @@ namespace GenesisVision.Core.Services.Validators
 
             var wallet = context.Wallets.First(x => x.UserId == model.UserId);
             if (wallet.Amount < model.Amount)
-                return new List<string> {$"Not enough money"};
+                return new List<string> {ValidationMessages.NotEnoughMoney};
 
             var investmentProgram = context.InvestmentPrograms
                                            .Include(x => x.Periods)

@@ -54,26 +54,6 @@ namespace GenesisVision.Core.Controllers
             
             return Ok(result.Data);
         }
-
-        /// <summary>
-        /// Create manager (from broker)
-        /// </summary>
-        [HttpPost]
-        [Route("broker/account/create")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult CreateManagerAccount([FromBody]NewManager request)
-        {
-            var errors = managerValidator.ValidateCreateManagerAccount(CurrentUser, request);
-            if (errors.Any())
-                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
-
-            var result = managerService.CreateManagerAccount(request);
-            if (!result.IsSuccess)
-                return BadRequest(ErrorResult.GetResult(result));
-
-            return Ok(result.Data);
-        }
         
         /// <summary>
         /// Close existing investment program
