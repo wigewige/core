@@ -10,6 +10,7 @@ namespace GenesisVision.Core.Helpers.Convertors
         {
             return new ProfileShortViewModel
                    {
+                       Id = user.Id,
                        Email = user.Email,
                        Balance = user.Wallet?.Amount ?? 0
                    };
@@ -19,6 +20,7 @@ namespace GenesisVision.Core.Helpers.Convertors
         {
             var model = new ProfileFullViewModel
                         {
+                            Id = user.Id,
                             Email = user.Email,
                             Balance = user.Wallet?.Amount ?? 0
                         };

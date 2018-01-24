@@ -1,6 +1,7 @@
 ﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Other;
 using GenesisVision.DataModel.Models;
@@ -20,12 +21,14 @@ namespace GenesisVision.Core.Controllers
     {
         private readonly ITrustManagementService trustManagementService;
         private readonly IInvestorValidator investorValidator;
+        private readonly IUserService userService;
 
-        public InvestorController(ITrustManagementService trustManagementService, IInvestorValidator investorValidator, UserManager<ApplicationUser> userManager)
+        public InvestorController(ITrustManagementService trustManagementService, IUserService userService, IInvestorValidator investorValidator, UserManager<ApplicationUser> userManager)
             : base(userManager)
         {
             this.trustManagementService = trustManagementService;
             this.investorValidator = investorValidator;
+            this.userService = userService;
         }
 
         /// <summary>
@@ -33,19 +36,27 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpPost]
         [Route("investor/investments/invest")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfileShortViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult Invest([FromBody]Invest model)
+        public IActionResult Invest([FromBody]InvestViewModel model)
         {
-            var errors = investorValidator.ValidateInvest(CurrentUser, model);
+            var investModel = new Invest
+                              {
+                                  UserId = CurrentUserId.Value,
+                                  Amount = model.Amount,
+                                  InvestmentProgramId = model.InvestmentProgramId
+                              };
+
+            var errors = investorValidator.ValidateInvest(CurrentUser, investModel);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
-            var res = trustManagementService.Invest(model);
+            var res = trustManagementService.Invest(investModel);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res.Errors));
 
-            return Ok();
+            var user = userService.GetUserProfileShort(CurrentUserId.Value);
+            return Ok(user.Data);
         }
 
         /// <summary>
@@ -55,13 +66,20 @@ namespace GenesisVision.Core.Controllers
         [Route("investor/investments/withdraw")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult RequestForWithdraw([FromBody]Invest model)
+        public IActionResult RequestForWithdraw([FromBody]InvestViewModel model)
         {
-            var errors = investorValidator.ValidateWithdraw(CurrentUser, model);
+            var investModel = new Invest
+                              {
+                                  UserId = CurrentUserId.Value,
+                                  Amount = model.Amount,
+                                  InvestmentProgramId = model.InvestmentProgramId
+                              };
+
+            var errors = investorValidator.ValidateWithdraw(CurrentUser, investModel);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
-            var res = trustManagementService.RequestForWithdraw(model);
+            var res = trustManagementService.RequestForWithdraw(investModel);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res.Errors));
 
