@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.ViewModels.Other;
+﻿using GenesisVision.Core.ViewModels.Common;
 
 namespace GenesisVision.Core.ViewModels.Wallet
 {

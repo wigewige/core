@@ -1,5 +1,7 @@
-﻿using GenesisVision.Core.ViewModels.Other;
+﻿using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.DataModel.Enums;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GenesisVision.Core.ViewModels.Broker
 {
@@ -9,6 +11,7 @@ namespace GenesisVision.Core.ViewModels.Broker
 
         public string TradeServerName { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public BrokerTradeServerType? TradeServerType { get; set; }
     }
 }

@@ -23,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -109,7 +110,11 @@ namespace GenesisVision.Core
                     .AddApiExplorer()
                     .AddAuthorization()
                     .AddDataAnnotations()
-                    .AddJsonFormatters();
+                    .AddJsonFormatters()
+                    .AddJsonOptions(options =>
+                    {
+                        options.SerializerSettings.DateFormatString = "yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz";
+                    });
 
             services.AddApiVersioning(option =>
             {
@@ -123,10 +128,22 @@ namespace GenesisVision.Core
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info {Title = "Core API", Version = "v1"});
+                c.SwaggerDoc("v1", new Info
+                                   {
+                                       Title = "Core API",
+                                       Version = "v1",
+                                       Contact = new Contact
+                                                 {
+                                                     Name = "Genesis Vision",
+                                                     Url = "https://genesis.vision/"
+                                                 }
+                                   });
                 c.DescribeAllEnumsAsStrings();
-                c.TagActionsBy(x => $"/{string.Join("/", x.RelativePath.Split("/").Take(2))}");
+                c.TagActionsBy(x => x.RelativePath.Split("/").Take(2).Last());
                 c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, "GenesisVision.Core.xml");
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

@@ -1,6 +1,6 @@
 ﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
-using GenesisVision.Core.ViewModels.Other;
+using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Http;

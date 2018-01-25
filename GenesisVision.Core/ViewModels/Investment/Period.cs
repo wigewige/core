@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
@@ -11,6 +13,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public int Number { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public PeriodStatus Status { get; set; }
         public decimal StartBalance { get; set; }
         public List<InvestmentRequest> InvestmentRequest { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace GenesisVision.Core.ViewModels.Other
+﻿namespace GenesisVision.Core.ViewModels.Common
 {
     public class PagingFilter
     {

@@ -2,7 +2,7 @@
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
-using GenesisVision.Core.ViewModels.Other;
+using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -62,7 +62,7 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Create manager (from broker)
+        /// Create manager
         /// </summary>
         [HttpPost]
         [Route("broker/account/create")]
@@ -151,7 +151,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetBrokers([FromBody]BrokersFilter filter)
         {
-            var data = trustManagementService.GetBrokerTradeServers(filter);
+            var data = trustManagementService.GetBrokerTradeServers(filter ?? new BrokersFilter());
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data.Errors));
 

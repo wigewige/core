@@ -1,4 +1,7 @@
-﻿namespace GenesisVision.Core.ViewModels.Trades
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace GenesisVision.Core.ViewModels.Trades
 {
     public enum Direction
     {
@@ -10,6 +13,7 @@
     {
         public long Login { get; set; }
         public long Ticket { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Direction Direction { get; set; }
     }
 }

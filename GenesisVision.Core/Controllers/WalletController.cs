@@ -1,6 +1,6 @@
 ﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
-using GenesisVision.Core.ViewModels.Other;
+using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.Core.ViewModels.Wallet;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +34,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetWalletTransactions([FromBody]TransactionsFilter filter)
         {
-            var data = walletService.GetTransactionHistory(CurrentUser.Id, filter);
+            var data = walletService.GetTransactionHistory(CurrentUser.Id, filter ?? new TransactionsFilter());
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 
@@ -43,6 +43,32 @@ namespace GenesisVision.Core.Controllers
                           Transactions = data.Data.Item1,
                           Total = data.Data.Item2
                       });
+        }
+
+        /// <summary>
+        /// Deposit
+        /// </summary>
+        [HttpPost]
+        [Route("investor/wallet/deposit")]
+        [Route("manager/wallet/deposit")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult Deposit()
+        {
+            return Ok();
+        }
+
+        /// <summary>
+        /// Withdraw
+        /// </summary>
+        [HttpPost]
+        [Route("investor/wallet/withdraw")]
+        [Route("manager/wallet/withdraw")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult Withdraw()
+        {
+            return Ok();
         }
     }
 }

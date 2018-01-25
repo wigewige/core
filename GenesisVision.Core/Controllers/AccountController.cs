@@ -3,7 +3,7 @@ using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
-using GenesisVision.Core.ViewModels.Other;
+using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +22,7 @@ namespace GenesisVision.Core.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailSender emailSender;
         private readonly IUserService userService;
-
+        
         public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IUserService userService)
             : base(userManager)
         {
@@ -31,6 +31,9 @@ namespace GenesisVision.Core.Controllers
             this.userService = userService;
         }
 
+        /// <summary>
+        /// Authorize
+        /// </summary>
         [HttpPost]
         [Route("manager/auth/signIn")]
         [Route("investor/auth/signIn")]
@@ -44,7 +47,7 @@ namespace GenesisVision.Core.Controllers
 
             var user = await userManager.FindByNameAsync(model.Email);
             if (user == null)
-                return BadRequest(ErrorResult.GetResult($"Wrong username/password"));
+                return BadRequest(ErrorResult.GetResult($"Wrong email/password"));
 
             if (await userManager.CheckPasswordAsync(user, model.Password))
             {
@@ -58,9 +61,12 @@ namespace GenesisVision.Core.Controllers
                 return Ok(token.Value);
             }
 
-            return BadRequest(ErrorResult.GetResult("Wrong username/password"));
+            return BadRequest(ErrorResult.GetResult("Wrong email/password"));
         }
 
+        /// <summary>
+        /// Update auth token
+        /// </summary>
         [HttpGet]
         [Authorize]
         [Route("manager/auth/updateToken")]
@@ -79,6 +85,9 @@ namespace GenesisVision.Core.Controllers
             return BadRequest(ErrorResult.GetResult(ValidationMessages.AccessDenied));
         }
 
+        /// <summary>
+        /// Get short profile
+        /// </summary>
         [HttpGet]
         [Authorize]
         [Route("manager/profile")]
@@ -94,6 +103,9 @@ namespace GenesisVision.Core.Controllers
             return Ok(user.Data);
         }
 
+        /// <summary>
+        /// Get full profile
+        /// </summary>
         [HttpGet]
         [Authorize]
         [Route("manager/profile/full")]
@@ -109,6 +121,9 @@ namespace GenesisVision.Core.Controllers
             return Ok(user.Data);
         }
 
+        /// <summary>
+        /// Update profile
+        /// </summary>
         [HttpPost]
         [Authorize]
         [Route("manager/profile/update")]
@@ -124,6 +139,9 @@ namespace GenesisVision.Core.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Register new manager
+        /// </summary>
         [HttpPost]
         [Route("manager/auth/signUp")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
@@ -162,6 +180,9 @@ namespace GenesisVision.Core.Controllers
             }
         }
 
+        /// <summary>
+        /// Register new investor
+        /// </summary>
         [HttpPost]
         [Route("investor/auth/signUp")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
@@ -201,6 +222,9 @@ namespace GenesisVision.Core.Controllers
             }
         }
 
+        /// <summary>
+        /// Confirm email after registration
+        /// </summary>
         [HttpGet]
         [Route("manager/auth/confirmEmail")]
         [Route("investor/auth/confirmEmail")]

@@ -2,8 +2,8 @@
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Account;
+using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.Core.ViewModels.Investment;
-using GenesisVision.Core.ViewModels.Other;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -96,7 +96,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
         {
-            var data = trustManagementService.GetInvestments(filter);
+            var data = trustManagementService.GetInvestments(filter ?? new InvestmentsFilter());
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 

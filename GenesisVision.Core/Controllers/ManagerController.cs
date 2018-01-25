@@ -1,9 +1,9 @@
 ﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
-using GenesisVision.Core.ViewModels.Other;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

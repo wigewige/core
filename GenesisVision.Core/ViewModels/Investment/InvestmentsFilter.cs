@@ -1,5 +1,7 @@
-﻿using GenesisVision.Core.ViewModels.Other;
-using System;
+﻿using System;
+using GenesisVision.Core.ViewModels.Common;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
@@ -20,6 +22,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public Guid? BrokerTradeServerId { get; set; }
         public decimal? InvestMaxAmountFrom { get; set; }
         public decimal? InvestMaxAmountTo { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Sorting? Sorting { get; set; }
     }
 }
