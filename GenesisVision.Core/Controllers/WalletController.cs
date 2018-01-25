@@ -28,14 +28,13 @@ namespace GenesisVision.Core.Controllers
         /// Get user wallet transactions
         /// </summary>
         [HttpPost]
-        [AllowAnonymous]
         [Route("investor/wallet/transactions")]
         [Route("manager/wallet/transactions")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(WalletTransactionsViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetWalletTransactions([FromBody]TransactionsFilter filter)
         {
-            var data = walletService.GetTransactionHistory(CurrentUserId.Value, filter);
+            var data = walletService.GetTransactionHistory(CurrentUser.Id, filter);
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 

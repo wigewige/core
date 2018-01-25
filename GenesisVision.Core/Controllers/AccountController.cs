@@ -70,10 +70,9 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult UpdateAuthToken()
         {
-            var user = CurrentUser;
-            if (user.IsEnabled && user.EmailConfirmed)
+            if (CurrentUser.IsEnabled && CurrentUser.EmailConfirmed)
             {
-                var token = JwtManager.GenerateToken(user);
+                var token = JwtManager.GenerateToken(CurrentUser);
                 return Ok(token.Value);
             }
 
@@ -88,7 +87,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult ProfileShort()
         {
-            var user = userService.GetUserProfileShort(CurrentUserId.Value);
+            var user = userService.GetUserProfileShort(CurrentUser.Id);
             if (!user.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(user));
 
@@ -103,7 +102,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult ProfileFull()
         {
-            var user = userService.GetUserProfileFull(CurrentUserId.Value);
+            var user = userService.GetUserProfileFull(CurrentUser.Id);
             if (!user.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(user));
 
@@ -118,7 +117,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult UpdateProfile([FromBody]ProfileFullViewModel model)
         {
-            var res = userService.UpdateUserProfile(CurrentUserId.Value, model);
+            var res = userService.UpdateUserProfile(CurrentUser.Id, model);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res));
 

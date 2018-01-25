@@ -1,8 +1,6 @@
 ﻿using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -10,9 +8,9 @@ namespace GenesisVision.Core.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
 
+        private ApplicationUser appUser;
         public ApplicationUser CurrentUser => GetCurrentUser();
         public string CurrentUserName => User?.Identity?.Name;
-        public Guid? CurrentUserId => GetCurrentUserId();
 
         public BaseController(UserManager<ApplicationUser> userManager)
         {
@@ -24,17 +22,11 @@ namespace GenesisVision.Core.Controllers
             if (!User.Identity.IsAuthenticated || string.IsNullOrEmpty(User.Identity?.Name))
                 return null;
 
-            var user = userManager.FindByNameAsync(User.Identity?.Name).Result;
-            return user;
-        }
+            if (appUser != null)
+                return appUser;
 
-        private Guid? GetCurrentUserId()
-        {
-            if (!User.Identity.IsAuthenticated || string.IsNullOrEmpty(User.Identity?.Name))
-                return null;
-
-            var id = Guid.Parse(User.Claims.First(x => x.Type == "id").Value);
-            return id;
+            appUser = userManager.FindByNameAsync(User.Identity?.Name).Result;
+            return appUser;
         }
     }
 }

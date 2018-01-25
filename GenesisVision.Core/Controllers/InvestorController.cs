@@ -42,7 +42,7 @@ namespace GenesisVision.Core.Controllers
         {
             var investModel = new Invest
                               {
-                                  UserId = CurrentUserId.Value,
+                                  UserId = CurrentUser.Id,
                                   Amount = model.Amount,
                                   InvestmentProgramId = model.InvestmentProgramId
                               };
@@ -55,7 +55,7 @@ namespace GenesisVision.Core.Controllers
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res.Errors));
 
-            var user = userService.GetUserProfileShort(CurrentUserId.Value);
+            var user = userService.GetUserProfileShort(CurrentUser.Id);
             return Ok(user.Data);
         }
 
@@ -70,7 +70,7 @@ namespace GenesisVision.Core.Controllers
         {
             var investModel = new Invest
                               {
-                                  UserId = CurrentUserId.Value,
+                                  UserId = CurrentUser.Id,
                                   Amount = model.Amount,
                                   InvestmentProgramId = model.InvestmentProgramId
                               };
@@ -117,7 +117,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult InvestorDashboard()
         {
-            var data = trustManagementService.GetInvestorDashboard(CurrentUserId.Value);
+            var data = trustManagementService.GetInvestorDashboard(CurrentUser.Id);
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 

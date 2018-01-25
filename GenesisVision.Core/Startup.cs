@@ -1,5 +1,6 @@
 ﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Helpers.TokenHelper;
+using GenesisVision.Core.Infrastructure.Filters;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators;
@@ -125,13 +126,7 @@ namespace GenesisVision.Core
                 c.SwaggerDoc("v1", new Info {Title = "Core API", Version = "v1"});
                 c.DescribeAllEnumsAsStrings();
                 c.TagActionsBy(x => $"/{string.Join("/", x.RelativePath.Split("/").Take(2))}");
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                                                  {
-                                                      Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                                                      Name = "Authorization",
-                                                      In = "header",
-                                                      Type = "apiKey"
-                                                  });
+                c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
             });
         }
 
