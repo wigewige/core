@@ -1,9 +1,11 @@
-﻿using System;
+﻿using GenesisVision.Core.ViewModels.Common;
+using System;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
-    public class Invest : InvestViewModel
+    public class Invest : HiddenUserId
     {
-        public Guid UserId { get; set; }
+        public Guid InvestmentProgramId { get; set; }
+        public decimal Amount { get; set; }
     }
 }

@@ -44,6 +44,8 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult NewInvestmentRequest([FromBody]NewInvestmentRequest request)
         {
+            request.UserId = CurrentUser.Id;
+
             var errors = managerValidator.ValidateNewInvestmentRequest(CurrentUser, request);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));

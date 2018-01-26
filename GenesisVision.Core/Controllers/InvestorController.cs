@@ -38,20 +38,15 @@ namespace GenesisVision.Core.Controllers
         [Route("investor/investments/invest")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfileShortViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult Invest([FromBody]InvestViewModel model)
+        public IActionResult Invest([FromBody]Invest model)
         {
-            var investModel = new Invest
-                              {
-                                  UserId = CurrentUser.Id,
-                                  Amount = model.Amount,
-                                  InvestmentProgramId = model.InvestmentProgramId
-                              };
+            model.UserId = CurrentUser.Id;
 
-            var errors = investorValidator.ValidateInvest(CurrentUser, investModel);
+            var errors = investorValidator.ValidateInvest(CurrentUser, model);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
-            var res = trustManagementService.Invest(investModel);
+            var res = trustManagementService.Invest(model);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res.Errors));
 
@@ -66,20 +61,15 @@ namespace GenesisVision.Core.Controllers
         [Route("investor/investments/withdraw")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult RequestForWithdraw([FromBody]InvestViewModel model)
+        public IActionResult RequestForWithdraw([FromBody]Invest model)
         {
-            var investModel = new Invest
-                              {
-                                  UserId = CurrentUser.Id,
-                                  Amount = model.Amount,
-                                  InvestmentProgramId = model.InvestmentProgramId
-                              };
+            model.UserId = CurrentUser.Id;
 
-            var errors = investorValidator.ValidateWithdraw(CurrentUser, investModel);
+            var errors = investorValidator.ValidateWithdraw(CurrentUser, model);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
-            var res = trustManagementService.RequestForWithdraw(investModel);
+            var res = trustManagementService.RequestForWithdraw(model);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res.Errors));
 

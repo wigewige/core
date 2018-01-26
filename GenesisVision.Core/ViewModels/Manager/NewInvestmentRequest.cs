@@ -1,10 +1,10 @@
 ﻿using System;
+using GenesisVision.Core.ViewModels.Common;
 
 namespace GenesisVision.Core.ViewModels.Manager
 {
-    public class NewInvestmentRequest
+    public class NewInvestmentRequest : HiddenUserId
     {
-        public Guid UserId { get; set; }
         public Guid BrokerTradeServerId { get; set; }
 
         public string TradePlatformPassword { get; set; }
