@@ -7,6 +7,7 @@ namespace GenesisVision.DataModel.Models
     public class IOTransactions
     {
         public Guid Id { get; set; }
+        public decimal Amount { get; set; }
         public string Currency { get; set; }
         public IOTransactionType Type { get; set; }
         public IOTransactionStatus Status { get; set; }
