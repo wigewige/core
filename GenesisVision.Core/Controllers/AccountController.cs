@@ -130,7 +130,7 @@ namespace GenesisVision.Core.Controllers
         [Route("investor/profile/update")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult UpdateProfile([FromBody]ProfileFullViewModel model)
+        public IActionResult UpdateProfile([FromBody]UpdateProfileViewModel model)
         {
             var res = userService.UpdateUserProfile(CurrentUser.Id, model);
             if (!res.IsSuccess)

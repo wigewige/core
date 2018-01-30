@@ -41,7 +41,7 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult UpdateUserProfile(Guid userId, ProfileFullViewModel profile)
+        public OperationResult UpdateUserProfile(Guid userId, UpdateProfileViewModel profile)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
@@ -49,13 +49,15 @@ namespace GenesisVision.Core.Services
 
                 user.Avatar = profile.Avatar;
                 user.Address = profile.Address;
-                user.Birthday = profile.Birthday;
+                if (profile.Birthday.HasValue)
+                    user.Birthday = profile.Birthday.Value;
                 user.City = profile.City;
                 user.Country = profile.Country;
                 user.DocumentNumber = profile.DocumentNumber;
                 user.DocumentType = profile.DocumentType;
                 user.FirstName = profile.FirstName;
-                user.Gender = profile.Gender;
+                if (profile.Gender.HasValue)
+                    user.Gender = profile.Gender.Value;
                 user.LastName = profile.LastName;
                 user.MiddleName = profile.MiddleName;
                 user.Phone = profile.Phone;
