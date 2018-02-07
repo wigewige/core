@@ -104,6 +104,7 @@ namespace GenesisVision.Core.Services
                               DateFrom = managerRequest.DateFrom,
                               DateTo = managerRequest.DateTo,
                               Description = managerRequest.Description,
+                              Title = managerRequest.Title,
                               FeeEntrance = managerRequest.FeeEntrance,
                               FeeManagement = managerRequest.FeeManagement,
                               FeeSuccess = managerRequest.FeeSuccess,
@@ -248,6 +249,8 @@ namespace GenesisVision.Core.Services
             {
                 var query = context.InvestmentPrograms
                                    .Include(x => x.ManagerAccount)
+                                   .ThenInclude(x => x.User)
+                                   .ThenInclude(x => x.Profile)
                                    .Include(x => x.Token)
                                    .Include(x => x.Periods)
                                    .AsQueryable();
@@ -474,6 +477,8 @@ namespace GenesisVision.Core.Services
         {
             var investmentProgram = context.InvestmentPrograms
                                            .Include(x => x.ManagerAccount)
+                                           .ThenInclude(x => x.User)
+                                           .ThenInclude(x => x.Profile)
                                            .Include(x => x.Token)
                                            .Include(x => x.Periods)
                                            .First(x => x.Id == investmentId);

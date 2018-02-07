@@ -16,5 +16,6 @@ namespace GenesisVision.Core.ViewModels.Account
         public DateTime Birthday { get; set; }
         public bool Gender { get; set; }
         public string Avatar { get; set; }
+        public string UserName { get; set; }
     }
 }

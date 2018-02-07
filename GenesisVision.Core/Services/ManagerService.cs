@@ -40,6 +40,7 @@ namespace GenesisVision.Core.Services
                               TokenSymbol = request.TokenSymbol,
                               Logo = request.Logo,
                               Description = request.Description,
+                              Title = request.Title,
                               DateFrom = request.DateFrom ?? DateTime.Now,
                               DateTo = request.DateTo,
                               Period = request.Period,

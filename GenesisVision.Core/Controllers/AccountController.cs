@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Helpers;
+﻿using System;
+using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
@@ -97,6 +98,23 @@ namespace GenesisVision.Core.Controllers
         public IActionResult ProfileShort()
         {
             var user = userService.GetUserProfileShort(CurrentUser.Id);
+            if (!user.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(user));
+
+            return Ok(user.Data);
+        }
+
+        /// <summary>
+        /// Get public profile
+        /// </summary>
+        [HttpGet]
+        [Route("manager/profile/public")]
+        [Route("investor/profile/public")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfilePublicViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult ProfileShort(Guid userId)
+        {
+            var user = userService.GetUserPublicProfile(userId);
             if (!user.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(user));
 

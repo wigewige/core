@@ -46,6 +46,9 @@ namespace GenesisVision.Core.Controllers
         {
             request.UserId = CurrentUser.Id;
 
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
+
             var errors = managerValidator.ValidateNewInvestmentRequest(CurrentUser, request);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));

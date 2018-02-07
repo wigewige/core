@@ -12,9 +12,10 @@ using System;
 namespace GenesisVision.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180207123233_Username")]
+    partial class Username
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,8 +189,6 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<decimal>("Rating");
 
-                    b.Property<string>("Title");
-
                     b.Property<decimal>("TotalProfit");
 
                     b.HasKey("Id");
@@ -198,9 +197,6 @@ namespace GenesisVision.Core.Migrations
                         .IsUnique();
 
                     b.HasIndex("ManagerTokensId")
-                        .IsUnique();
-
-                    b.HasIndex("Title")
                         .IsUnique();
 
                     b.ToTable("InvestmentPrograms");
@@ -346,8 +342,6 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<int>("Status");
 
-                    b.Property<string>("Title");
-
                     b.Property<string>("TokenName");
 
                     b.Property<string>("TokenSymbol");
@@ -363,9 +357,6 @@ namespace GenesisVision.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BrokerTradeServerId");
-
-                    b.HasIndex("Title")
-                        .IsUnique();
 
                     b.HasIndex("TokenName")
                         .IsUnique();

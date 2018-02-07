@@ -41,12 +41,27 @@ namespace GenesisVision.Core.Services
             });
         }
 
+        public OperationResult<ProfilePublicViewModel> GetUserPublicProfile(Guid userId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var user = context.Users
+                                  .Include(x => x.Profile)
+                                  .First(x => x.Id == userId);
+                return user.ToProfilePublic();
+            });
+        }
+
         public OperationResult UpdateUserProfile(Guid userId, UpdateProfileViewModel profile)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                if (context.Profiles.Any(x => x.UserName == profile.UserName))
+                    throw new Exception("Username already exists");
+
                 var user = context.Profiles.First(x => x.UserId == userId);
 
+                user.UserName = profile.UserName;
                 user.Avatar = profile.Avatar;
                 user.Address = profile.Address;
                 if (profile.Birthday.HasValue)

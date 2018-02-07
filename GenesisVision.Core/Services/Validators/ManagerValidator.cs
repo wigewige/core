@@ -41,6 +41,9 @@ namespace GenesisVision.Core.Services.Validators
             if (wallet == null || wallet.Amount < request.DepositAmount)
                 result.Add(ValidationMessages.NotEnoughMoney);
 
+            if (context.ManagerRequests.Any(x => x.Title == request.Title))
+                result.Add("Title already exists");
+
             if (request.DateFrom.HasValue && request.DateFrom.Value.Date <= DateTime.Now.Date)
                 result.Add("DateFrom must be greater than today");
 

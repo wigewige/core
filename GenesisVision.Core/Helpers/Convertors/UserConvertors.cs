@@ -5,7 +5,6 @@ namespace GenesisVision.Core.Helpers.Convertors
 {
     public static partial class Convertors
     {
-
         public static ProfileShortViewModel ToProfileShort(this ApplicationUser user)
         {
             return new ProfileShortViewModel
@@ -13,6 +12,17 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Id = user.Id,
                        Email = user.Email,
                        Balance = user.Wallet?.Amount ?? 0
+                   };
+        }
+
+        public static ProfilePublicViewModel ToProfilePublic(this ApplicationUser user)
+        {
+            return new ProfilePublicViewModel
+                   {
+                       Id = user.Id,
+                       Avatar = user.Profile?.Avatar,
+                       Username = user.Profile?.UserName,
+                       Country = user.Profile?.Country
                    };
         }
 
@@ -26,6 +36,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                         };
             if (user.Profile != null)
             {
+                model.UserName = user.Profile.UserName;
                 model.Avatar = user.Profile.Avatar;
                 model.Address = user.Profile.Address;
                 model.Birthday = user.Profile.Birthday;

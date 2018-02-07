@@ -1,14 +1,14 @@
 ﻿using GenesisVision.Core.ViewModels.Broker;
 using System;
+using GenesisVision.Core.ViewModels.Account;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
     public class InvestmentProgram
     {
+        public ProfilePublicViewModel Manager { get; set; }
         public Investment Investment { get; set; }
-
         public ManagerAccount Account { get; set; }
-
         public ManagerToken Token { get; set; }
     }
 
@@ -32,6 +32,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public Guid ManagerTokensId { get; set; }
         public string Logo { get; set; }
         public string Description { get; set; }
+        public string Title { get; set; }
         public bool IsEnabled { get; set; }
         public decimal Rating { get; set; }
         public int OrdersCount { get; set; }

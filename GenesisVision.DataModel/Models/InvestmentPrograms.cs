@@ -6,6 +6,7 @@ namespace GenesisVision.DataModel.Models
     public class InvestmentPrograms
     {
         public Guid Id { get; set; }
+        public string Title { get; set; }
         public string Description { get; set; }
         public string Logo { get; set; }
         public DateTime DateFrom { get; set; }

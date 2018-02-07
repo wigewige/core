@@ -55,6 +55,10 @@ namespace GenesisVision.DataModel
             builder.Entity<Profiles>()
                    .HasKey(x => x.UserId);
 
+            builder.Entity<Profiles>()
+                   .HasIndex(x => x.UserName)
+                   .IsUnique();
+
             builder.Entity<ApplicationUser>()
                    .HasOne(x => x.Wallet)
                    .WithOne(x => x.User)
@@ -111,7 +115,11 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.InvestmentProgram)
                    .WithOne(x => x.ManagerAccount)
                    .HasForeignKey<InvestmentPrograms>(x => x.ManagerAccountId);
-            
+
+
+            builder.Entity<InvestmentPrograms>()
+                   .HasIndex(x => x.Title)
+                   .IsUnique();
 
             builder.Entity<InvestmentRequests>()
                    .HasOne(x => x.User)
@@ -150,6 +158,10 @@ namespace GenesisVision.DataModel
 
             builder.Entity<ManagerRequests>()
                    .HasIndex(x => x.TokenSymbol)
+                   .IsUnique();
+
+            builder.Entity<ManagerRequests>()
+                   .HasIndex(x => x.Title)
                    .IsUnique();
 
 

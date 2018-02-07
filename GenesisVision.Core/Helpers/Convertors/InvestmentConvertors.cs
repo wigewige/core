@@ -52,6 +52,7 @@ namespace GenesisVision.Core.Helpers.Convertors
         {
             return new InvestmentProgram
                    {
+                       Manager = inv.ManagerAccount.User?.ToProfilePublic(),
                        Account = new ManagerAccount
                                  {
                                      Id = inv.ManagerAccount.Id,
@@ -81,6 +82,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                        InvestMinAmount = inv.InvestMinAmount,
                        InvestMaxAmount = inv.InvestMaxAmount,
                        Description = inv.Description,
+                       Title = inv.Title,
                        IsEnabled = inv.IsEnabled,
                        FeeEntrance = inv.FeeEntrance,
                        FeeSuccess = inv.FeeSuccess,
@@ -104,6 +106,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                    {
                        Id = inv.Id,
                        Description = inv.Description,
+                       Title = inv.Title,
                        IsEnabled = inv.IsEnabled,
                        ManagerAccountId = inv.ManagerAccountId,
                        ManagerTokensId = inv.ManagerTokensId,

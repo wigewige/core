@@ -10,6 +10,8 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult<ProfileFullViewModel> GetUserProfileFull(Guid userId);
 
+        OperationResult<ProfilePublicViewModel> GetUserPublicProfile(Guid userId);
+
         OperationResult UpdateUserProfile(Guid userId, UpdateProfileViewModel profile);
     }
 }
