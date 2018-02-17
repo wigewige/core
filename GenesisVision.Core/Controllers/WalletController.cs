@@ -28,6 +28,7 @@ namespace GenesisVision.Core.Controllers
         /// Get user wallet transactions
         /// </summary>
         [HttpPost]
+        [Authorize]
         [Route("investor/wallet/transactions")]
         [Route("manager/wallet/transactions")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(WalletTransactionsViewModel))]
@@ -49,6 +50,7 @@ namespace GenesisVision.Core.Controllers
         /// Deposit
         /// </summary>
         [HttpPost]
+        [Authorize]
         [Route("investor/wallet/deposit")]
         [Route("manager/wallet/deposit")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
@@ -62,6 +64,7 @@ namespace GenesisVision.Core.Controllers
         /// Withdraw
         /// </summary>
         [HttpPost]
+        [Authorize]
         [Route("investor/wallet/withdraw")]
         [Route("manager/wallet/withdraw")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
@@ -69,6 +72,20 @@ namespace GenesisVision.Core.Controllers
         public IActionResult Withdraw()
         {
             return Ok();
+        }
+
+        /// <summary>
+        /// Get eth address for GVT depositing
+        /// </summary>
+        [HttpGet]
+        [Authorize]
+        [Route("investor/wallet/address")]
+        [Route("manager/wallet/address")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetWalletAddress()
+        {
+            return Ok(new { Address = walletService.GetUserWallet(CurrentUser.Id) });
         }
     }
 }

@@ -9,9 +9,11 @@ namespace GenesisVision.DataModel.Models
         public ApplicationUser User { get; set; }
 
         public decimal Amount { get; set; }
-        public string Address { get; set; }
+        public EthAddresses CurrentAddress { get; set; }
+        public Guid CurrentAddressId { get;set; }
 
         public ICollection<IOTransactions> IOTransactions { get; set; }
         public ICollection<WalletTransactions> WalletTransactions { get; set; }
+        public ICollection<EthAddresses> EthAddresses { get; set; }
     }
 }
