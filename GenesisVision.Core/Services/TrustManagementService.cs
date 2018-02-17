@@ -492,7 +492,70 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var lastPeriod = context.Periods
+                                        .Where(x => x.InvestmentProgramId == accrual.InvestmentProgramId)
+                                        .OrderByDescending(x => x.Number)
+                                        .First();
 
+                var investmentProgram = context.InvestmentPrograms
+                      .Include(x => x.ManagerAccount)
+                      .ThenInclude(x => x.BrokerTradeServer)
+                      .ThenInclude(x => x.Broker)
+                      .ThenInclude(x => x.User)
+                      .ThenInclude(x => x.Wallet)
+                      .First(x => x.Id == accrual.InvestmentProgramId);
+
+                var totalProfit = accrual.Accruals.Sum(a => a.Amount);
+
+                investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallet.Amount -= totalProfit;
+
+                var brokerTx = new WalletTransactions
+                {
+                    Id = Guid.NewGuid(),
+                    Type = WalletTransactionsType.ProfitFromProgram,
+                    UserId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id,
+                    Amount = -totalProfit,
+                    Date = DateTime.Now
+                };
+
+                var brokerProfitDistribution = new ProfitDistributionTransactions
+                {
+                    PeriodId = lastPeriod.Id,
+                    WalletTransactionId = brokerTx.Id
+                };
+
+                context.Add(brokerTx);
+                context.Add(brokerProfitDistribution);
+
+                foreach (var acc in accrual.Accruals)
+                {
+                    var investor = context.InvestorAccounts
+                      .Include(x => x.User)
+                      .ThenInclude(x => x.Wallet)
+                      .First(x => x.UserId == acc.InvestorId);
+
+                    investor.User.Wallet.Amount += acc.Amount;
+
+                    var investorTx = new WalletTransactions
+                    {
+                        Id = Guid.NewGuid(),
+                        Type = WalletTransactionsType.ProfitFromProgram,
+                        UserId = acc.InvestorId,
+                        Amount = acc.Amount,
+                        Date = DateTime.Now
+                    };
+
+                    var investorProfitDistribution = new ProfitDistributionTransactions
+                    {
+                        PeriodId = lastPeriod.Id,
+                        WalletTransactionId = investorTx.Id
+                    };
+
+                    context.Add(investorTx);
+                    context.Add(investorProfitDistribution);
+                }
+
+                context.SaveChanges();
             });
         }
     }
