@@ -11,3 +11,4 @@ namespace GenesisVision.DataModel.Models
         public ICollection<ManagerTokens> ManagerTokens { get; set; }
     }
 }
+    

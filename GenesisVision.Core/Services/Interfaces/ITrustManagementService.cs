@@ -32,5 +32,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult<InvestmentProgram> GetInvestment(Guid investmentId);
 
         OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId);
+
+        OperationResult AccrueProfits(InvestmentProgramAccrual accrual);
     }
 }

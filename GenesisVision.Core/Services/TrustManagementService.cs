@@ -487,5 +487,13 @@ namespace GenesisVision.Core.Services
 
             return ipfsService.WriteIpfsText(json);
         }
+
+        public OperationResult AccrueProfits(InvestmentProgramAccrual accrual)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+
+            });
+        }
     }
 }

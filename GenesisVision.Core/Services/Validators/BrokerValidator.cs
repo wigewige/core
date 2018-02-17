@@ -137,5 +137,32 @@ namespace GenesisVision.Core.Services.Validators
             
             return result;
         }
+
+        public List<string> ValidateAccrueProfits(ApplicationUser user, InvestmentProgramAccrual accrual)
+        {
+            var periodErrors = ValidateClosePeriod(user, accrual.InvestmentProgramId);
+            if (periodErrors.Any())
+                return periodErrors;
+
+            var result = new List<string>();
+
+            var investorIds = accrual.Accruals.Select(x => x.InvestorId).ToList();
+
+            foreach (var acc in accrual.Accruals)
+            {
+                var portfolio = context.Portfolios
+                    .Include(p => p.ManagerTokens)
+                    .ThenInclude(p => p.InvestmentProgram)
+                    .Where(p => p.InvestorAccountId == acc.InvestorId)
+                    .Where(p => p.ManagerTokens.Any(t => t.InvestmentProgram.Id == accrual.InvestmentProgramId))
+                    .FirstOrDefault();
+
+                if (portfolio == null)
+                   result.Add($"Investor {acc.InvestorId} doesn't belong to investment program");
+            }
+
+            return result;
+        }
+
     }
 }

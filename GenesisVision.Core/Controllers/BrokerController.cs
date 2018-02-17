@@ -161,5 +161,25 @@ namespace GenesisVision.Core.Controllers
                           Total = data.Data.Item2
                       });
         }
+
+        /// <summary>
+        /// Accrue investors' profits
+        /// </summary>
+        [HttpPost]
+        [Route("broker/period/accrueProfits")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult AccrueProfits([FromBody]InvestmentProgramAccrual accrual)
+        {
+            var errors = brokerValidator.ValidateAccrueProfits(CurrentUser, accrual);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var result = trustManagementService.AccrueProfits(accrual);
+            if (!result.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(result));
+
+            return Ok(result);
+        }
     }
 }
