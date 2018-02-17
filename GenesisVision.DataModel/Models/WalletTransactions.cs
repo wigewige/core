@@ -17,5 +17,7 @@ namespace GenesisVision.DataModel.Models
         public IOTransactions IOTransaction { get; set; }
 
         public InvestmentRequests InvestmentRequest { get; set; }
+
+        public ProfitDistributionTransactions ProfitDistributionTransaction { get; set; }
     }
 }
