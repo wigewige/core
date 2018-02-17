@@ -37,5 +37,14 @@ namespace GenesisVision.Core.Services
                 return (investments, count);
             });
         }
+
+        public OperationResult<string> GetUserWallet(Guid userId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var address = context.Wallets.First(w => w.UserId == userId).CurrentAddress.Address;
+                return address;
+            });
+        }
     }
 }
