@@ -487,5 +487,110 @@ namespace GenesisVision.Core.Services
 
             return ipfsService.WriteIpfsText(json);
         }
+
+        public OperationResult AccrueProfits(InvestmentProgramAccrual accrual)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var lastPeriod = context.Periods
+                                        .Where(x => x.InvestmentProgramId == accrual.InvestmentProgramId)
+                                        .OrderByDescending(x => x.Number)
+                                        .First();
+
+                var investmentProgram = context.InvestmentPrograms
+                      .Include(x => x.ManagerAccount)
+                      .ThenInclude(x => x.BrokerTradeServer)
+                      .ThenInclude(x => x.Broker)
+                      .ThenInclude(x => x.User)
+                      .ThenInclude(x => x.Wallet)
+                      .First(x => x.Id == accrual.InvestmentProgramId);
+
+                var totalProfit = accrual.Accruals.Sum(a => a.Amount);
+
+                investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallet.Amount -= totalProfit;
+
+                var brokerTx = new WalletTransactions
+                {
+                    Id = Guid.NewGuid(),
+                    Type = WalletTransactionsType.ProfitFromProgram,
+                    UserId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id,
+                    Amount = -totalProfit,
+                    Date = DateTime.Now
+                };
+
+                var brokerProfitDistribution = new ProfitDistributionTransactions
+                {
+                    PeriodId = lastPeriod.Id,
+                    WalletTransactionId = brokerTx.Id
+                };
+
+                context.Add(brokerTx);
+                context.Add(brokerProfitDistribution);
+
+                foreach (var acc in accrual.Accruals)
+                {
+                    var investor = context.InvestorAccounts
+                      .Include(x => x.User)
+                      .ThenInclude(x => x.Wallet)
+                      .First(x => x.UserId == acc.InvestorId);
+
+                    investor.User.Wallet.Amount += acc.Amount;
+
+                    var investorTx = new WalletTransactions
+                    {
+                        Id = Guid.NewGuid(),
+                        Type = WalletTransactionsType.ProfitFromProgram,
+                        UserId = acc.InvestorId,
+                        Amount = acc.Amount,
+                        Date = DateTime.Now
+                    };
+
+                    var investorProfitDistribution = new ProfitDistributionTransactions
+                    {
+                        PeriodId = lastPeriod.Id,
+                        WalletTransactionId = investorTx.Id
+                    };
+
+                    context.Add(investorTx);
+                    context.Add(investorProfitDistribution);
+                }
+
+                context.SaveChanges();
+            });
+        }
+
+        public OperationResult CancelInvestmentRequest(Guid requestId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var investmentRequest = context.InvestmentRequests
+                                    .Include(x => x.User)
+                                    .ThenInclude(x => x.Wallet)
+                                    .FirstOrDefault(x => x.Id == requestId
+                                    && x.Status == InvestmentRequestStatus.New);
+
+                investmentRequest.Status = InvestmentRequestStatus.Cancelled;
+
+                if (investmentRequest.Type == InvestmentRequestType.Invest)
+                {
+                    var investor = investmentRequest.User;
+
+                    var tx = new WalletTransactions
+                    {
+                        Id = Guid.NewGuid(),
+                        Type = WalletTransactionsType.CancelInvestmentRequest,
+                        UserId = investor.Id,
+                        Amount = investmentRequest.Amount,
+                        Date = DateTime.Now
+                    };
+
+                    context.Add(tx);
+
+                    investor.Wallet.Amount += investmentRequest.Amount;
+                }
+
+                context.SaveChanges();
+            });
+        }
     }
 }

@@ -16,5 +16,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateCreateManagerAccount(ApplicationUser user, NewManager request);
 
         List<string> ValidateSetPeriodStartBalance(ApplicationUser user, Guid periodId, decimal balance);
+
+        List<string> ValidateAccrueProfits(ApplicationUser user, InvestmentProgramAccrual accrual);
     }
 }
