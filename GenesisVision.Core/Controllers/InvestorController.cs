@@ -78,7 +78,7 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Cancel withdrawal request
+        /// Cancel investment request
         /// </summary>
         [HttpPost]
         [Route("investor/investments/cancelInvestmentRequest")]

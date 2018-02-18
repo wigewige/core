@@ -1,5 +1,6 @@
 ﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Validators.Interfaces;
+using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
@@ -105,6 +106,91 @@ namespace GenesisVision.Core.Services.Validators
             return context.ManagersAccounts.Any(x => x.Id == managerId)
                 ? new List<string>()
                 : new List<string> {$"Does not find manager account with id \"{managerId}\""};
+        }
+
+        public List<string> ValidateInvest(ApplicationUser user, Invest model)
+        {
+            if (!user.IsEnabled || user.Type != UserType.Manager || user.Id != model.UserId)
+                return new List<string> { ValidationMessages.AccessDenied };
+
+            var result = new List<string>();
+
+            var wallet = context.Wallets.First(x => x.UserId == model.UserId);
+            if (wallet.Amount < model.Amount)
+                return new List<string> { ValidationMessages.NotEnoughMoney };
+
+            var investmentProgram = context.InvestmentPrograms
+                                           .Include(x => x.Periods)
+                                           .FirstOrDefault(x => x.Id == model.InvestmentProgramId);
+            if (investmentProgram == null)
+                return new List<string> { $"Does not find investment program id \"{model.InvestmentProgramId}\"" };
+
+            if (investmentProgram.ManagerAccountId != user.Id)
+                return new List<string> { $"Manager can invest only in his own programs" };
+
+            var lastPeriod = investmentProgram.Periods
+                                              .OrderByDescending(x => x.Number)
+                                              .FirstOrDefault();
+            if (lastPeriod == null || lastPeriod.Status != PeriodStatus.Planned)
+                return new List<string> { "There are no new period for investment program" };
+
+            if (lastPeriod.InvestmentRequests.Any(x => x.UserId == user.Id && x.Type == InvestmentRequestType.Invest))
+                return new List<string> { "Investment request can't be created having pending withdrawal request" };
+
+            if (model.Amount <= 0)
+                result.Add("Amount must be greater than zero");
+
+            return result;
+        }
+
+        public List<string> ValidateWithdraw(ApplicationUser user, Invest model)
+        {
+            if (!user.IsEnabled || user.Type != UserType.Manager || user.Id != model.UserId)
+                return new List<string> { ValidationMessages.AccessDenied };
+
+            var result = new List<string>();
+
+            var investmentProgram = context.InvestmentPrograms
+                                           .Include(x => x.Periods)
+                                           .ThenInclude(x => x.InvestmentRequests)
+                                           .FirstOrDefault(x => x.Id == model.InvestmentProgramId);
+            if (investmentProgram == null)
+                return new List<string> { $"Does not find investment program id \"{model.InvestmentProgramId}\"" };
+
+            if (investmentProgram.ManagerAccountId != user.Id)
+                return new List<string> { $"Manager can withdraw only from his own programs" };
+
+            var lastPeriod = investmentProgram.Periods
+                                              .OrderByDescending(x => x.Number)
+                                              .FirstOrDefault();
+            if (lastPeriod == null || lastPeriod.Status != PeriodStatus.Planned)
+                return new List<string> { "There are no new period for investment program" };
+
+            if (lastPeriod.InvestmentRequests.Any(x => x.UserId == user.Id && x.Type == InvestmentRequestType.Invest))
+                return new List<string> { "Withdrawal request can't be created having pending investment request" };
+
+            if (model.Amount <= 0)
+                result.Add("Amount must be greater than zero");
+
+            return result;
+        }
+
+        public List<string> ValidateCancelInvestmentRequest(ApplicationUser user, Guid requestId)
+        {
+            if (!user.IsEnabled || user.Type != UserType.Manager)
+                return new List<string> { ValidationMessages.AccessDenied };
+
+            var result = new List<string>();
+
+            var investmentRequest = context.InvestmentRequests
+                                    .FirstOrDefault(x => x.Id == requestId
+                                    && x.Status == InvestmentRequestStatus.New
+                                    && x.UserId == user.Id);
+
+            if (investmentRequest == null)
+                return new List<string> { "No investment request found" };
+
+            return result;
         }
     }
 }

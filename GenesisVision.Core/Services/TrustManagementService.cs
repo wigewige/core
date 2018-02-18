@@ -171,10 +171,9 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var investor = context.InvestorAccounts
-                                      .Include(x => x.User)
-                                      .ThenInclude(x => x.Wallet)
-                                      .First(x => x.UserId == model.UserId);
+                var investor = context.Users
+                                      .Include(x => x.Wallet)
+                                      .First(x => x.Id == model.UserId);
 
                 var lastPeriod = context.Periods
                                         .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
@@ -203,7 +202,7 @@ namespace GenesisVision.Core.Services
                                      WalletTransactionId = tx.Id
                                  };
 
-                investor.User.Wallet.Amount -= model.Amount;
+                investor.Wallet.Amount -= model.Amount;
                 
                 context.Add(invRequest);
                 context.Add(tx);
@@ -215,8 +214,8 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var investor = context.InvestorAccounts
-                                      .First(x => x.UserId == model.UserId);
+                var investor = context.Users
+                                      .First(x => x.Id == model.UserId);
 
                 var period = context.Periods
                                     .FirstOrDefault(x => x.InvestmentProgramId == model.InvestmentProgramId &&

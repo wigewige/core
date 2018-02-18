@@ -104,5 +104,69 @@ namespace GenesisVision.Core.Controllers
                           Statistic = statistic.Data
                       });
         }
+
+        /// <summary>
+        /// Manager deposit in his own investment program
+        /// </summary>
+        [HttpPost]
+        [Route("manager/investment/invest")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult Invest([FromBody]Invest model)
+        {
+            model.UserId = CurrentUser.Id;
+
+            var errors = managerValidator.ValidateInvest(CurrentUser, model);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var res = trustManagementService.Invest(model);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res.Errors));
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Manager withdrawal from his own investment program
+        /// </summary>
+        [HttpPost]
+        [Route("manager/investment/withdraw")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult RequestForWithdraw([FromBody]Invest model)
+        {
+            model.UserId = CurrentUser.Id;
+
+            var errors = managerValidator.ValidateWithdraw(CurrentUser, model);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var res = trustManagementService.RequestForWithdraw(model);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res.Errors));
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Cancel investment request
+        /// </summary>
+        [HttpPost]
+        [Route("manager/investment/cancelInvestmentRequest")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult CancelInvestmentRequest(Guid requestId)
+        {
+            var errors = managerValidator.ValidateCancelInvestmentRequest(CurrentUser, requestId);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var res = trustManagementService.CancelInvestmentRequest(requestId);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res.Errors));
+
+            return Ok();
+        }
     }
 }
