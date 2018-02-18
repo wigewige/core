@@ -180,10 +180,10 @@ namespace GenesisVision.DataModel
                    .WithOne(x => x.User)
                    .HasForeignKey<InvestorAccounts>(x => x.UserId);
             
-            builder.Entity<InvestorAccounts>()
-                   .HasOne(x => x.Portfolio)
-                   .WithOne(x => x.InvestorAccount)
-                   .HasForeignKey<Portfolios>(x => x.InvestorAccountId);
+            //builder.Entity<InvestorAccounts>()
+            //       .HasOne(x => x.Portfolios)
+            //       .WithMany(x => x.InvestorAccount)
+            //       .HasForeignKey<Portfolios>(x => x.InvestorAccountId);
 
             builder.Entity<Portfolios>()
                    .HasKey(x => x.InvestorAccountId);

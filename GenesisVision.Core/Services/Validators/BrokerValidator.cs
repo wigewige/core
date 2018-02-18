@@ -154,7 +154,7 @@ namespace GenesisVision.Core.Services.Validators
                     .Include(p => p.ManagerTokens)
                     .ThenInclude(p => p.InvestmentProgram)
                     .Where(p => p.InvestorAccountId == acc.InvestorId)
-                    .Where(p => p.ManagerTokens.Any(t => t.InvestmentProgram.Id == accrual.InvestmentProgramId))
+                    .Where(p => p.ManagerTokens.InvestmentProgram.Id == accrual.InvestmentProgramId)
                     .FirstOrDefault();
 
                 if (portfolio == null)
