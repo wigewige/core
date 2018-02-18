@@ -186,6 +186,7 @@ namespace GenesisVision.Core
             services.AddTransient<IManagerValidator, ManagerValidator>();
             services.AddTransient<IBrokerValidator, BrokerValidator>();
             services.AddTransient<IInvestorValidator, InvestorValidator>();
+            services.AddTransient<IRateService, RateService>();
 
             services.AddSingleton<IIpfsService, IpfsService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

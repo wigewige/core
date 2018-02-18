@@ -27,7 +27,8 @@ namespace GenesisVision.DataModel
         public DbSet<Wallets> Wallets { get; set; }
         public DbSet<IOTransactions> IOTransactions { get; set; }
         public DbSet<WalletTransactions> WalletTransactions { get; set; }
-
+        public DbSet<BlockchainAddresses> EthAddresses { get; set; }
+        public DbSet<PaymentTransactions> PaymentTransactions { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
