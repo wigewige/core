@@ -181,5 +181,25 @@ namespace GenesisVision.Core.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Process investment requests
+        /// </summary>
+        [HttpPost]
+        [Route("broker/period/processInvestmentRequests")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult ProcessInvestmentRequests(Guid investmentProgramId)
+        {
+            var errors = brokerValidator.ValidateProcessInvestmentRequests(CurrentUser, investmentProgramId);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var result = trustManagementService.ProcessInvestmentRequests(investmentProgramId);
+            if (!result.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(result));
+
+            return Ok(result.Data);
+        }
     }
 }
