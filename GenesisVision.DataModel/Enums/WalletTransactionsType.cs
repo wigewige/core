@@ -7,6 +7,7 @@
         OpenProgram = 2,
         InvestToProgram = 3,
         WithdrawFromProgram = 4,
-        ProfitFromProgram = 5
+        ProfitFromProgram = 5,
+        CancelInvestmentRequest = 6
     }
 }

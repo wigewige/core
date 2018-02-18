@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Linq;
 
 namespace GenesisVision.Core.Controllers
@@ -70,6 +71,26 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
             var res = trustManagementService.RequestForWithdraw(model);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res.Errors));
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Cancel withdrawal request
+        /// </summary>
+        [HttpPost]
+        [Route("investor/investments/cancelInvestmentRequest")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult CancelInvestmentRequest(Guid requestId)
+        {
+            var errors = investorValidator.ValidateCancelInvestmentRequest(CurrentUser, requestId);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var res = trustManagementService.CancelInvestmentRequest(requestId);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res.Errors));
 

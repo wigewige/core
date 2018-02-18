@@ -5,6 +5,7 @@ using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +18,24 @@ namespace GenesisVision.Core.Services.Validators
         public InvestorValidator(ApplicationDbContext context)
         {
             this.context = context;
+        }
+
+        public List<string> ValidateCancelInvestmentRequest(ApplicationUser user, Guid requestId)
+        {
+            if (!user.IsEnabled || user.Type != UserType.Investor)
+                return new List<string> { ValidationMessages.AccessDenied };
+
+            var result = new List<string>();
+
+            var investmentRequest = context.InvestmentRequests
+                                    .FirstOrDefault(x => x.Id == requestId 
+                                    && x.Status == InvestmentRequestStatus.New
+                                    && x.UserId == user.Id);
+
+            if (investmentRequest == null)
+                return new List<string> { "No investment request found" };
+
+            return result;
         }
 
         public List<string> ValidateInvest(ApplicationUser user, Invest model)
