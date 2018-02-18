@@ -56,14 +56,14 @@ namespace GenesisVision.Core.Services
                             var tx = new WalletTransactions
                                      {
                                          Id = Guid.NewGuid(),
-                                         Type = WalletTransactionsType.WithdrawFromProgram,
+                                         Type = WalletTransactionsType.CancelInvestmentRequest,
                                          UserId = request.UserId,
                                          Amount = request.Amount,
                                          Date = DateTime.Now
                                      };
                             context.Add(tx);
                         }
-                        pendingInvests.ForEach(x => x.Status = InvestmentRequestStatus.Executed);
+                        pendingInvests.ForEach(x => x.Status = InvestmentRequestStatus.Cancelled);
                     }
                 }
 
@@ -590,6 +590,26 @@ namespace GenesisVision.Core.Services
                 }
 
                 context.SaveChanges();
+            });
+        }
+
+        public OperationResult<decimal> ProcessInvestmentRequests(Guid investmentProgramId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                decimal totalBalanceChange = 0;
+
+                //ToDo: Manager's requests processing
+
+                var investment = context.InvestmentPrograms
+                                        .Include(x => x.Periods)
+                                        .First(x => x.Id == investmentProgramId);               
+
+                var plannedPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
+
+
+
+                return totalBalanceChange;
             });
         }
     }

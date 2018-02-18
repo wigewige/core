@@ -36,5 +36,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult AccrueProfits(InvestmentProgramAccrual accrual);
 
         OperationResult CancelInvestmentRequest(Guid requestId);
+
+        OperationResult<decimal> ProcessInvestmentRequests(Guid investmentProgramId);
     }
 }
