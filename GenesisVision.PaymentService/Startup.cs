@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using GenesisVision.PaymentService.Services;
 using GenesisVision.PaymentService.Services.Interfaces;
+using GenesisVision.PaymentService.Models;
 
 namespace GenesisVision.PaymentService
 {
@@ -27,6 +28,7 @@ namespace GenesisVision.PaymentService
         {
             services.AddMvc();
             services.AddTransient<IEthService, EthService>();
+            services.AddTransient<IPaymentTransactionService, PaymentTransactionService>();
 
         }
 
