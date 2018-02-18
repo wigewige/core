@@ -8,7 +8,7 @@ namespace GenesisVision.DataModel.Models
         public Guid UserId { get; set; }
         public ApplicationUser User { get; set; }
 
-        public Portfolios Portfolio { get; set; }
+        public ICollection<Portfolios> Portfolios { get; set; }
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
     }
