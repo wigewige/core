@@ -42,7 +42,8 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var address = context.Wallets.First(w => w.UserId == userId).CurrentAddress.Address;
+                var address = context.Wallets.First(w => w.UserId == userId).BlockchainAddresses.FirstOrDefault(x => x.IsDefault)?.Address ??
+                              context.Wallets.First(w => w.UserId == userId).BlockchainAddresses.FirstOrDefault()?.Address;
                 return address;
             });
         }

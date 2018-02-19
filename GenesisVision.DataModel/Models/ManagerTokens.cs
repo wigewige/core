@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GenesisVision.DataModel.Models
 {
@@ -10,5 +11,7 @@ namespace GenesisVision.DataModel.Models
         public string TokenAddress { get; set; }
 
         public InvestmentPrograms InvestmentProgram { get; set; }
+
+        public ICollection<Portfolios> Portfolios { get; set; }
     }
 }

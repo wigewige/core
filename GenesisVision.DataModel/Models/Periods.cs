@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using GenesisVision.DataModel.Enums;
+using System;
 using System.Collections.Generic;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.DataModel.Models
 {
@@ -20,5 +19,7 @@ namespace GenesisVision.DataModel.Models
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 
         public ICollection<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
+
+        public ICollection<ProfitDistributionTransactions> ProfitDistributionTransactions { get; set; }
     }
 }

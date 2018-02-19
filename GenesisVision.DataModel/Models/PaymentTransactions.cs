@@ -19,8 +19,10 @@ namespace GenesisVision.DataModel.Models
         public decimal? PayoutServiceFee { get; set; }
         public PaymentTransactionStatus PayoutStatus { get; set; }
 
-        public BlockchainAddresses Wallet { get; set; }
-        public Guid WalletId { get; set; }
+        public BlockchainAddresses BlockchainAddress { get; set; }
+        public Guid BlockchainAddressId { get; set; }
 
+        public WalletTransactions WalletTransaction { get; set; }
+        public Guid WalletTransactionId { get; set; }
     }
 }

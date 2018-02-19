@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GenesisVision.DataModel.Models
 {
     public class BlockchainAddresses
     {
         public Guid Id { get; set; }
-
-        public Wallets Wallet { get; set; }
-        public Guid WalletId { get; set; }
-
         public string Currency { get; set; }
-
-
         public string Address { get; set; }
+        public bool IsDefault { get; set; }
+
+        public ApplicationUser User { get; set; }
+        public Wallets Wallet { get; set; }
+        public Guid UserId { get; set; }
+
+        public ICollection<PaymentTransactions> PaymentTransactions { get; set; }
     }
 }

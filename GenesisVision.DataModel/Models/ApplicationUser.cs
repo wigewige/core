@@ -15,7 +15,7 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<ManagerRequests> ManagerAccountRequests { get; set; }
 
-        public ICollection<IOTransactions> IOTransactions { get; set; }
+        public ICollection<BlockchainAddresses> BlockchainAddresses { get; set; }
 
         public ICollection<WalletTransactions> WalletTransactions { get; set; }
 

@@ -14,7 +14,7 @@ namespace GenesisVision.DataModel.Models
         public Wallets Wallet { get; set; }
         public ApplicationUser User { get; set; }
 
-        public IOTransactions IOTransaction { get; set; }
+        public PaymentTransactions PaymentTransaction { get; set; }
 
         public InvestmentRequests InvestmentRequest { get; set; }
 

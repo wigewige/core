@@ -9,7 +9,9 @@ namespace GenesisVision.DataModel.Models
         public InvestorAccounts InvestorAccount { get; set; }
 
         public decimal Amount { get; set; }
-        public ManagerTokens ManagerTokens { get; set; }
+
+        public ManagerTokens ManagerToken { get; set; }
+        public Guid ManagerTokenId { get; set; }
     }
 }
     
