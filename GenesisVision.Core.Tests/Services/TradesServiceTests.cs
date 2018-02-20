@@ -71,9 +71,9 @@ namespace GenesisVision.Core.Tests.Services
         public void TestMetaTraderOrdersNotAllHeadersWrong()
         {
             var ipfsText =
-@"""Volume"";""DateOpen"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""DateClose"";""Direction"";""Symbol"";
-""6"";""12/22/2017 9:56:46 AM"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""Sell"";""TEST"";
-""9"";""12/22/2017 2:07:38 PM"";""182837"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
+@"""DateOpen"";""Ticket"";""PriceOpen"";""PriceClose"";""Profit"";""DateClose"";""Direction"";""Symbol"";
+""12/22/2017 9:56:46 AM"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""Sell"";""TEST"";
+""12/22/2017 2:07:38 PM"";""182837"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
 
             var result = tradesService.ConvertMetaTrader4OrdersFromCsv(ipfsText);
 

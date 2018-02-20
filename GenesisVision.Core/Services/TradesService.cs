@@ -19,7 +19,6 @@ namespace GenesisVision.Core.Services
                 {
                     BrokerTradeServerType.MetaTrader4, new List<string>
                                                        {
-                                                           "Login",
                                                            "Ticket",
                                                            "Symbol",
                                                            "PriceOpen",
@@ -34,7 +33,6 @@ namespace GenesisVision.Core.Services
                 {
                     BrokerTradeServerType.MetaTrader5, new List<string>
                                                        {
-                                                           "Login",
                                                            "Ticket",
                                                            "Symbol",
                                                            "Price",
