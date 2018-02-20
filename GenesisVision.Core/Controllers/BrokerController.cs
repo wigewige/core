@@ -3,6 +3,7 @@ using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.Services.Validators.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Common;
+using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,14 +22,16 @@ namespace GenesisVision.Core.Controllers
     {
         private readonly IManagerService managerService;
         private readonly ITrustManagementService trustManagementService;
+        private readonly ITradesService tradesService;
         private readonly IBrokerValidator brokerValidator;
 
         public BrokerController(IManagerService managerService, ITrustManagementService trustManagementService,
-            IBrokerValidator brokerValidator, UserManager<ApplicationUser> userManager)
+            IBrokerValidator brokerValidator, UserManager<ApplicationUser> userManager, ITradesService tradesService)
             : base(userManager)
         {
             this.managerService = managerService;
             this.trustManagementService = trustManagementService;
+            this.tradesService = tradesService;
             this.brokerValidator = brokerValidator;
         }
 
@@ -200,6 +203,27 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(ErrorResult.GetResult(result));
 
             return Ok(result.Data);
+        }
+
+        /// <summary>
+        /// New trade event
+        /// </summary>
+        [HttpPost]
+        [Route("broker/trades/new")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult NewTrade([FromBody]NewTradeEvent tradeEvent)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
+
+            var errors = brokerValidator.ValidateNewTrade(CurrentUser, tradeEvent);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            tradesService.SaveNewTrade(tradeEvent);
+
+            return Ok();
         }
     }
 }

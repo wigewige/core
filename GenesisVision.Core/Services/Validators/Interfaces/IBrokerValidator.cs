@@ -1,4 +1,5 @@
 ﻿using GenesisVision.Core.ViewModels.Broker;
+using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.DataModel.Models;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateAccrueProfits(ApplicationUser user, InvestmentProgramAccrual accrual);
 
         List<string> ValidateProcessInvestmentRequests(ApplicationUser user, Guid investmentProgramId);
+
+        List<string> ValidateNewTrade(ApplicationUser user, NewTradeEvent tradeEvent);
     }
 }

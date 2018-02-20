@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GenesisVision.Core.ViewModels.Trades;
 
 namespace GenesisVision.Core.Services.Validators
 {
@@ -170,6 +171,19 @@ namespace GenesisVision.Core.Services.Validators
             var periodErrors = ValidateClosePeriod(user, investmentProgramId);
             if (periodErrors.Any())
                 return periodErrors;
+
+            return result;
+        }
+
+        public List<string> ValidateNewTrade(ApplicationUser user, NewTradeEvent tradeEvent)
+        {
+            var result = new List<string>();
+
+            var mangerAccount = context.ManagersAccounts
+                                       .FirstOrDefault(x => x.Id == tradeEvent.ManagerAccountId &&
+                                                            x.BrokerTradeServer.Broker.UserId == user.Id);
+            if (mangerAccount == null)
+                result.Add("Manager account does not exist");
 
             return result;
         }

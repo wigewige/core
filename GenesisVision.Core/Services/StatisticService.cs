@@ -39,13 +39,5 @@ namespace GenesisVision.Core.Services
                 return result;
             });
         }
-
-        public OperationResult<BrokerTradeServerType> GetManagerAccountType(Guid accountId)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                return context.ManagersAccounts.First(x => x.Id == accountId).BrokerTradeServer.Type;
-            });
-        }
     }
 }
