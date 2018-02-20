@@ -1,13 +1,13 @@
-﻿using GenesisVision.DataModel.Models;
-using GenesisVision.Core.Models;
+﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Trades;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services
 {
@@ -30,10 +30,90 @@ namespace GenesisVision.Core.Services
                                                            "DateClose",
                                                            "Direction"
                                                        }
+                },
+                {
+                    BrokerTradeServerType.MetaTrader5, new List<string>
+                                                       {
+                                                           "Login",
+                                                           "Ticket",
+                                                           "Symbol",
+                                                           "Price",
+                                                           "Profit",
+                                                           "Volume",
+                                                           "Date",
+                                                           "Direction",
+                                                           "Entry"
+                                                       }
                 }
             };
 
-        public OperationResult<List<MetaTraderOrder>> ConvertMetaTraderOrdersFromCsv(string ipfsText)
+        private readonly ApplicationDbContext context;
+
+        public TradesService(ApplicationDbContext context)
+        {
+            this.context = context;
+        }
+
+        public OperationResult<List<MetaTrader4Order>> GetMetaTrader4Orders(Guid accountId, DateTime? dateFrom = null, DateTime? dateTo = null)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var trades = context.ManagersAccountsTrades
+                                    .Where(x => x.ManagerAccountId == accountId);
+
+                if (dateFrom.HasValue)
+                    trades = trades.Where(x => x.DateClose >= dateFrom.Value);
+                if (dateTo.HasValue)
+                    trades = trades.Where(x => x.DateClose <= dateTo);
+
+                var result = trades.Select(x => new MetaTrader4Order
+                                                {
+                                                    Id = x.Id,
+                                                    Ticket = x.Ticket,
+                                                    Volume = x.Volume,
+                                                    Symbol = x.Symbol,
+                                                    Profit = x.Profit,
+                                                    Direction = x.Direction,
+                                                    DateClose = x.DateClose.Value,
+                                                    DateOpen = x.DateOpen.Value,
+                                                    PriceClose = x.PriceClose.Value,
+                                                    PriceOpen = x.PriceOpen.Value
+                                                })
+                                   .ToList();
+                return result;
+            });
+        }
+
+        public OperationResult<List<MetaTrader5Order>> GetMetaTrader5Orders(Guid accountId, DateTime? dateFrom = null, DateTime? dateTo = null)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var trades = context.ManagersAccountsTrades
+                                    .Where(x => x.ManagerAccountId == accountId);
+
+                if (dateFrom.HasValue)
+                    trades = trades.Where(x => x.DateClose >= dateFrom.Value);
+                if (dateTo.HasValue)
+                    trades = trades.Where(x => x.DateClose <= dateTo);
+
+                var result = trades.Select(x => new MetaTrader5Order
+                                                {
+                                                    Id = x.Id,
+                                                    Ticket = x.Ticket,
+                                                    Volume = x.Volume,
+                                                    Symbol = x.Symbol,
+                                                    Profit = x.Profit,
+                                                    Direction = x.Direction,
+                                                    Date = x.Date.Value,
+                                                    Entry = x.Entry.Value,
+                                                    Price = x.Price.Value
+                                                })
+                                   .ToList();
+                return result;
+            });
+        }
+
+        public OperationResult<List<MetaTrader4Order>> ConvertMetaTrader4OrdersFromCsv(string ipfsText)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
@@ -44,14 +124,14 @@ namespace GenesisVision.Core.Services
                 if (!header.IsSuccess)
                     throw new Exception(header.Errors.FirstOrDefault());
 
-                var trades = new List<MetaTraderOrder>();
+                var trades = new List<MetaTrader4Order>();
                 for (var i = 0; i < csv.Length; i++)
                 {
                     if (i == 0)
                         continue;
 
                     var fields = csv[i].Split(";");
-                    var order = new MetaTraderOrder();
+                    var order = new MetaTrader4Order();
                     foreach (var headerText in header.Data)
                     {
                         var field = fields[headerText.Value].Replace("\"", "");
@@ -67,8 +147,8 @@ namespace GenesisVision.Core.Services
                             value = Convert.ToInt64(field);
                         else if (propInfo.PropertyType == typeof(DateTime))
                             value = DateTime.ParseExact(field, "G", null);
-                        else if (propInfo.PropertyType == typeof(Direction))
-                            value = Enum.Parse(typeof(Direction), field);
+                        else if (propInfo.PropertyType == typeof(TradeDirectionType))
+                            value = Enum.Parse(typeof(TradeDirectionType), field);
 
                         propInfo.SetValue(order, value, null);
                     }

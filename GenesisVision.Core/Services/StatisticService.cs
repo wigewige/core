@@ -5,7 +5,9 @@ using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services
 {
@@ -35,6 +37,14 @@ namespace GenesisVision.Core.Services
                     .ToList();
 
                 return result;
+            });
+        }
+
+        public OperationResult<BrokerTradeServerType> GetManagerAccountType(Guid accountId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                return context.ManagersAccounts.First(x => x.Id == accountId).BrokerTradeServer.Type;
             });
         }
     }

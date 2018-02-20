@@ -1,6 +1,8 @@
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
-using GenesisVision.Core.ViewModels.Trades;
+using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -10,12 +12,17 @@ namespace GenesisVision.Core.Tests.Services
     [TestFixture]
     public class TradesServiceTests
     {
+        private ApplicationDbContext context;
         private ITradesService tradesService;
 
         [SetUp]
         public void Init()
         {
-            tradesService = new TradesService();
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseInMemoryDatabase("databaseManagerService");
+            context = new ApplicationDbContext(optionsBuilder.Options);
+
+            tradesService = new TradesService(context);
         }
 
         [Test]
@@ -28,12 +35,12 @@ namespace GenesisVision.Core.Tests.Services
 ""102"";""236960"";""TEST"";""0.964"";""1.061"";""334"";""2"";""12/22/2017 10:55:39 AM"";""12/23/2017 12:33:39 AM"";""Buy"";
 ""102"";""190553"";""TEST"";""0.939"";""1.041"";""266"";""4"";""12/22/2017 9:58:46 AM"";""12/23/2017 12:21:46 AM"";""Sell"";";
 
-            var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
+            var result = tradesService.ConvertMetaTrader4OrdersFromCsv(ipfsText);
 
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(4, result.Data.Count);
-            Assert.AreEqual(1, result.Data.Count(x => x.Direction == Direction.Buy));
-            Assert.AreEqual(3, result.Data.Count(x => x.Direction == Direction.Sell));
+            Assert.AreEqual(1, result.Data.Count(x => x.Direction == TradeDirectionType.Buy));
+            Assert.AreEqual(3, result.Data.Count(x => x.Direction == TradeDirectionType.Sell));
             Assert.AreEqual(new DateTime(2017, 12, 22, 14, 08, 45), result.Data.First().DateOpen);
             Assert.AreEqual(new DateTime(2017, 12, 23, 0, 21, 46), result.Data.Last().DateClose);
             Assert.AreEqual(236872, result.Data.First().Ticket);
@@ -49,12 +56,12 @@ namespace GenesisVision.Core.Tests.Services
 ""6"";""12/22/2017 9:56:46 AM"";""102"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""Sell"";""TEST"";
 ""9"";""12/22/2017 2:07:38 PM"";""102"";""182837"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
 
-            var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
+            var result = tradesService.ConvertMetaTrader4OrdersFromCsv(ipfsText);
 
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(2, result.Data.Count);
-            Assert.AreEqual(1, result.Data.Count(x => x.Direction == Direction.Buy));
-            Assert.AreEqual(1, result.Data.Count(x => x.Direction == Direction.Sell));
+            Assert.AreEqual(1, result.Data.Count(x => x.Direction == TradeDirectionType.Buy));
+            Assert.AreEqual(1, result.Data.Count(x => x.Direction == TradeDirectionType.Sell));
             Assert.AreEqual(new DateTime(2017, 12, 22, 9, 56, 46), result.Data.First().DateOpen);
             Assert.AreEqual("TEST", result.Data.First().Symbol);
             Assert.AreEqual(0.956, result.Data.Last().PriceOpen);
@@ -68,7 +75,7 @@ namespace GenesisVision.Core.Tests.Services
 ""6"";""12/22/2017 9:56:46 AM"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""Sell"";""TEST"";
 ""9"";""12/22/2017 2:07:38 PM"";""182837"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
 
-            var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
+            var result = tradesService.ConvertMetaTrader4OrdersFromCsv(ipfsText);
 
             Assert.IsFalse(result.IsSuccess);
             Assert.AreEqual("Header does not contains all labels", result.Errors.First());
@@ -82,7 +89,7 @@ namespace GenesisVision.Core.Tests.Services
 ""6"";""12/22/2017 9:56:46 AM"";""466172"";""0.992"";""1.071"";""117"";""12/22/2017 11:43:46 PM"";""error!"";""TEST"";
 ""9"";""12/22/2017 2:07:38 PM"";""error!"";""0.956"";""1.077"";""287"";""12/22/2017 9:59:38 PM"";""Buy"";""TEST"";";
 
-            var result = tradesService.ConvertMetaTraderOrdersFromCsv(ipfsText);
+            var result = tradesService.ConvertMetaTrader4OrdersFromCsv(ipfsText);
 
             Assert.IsFalse(result.IsSuccess);
         }

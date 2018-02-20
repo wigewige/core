@@ -395,6 +395,44 @@ namespace GenesisVision.Core.Migrations
                     b.ToTable("ManagersAccountsStatistics");
                 });
 
+            modelBuilder.Entity("GenesisVision.DataModel.Models.ManagersAccountsTrades", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime?>("Date");
+
+                    b.Property<DateTime?>("DateClose");
+
+                    b.Property<DateTime?>("DateOpen");
+
+                    b.Property<int>("Direction");
+
+                    b.Property<int?>("Entry");
+
+                    b.Property<Guid>("ManagerAccountId");
+
+                    b.Property<decimal?>("Price");
+
+                    b.Property<decimal?>("PriceClose");
+
+                    b.Property<decimal?>("PriceOpen");
+
+                    b.Property<decimal>("Profit");
+
+                    b.Property<string>("Symbol");
+
+                    b.Property<long>("Ticket");
+
+                    b.Property<decimal>("Volume");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManagerAccountId");
+
+                    b.ToTable("ManagersAccountsTrades");
+                });
+
             modelBuilder.Entity("GenesisVision.DataModel.Models.ManagerTokens", b =>
                 {
                     b.Property<Guid>("Id")
@@ -796,6 +834,14 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
                         .WithMany("ManagersAccountsStatistics")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GenesisVision.DataModel.Models.ManagersAccountsTrades", b =>
+                {
+                    b.HasOne("GenesisVision.DataModel.Models.ManagerAccounts", "ManagerAccount")
+                        .WithMany("ManagersAccountsTrades")
+                        .HasForeignKey("ManagerAccountId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

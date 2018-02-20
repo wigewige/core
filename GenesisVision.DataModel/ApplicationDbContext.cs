@@ -17,6 +17,7 @@ namespace GenesisVision.DataModel
         public DbSet<BrokerTradeServers> BrokerTradeServers { get; set; }
         public DbSet<ManagerAccounts> ManagersAccounts { get; set; }
         public DbSet<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
+        public DbSet<ManagersAccountsTrades> ManagersAccountsTrades { get; set; }
         public DbSet<InvestorAccounts> InvestorAccounts { get; set; }
         public DbSet<ManagerRequests> ManagerRequests { get; set; }
         public DbSet<InvestmentPrograms> InvestmentPrograms { get; set; }
@@ -112,15 +113,20 @@ namespace GenesisVision.DataModel
                    .WithMany(x => x.ManagersAccountsStatistics)
                    .HasForeignKey(x => x.PeriodId);
 
-            builder.Entity<ProfitDistributionTransactions>()
-                   .HasOne(x => x.Period)
-                   .WithMany(x => x.ProfitDistributionTransactions)
-                   .HasForeignKey(x => x.PeriodId);
-
             builder.Entity<ManagersAccountsStatistics>()
                    .HasOne(x => x.InvestmentProgram)
                    .WithMany(x => x.ManagersAccountsStatistics)
                    .HasForeignKey(x => x.InvestmentProgramId);
+
+            builder.Entity<ManagersAccountsTrades>()
+                   .HasOne(x => x.ManagerAccount)
+                   .WithMany(x => x.ManagersAccountsTrades)
+                   .HasForeignKey(x => x.ManagerAccountId);
+
+            builder.Entity<ProfitDistributionTransactions>()
+                   .HasOne(x => x.Period)
+                   .WithMany(x => x.ProfitDistributionTransactions)
+                   .HasForeignKey(x => x.PeriodId);
 
             builder.Entity<ManagerTokens>()
                    .HasIndex(x => x.TokenName)

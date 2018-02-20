@@ -37,7 +37,7 @@ namespace GenesisVision.Core.Controllers
             if (!text.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(text));
 
-            var trades = tradesServer.ConvertMetaTraderOrdersFromCsv(text.Data);
+            var trades = tradesServer.ConvertMetaTrader4OrdersFromCsv(text.Data);
             if (!trades.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(trades));
 
