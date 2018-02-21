@@ -21,13 +21,15 @@ namespace GenesisVision.Core.Services
         private readonly ApplicationDbContext context;
         private readonly IIpfsService ipfsService;
         private readonly ISmartContractService smartContractService;
+        private readonly IStatisticService statisticService;
         private readonly ILogger<TrustManagementService> logger;
 
-        public TrustManagementService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService, ILogger<TrustManagementService> logger)
+        public TrustManagementService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService, IStatisticService statisticService, ILogger<TrustManagementService> logger)
         {
             this.context = context;
             this.ipfsService = ipfsService;
             this.smartContractService = smartContractService;
+            this.statisticService = statisticService;
             this.logger = logger;
         }
         
@@ -409,6 +411,8 @@ namespace GenesisVision.Core.Services
                 }
 
                 context.SaveChanges();
+
+                statisticService.RecalculateStatisticForPeriod(currentPeriod.Id);
             });
         }
 
