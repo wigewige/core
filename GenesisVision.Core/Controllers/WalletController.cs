@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GenesisVision.Core.Controllers
@@ -17,11 +18,13 @@ namespace GenesisVision.Core.Controllers
     public class WalletController : BaseController
     {
         private readonly IWalletService walletService;
+        private readonly ILogger<WalletController> logger;
 
-        public WalletController(UserManager<ApplicationUser> userManager, IWalletService walletService)
+        public WalletController(UserManager<ApplicationUser> userManager, IWalletService walletService, ILogger<WalletController> logger)
             : base(userManager)
         {
             this.walletService = walletService;
+            this.logger = logger;
         }
 
         /// <summary>

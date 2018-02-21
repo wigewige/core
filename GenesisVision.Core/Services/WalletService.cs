@@ -3,6 +3,7 @@ using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Wallet;
 using GenesisVision.DataModel;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace GenesisVision.Core.Services
     public class WalletService : IWalletService
     {
         private readonly ApplicationDbContext context;
+        private readonly ILogger<WalletService> logger;
 
-        public WalletService(ApplicationDbContext context)
+        public WalletService(ApplicationDbContext context, ILogger<WalletService> logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public OperationResult<(List<WalletTransaction>, int)> GetTransactionHistory(Guid userId, TransactionsFilter filter)

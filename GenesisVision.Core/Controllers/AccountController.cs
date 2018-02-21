@@ -1,5 +1,4 @@
-﻿using System;
-using GenesisVision.Core.Helpers;
+﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
@@ -11,7 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Threading.Tasks;
 
 namespace GenesisVision.Core.Controllers
@@ -23,13 +24,15 @@ namespace GenesisVision.Core.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailSender emailSender;
         private readonly IUserService userService;
-        
-        public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IUserService userService)
+        private readonly ILogger<AccountController> logger;
+
+        public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IUserService userService, ILogger<AccountController> logger)
             : base(userManager)
         {
             this.userManager = userManager;
             this.emailSender = emailSender;
             this.userService = userService;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -166,6 +169,8 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public async Task<IActionResult> RegisterManager([FromBody]RegisterManagerViewModel model)
         {
+            logger.LogInformation($"Register manager: {model?.Email}");
+
             if (!ModelState.IsValid)
                 return BadRequest(ErrorResult.GetResult(ModelState));
 
@@ -207,6 +212,8 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public async Task<IActionResult> RegisterInvestor([FromBody]RegisterInvestorViewModel model)
         {
+            logger.LogInformation($"Register investor: {model?.Email}");
+
             if (!ModelState.IsValid)
                 return BadRequest(ErrorResult.GetResult(ModelState));
 

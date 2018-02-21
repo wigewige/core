@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
@@ -24,15 +25,17 @@ namespace GenesisVision.Core.Controllers
         private readonly IStatisticService statisticService;
         private readonly IManagerService managerService;
         private readonly IManagerValidator managerValidator;
+        private readonly ILogger<ManagerController> logger;
 
         public ManagerController(ITrustManagementService trustManagementService, IStatisticService statisticService, IManagerService managerService,
-            IManagerValidator managerValidator, UserManager<ApplicationUser> userManager)
+            IManagerValidator managerValidator, UserManager<ApplicationUser> userManager, ILogger<ManagerController> logger)
             : base(userManager)
         {
             this.trustManagementService = trustManagementService;
             this.statisticService = statisticService;
             this.managerService = managerService;
             this.managerValidator = managerValidator;
+            this.logger = logger;
         }
 
         /// <summary>

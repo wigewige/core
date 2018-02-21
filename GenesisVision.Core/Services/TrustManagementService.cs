@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Helpers.Convertors;
+﻿using GenesisVision.Core.Controllers;
+using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
@@ -7,6 +8,7 @@ using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,12 +21,14 @@ namespace GenesisVision.Core.Services
         private readonly ApplicationDbContext context;
         private readonly IIpfsService ipfsService;
         private readonly ISmartContractService smartContractService;
+        private readonly ILogger<TrustManagementService> logger;
 
-        public TrustManagementService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService)
+        public TrustManagementService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService, ILogger<TrustManagementService> logger)
         {
             this.context = context;
             this.ipfsService = ipfsService;
             this.smartContractService = smartContractService;
+            this.logger = logger;
         }
         
         public OperationResult CloseInvestmentProgram(Guid invProgramId)

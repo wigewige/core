@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
@@ -24,15 +25,17 @@ namespace GenesisVision.Core.Controllers
         private readonly ITrustManagementService trustManagementService;
         private readonly ITradesService tradesService;
         private readonly IBrokerValidator brokerValidator;
+        private readonly ILogger<BrokerController> logger;
 
         public BrokerController(IManagerService managerService, ITrustManagementService trustManagementService,
-            IBrokerValidator brokerValidator, UserManager<ApplicationUser> userManager, ITradesService tradesService)
+            IBrokerValidator brokerValidator, UserManager<ApplicationUser> userManager, ITradesService tradesService, ILogger<BrokerController> logger)
             : base(userManager)
         {
             this.managerService = managerService;
             this.trustManagementService = trustManagementService;
             this.tradesService = tradesService;
             this.brokerValidator = brokerValidator;
+            this.logger = logger;
         }
 
         /// <summary>
