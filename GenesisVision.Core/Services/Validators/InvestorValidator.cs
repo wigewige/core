@@ -62,8 +62,8 @@ namespace GenesisVision.Core.Services.Validators
             if (lastPeriod == null || lastPeriod.Status != PeriodStatus.Planned)
                 return new List<string> {"There are no new period for investment program"};
 
-            if (lastPeriod.InvestmentRequests.Any(x => x.UserId == user.Id && x.Type == InvestmentRequestType.Invest))
-                return new List<string> { "Investment request can't be created having pending withdrawal request" };
+            if (lastPeriod.InvestmentRequests.Any(x => x.UserId == user.Id && x.Type == InvestmentRequestType.Withdrawal))
+                return new List<string> {"Investment request can't be created having pending withdrawal request"};
 
             if (model.Amount <= 0)
                 result.Add("Amount must be greater than zero");
