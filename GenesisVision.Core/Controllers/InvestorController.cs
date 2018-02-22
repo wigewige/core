@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
+using GenesisVision.Core.ViewModels.Trades;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -24,14 +25,18 @@ namespace GenesisVision.Core.Controllers
         private readonly ITrustManagementService trustManagementService;
         private readonly IInvestorValidator investorValidator;
         private readonly IUserService userService;
+        private readonly IStatisticService statisticService;
+        private readonly ITradesService tradesService;
         private readonly ILogger<InvestorController> logger;
 
-        public InvestorController(ITrustManagementService trustManagementService, IUserService userService, IInvestorValidator investorValidator, UserManager<ApplicationUser> userManager, ILogger<InvestorController> logger)
+        public InvestorController(ITrustManagementService trustManagementService, IUserService userService, IInvestorValidator investorValidator, UserManager<ApplicationUser> userManager, IStatisticService statisticService, ITradesService tradesService, ILogger<InvestorController> logger)
             : base(userManager)
         {
             this.trustManagementService = trustManagementService;
             this.investorValidator = investorValidator;
             this.userService = userService;
+            this.statisticService = statisticService;
+            this.tradesService = tradesService;
             this.logger = logger;
         }
 
@@ -120,8 +125,7 @@ namespace GenesisVision.Core.Controllers
                           Total = data.Data.Item2
                       });
         }
-
-
+        
         /// <summary>
         /// Get investor dashboard
         /// </summary>
@@ -136,6 +140,71 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(ErrorResult.GetResult(data));
 
             return Ok(data.Data);
+        }
+
+        /// <summary>
+        /// Get investment program with statistic by id
+        /// </summary>
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("investor/investment")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetInvestmentProgram(Guid investmentProgramId)
+        {
+            var investment = trustManagementService.GetInvestment(investmentProgramId);
+            if (!investment.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(investment));
+
+            var statistic = statisticService.GetInvestmentProgramStatistic(investmentProgramId);
+            if (!statistic.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(statistic));
+
+            return Ok(new InvestmentProgramViewModel
+                      {
+                          InvestmentProgram = investment.Data,
+                          Statistic = statistic.Data
+                      });
+        }
+
+        /// <summary>
+        /// Get manager trade history
+        /// </summary>
+        [HttpPost]
+        [Route("investor/investment/trades")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TradesViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetManagerTrades([FromBody]TradesFilter filter)
+        {
+            var trades = tradesService.GetManagerTrades(filter);
+            if (!trades.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(trades));
+
+            return Ok(new TradesViewModel
+                      {
+                          Trades = trades.Data.Item1,
+                          Total = trades.Data.Item2
+                      });
+        }
+
+        /// <summary>
+        /// Get manager open trades
+        /// </summary>
+        [HttpPost]
+        [Route("investor/investment/openTrades")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(OpenTradesViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetManagerOpenTrades([FromBody]TradesFilter filter)
+        {
+            var trades = tradesService.GetManagerOpenTrades(filter);
+            if (!trades.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(trades));
+
+            return Ok(new OpenTradesViewModel
+                      {
+                          Trades = trades.Data.Item1,
+                          Total = trades.Data.Item2
+                      });
         }
     }
 }

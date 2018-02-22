@@ -23,5 +23,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateProcessInvestmentRequests(ApplicationUser user, Guid investmentProgramId);
 
         List<string> ValidateNewTrade(ApplicationUser user, NewTradeEvent tradeEvent);
+
+        List<string> ValidateNewOpenTrades(ApplicationUser user, NewOpenTradesEvent trades);
     }
 }

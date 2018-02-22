@@ -82,32 +82,7 @@ namespace GenesisVision.Core.Controllers
 
             return Ok();
         }
-
-        /// <summary>
-        /// Get investment program with statistic by id
-        /// </summary>
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("manager/investment")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramViewModel))]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult GetInvestmentProgram(Guid investmentProgramId)
-        {
-            var investment = trustManagementService.GetInvestment(investmentProgramId);
-            if (!investment.IsSuccess)
-                return BadRequest(ErrorResult.GetResult(investment));
-
-            var statistic = statisticService.GetInvestmentProgramStatistic(investmentProgramId);
-            if (!statistic.IsSuccess)
-                return BadRequest(ErrorResult.GetResult(statistic));
-
-            return Ok(new InvestmentProgramViewModel
-                      {
-                          InvestmentProgram = investment.Data,
-                          Statistic = statistic.Data
-                      });
-        }
-
+        
         /// <summary>
         /// Manager deposit in his own investment program
         /// </summary>

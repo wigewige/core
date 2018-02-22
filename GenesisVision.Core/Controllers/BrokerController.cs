@@ -228,5 +228,26 @@ namespace GenesisVision.Core.Controllers
 
             return Ok();
         }
+
+        /// <summary>
+        /// New open trades event
+        /// </summary>
+        [HttpPost]
+        [Route("broker/trades/openTrades/new")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult NewOpenTrades([FromBody]NewOpenTradesEvent trades)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
+
+            var errors = brokerValidator.ValidateNewOpenTrades(CurrentUser, trades);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            tradesService.SaveNewOpenTrade(trades);
+
+            return Ok();
+        }
     }
 }

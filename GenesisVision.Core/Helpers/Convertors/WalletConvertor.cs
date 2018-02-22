@@ -3,7 +3,7 @@ using GenesisVision.DataModel.Models;
 
 namespace GenesisVision.Core.Helpers.Convertors
 {
-    public static class WalletConvertor
+    public static partial class Convertors
     {
         public static WalletTransaction ToTransaction(this WalletTransactions tx)
         {
