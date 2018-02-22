@@ -1,5 +1,7 @@
-﻿using GenesisVision.Core.Services;
+﻿using GenesisVision.Core.Models;
+using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
+using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
@@ -9,8 +11,6 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using GenesisVision.Core.Models;
-using GenesisVision.Core.ViewModels.Broker;
 
 namespace GenesisVision.Core.Tests.Services
 {
@@ -20,6 +20,7 @@ namespace GenesisVision.Core.Tests.Services
         private ITrustManagementService trustManagementService;
         private Mock<ISmartContractService> smartContractService;
         private Mock<IIpfsService> ipfsService;
+        private Mock<IStatisticService> statisticService;
 
         private ApplicationDbContext context;
 
@@ -95,8 +96,9 @@ namespace GenesisVision.Core.Tests.Services
 
             smartContractService = new Mock<ISmartContractService>();
             ipfsService = new Mock<IIpfsService>();
+            statisticService = new Mock<IStatisticService>();
 
-            trustManagementService = new TrustManagementService(context, ipfsService.Object, smartContractService.Object);
+            trustManagementService = new TrustManagementService(context, ipfsService.Object, smartContractService.Object, statisticService.Object, null);
         }
 
         [Test]

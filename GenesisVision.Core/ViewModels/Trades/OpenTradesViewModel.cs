@@ -2,9 +2,9 @@
 
 namespace GenesisVision.Core.ViewModels.Trades
 {
-    public class TradesViewModel
+    public class OpenTradesViewModel
     {
-        public List<OrderModel> Trades { get; set; }
+        public List<OpenOrderModel> Trades { get; set; }
 
         public int Total { get; set; }
     }

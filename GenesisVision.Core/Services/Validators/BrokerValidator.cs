@@ -187,5 +187,23 @@ namespace GenesisVision.Core.Services.Validators
 
             return result;
         }
+
+        public List<string> ValidateNewOpenTrades(ApplicationUser user, NewOpenTradesEvent trades)
+        {
+            var result = new List<string>();
+
+            if (!trades.OpenTrades.Any())
+                return result;
+
+            var managersIds = trades.OpenTrades.Select(x => x.ManagerAccountId).ToList();
+            var mangerAccount = context.ManagersAccounts
+                                       .Where(x => managersIds.Contains(x.Id) &&
+                                                   x.BrokerTradeServer.Broker.UserId == user.Id)
+                                       .ToList();
+            if (mangerAccount.Count != managersIds.Count)
+                result.Add("Managers accounts does not exists");
+
+            return result;
+        }
     }
 }

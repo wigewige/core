@@ -22,5 +22,6 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
         public ICollection<ManagersAccountsTrades> ManagersAccountsTrades { get; set; }
+        public ICollection<ManagersAccountsOpenTrades> ManagersAccountsOpenTrades { get; set; }
     }
 }

@@ -110,7 +110,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Close investment period
         /// </summary>
-        [HttpGet]
+        [HttpPost]
         [Route("broker/period/close")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
@@ -130,7 +130,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Set investment period start balance
         /// </summary>
-        [HttpGet]
+        [HttpPost]
         [Route("broker/period/setStartBalance")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
@@ -225,6 +225,27 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
             tradesService.SaveNewTrade(tradeEvent);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// New open trades event
+        /// </summary>
+        [HttpPost]
+        [Route("broker/trades/openTrades/new")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult NewOpenTrades([FromBody]NewOpenTradesEvent trades)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
+
+            var errors = brokerValidator.ValidateNewOpenTrades(CurrentUser, trades);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            tradesService.SaveNewOpenTrade(trades);
 
             return Ok();
         }

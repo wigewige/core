@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using GenesisVision.Core.Helpers.Convertors;
 
 namespace GenesisVision.Core.Services
 {
@@ -57,36 +58,44 @@ namespace GenesisVision.Core.Services
             this.context = context;
         }
 
-        public OperationResult<List<OrderModel>> GetOrders(Guid accountId, DateTime? dateFrom = null, DateTime? dateTo = null)
+        public OperationResult<(List<OrderModel>, int)> GetManagerTrades(TradesFilter filter)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var trades = context.ManagersAccountsTrades
-                                    .Where(x => x.ManagerAccountId == accountId);
+                var manager = context.ManagersAccounts
+                                     .Include(x => x.BrokerTradeServer)
+                                     .First(x => x.Id == filter.ManagerId);
 
-                if (dateFrom.HasValue)
-                    trades = trades.Where(x => x.DateClose >= dateFrom.Value);
-                if (dateTo.HasValue)
-                    trades = trades.Where(x => x.DateClose <= dateTo);
+                var query = context.ManagersAccountsTrades
+                                   .Where(x => x.ManagerAccountId == filter.ManagerId);
 
-                var result = trades.Select(x => new OrderModel
-                                                {
-                                                    Id = x.Id,
-                                                    Ticket = x.Ticket,
-                                                    Volume = x.Volume,
-                                                    Symbol = x.Symbol,
-                                                    Profit = x.Profit,
-                                                    Direction = x.Direction,
-                                                    DateClose = x.DateClose,
-                                                    DateOpen = x.DateOpen,
-                                                    PriceClose = x.PriceClose,
-                                                    PriceOpen = x.PriceOpen,
-                                                    Date = x.Date,
-                                                    Entry = x.Entry,
-                                                    Price = x.Price
-                                                })
-                                   .ToList();
-                return result;
+                if (filter.DateFrom.HasValue)
+                {
+                    if (manager.BrokerTradeServer.Type == BrokerTradeServerType.MetaTrader4)
+                        query = query.Where(x => x.DateClose >= filter.DateFrom.Value);
+                    if (manager.BrokerTradeServer.Type == BrokerTradeServerType.MetaTrader5)
+                        query = query.Where(x => x.Date >= filter.DateFrom.Value);
+                }
+                if (filter.DateTo.HasValue)
+                {
+                    if (manager.BrokerTradeServer.Type == BrokerTradeServerType.MetaTrader4)
+                        query = query.Where(x => x.DateClose <filter.DateTo.Value);
+                    if (manager.BrokerTradeServer.Type == BrokerTradeServerType.MetaTrader5)
+                        query = query.Where(x => x.Date < filter.DateTo.Value);
+                }
+                if (!string.IsNullOrEmpty(filter.Symbol))
+                    query = query.Where(x => x.Symbol == filter.Symbol);
+
+                var total = query.Count();
+
+                if (filter.Skip.HasValue)
+                    query = query.Skip(filter.Skip.Value);
+                if (filter.Take.HasValue)
+                    query = query.Take(filter.Take.Value);
+                
+                var result = query.Select(x => x.ToOrder()).ToList();
+                
+                return (result, total);
             });
         }
 
@@ -189,6 +198,68 @@ namespace GenesisVision.Core.Services
                 }
 
                 context.SaveChanges();
+            });
+        }
+
+        public OperationResult SaveNewOpenTrade(NewOpenTradesEvent openTradesEvent)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                foreach (var openTrades in openTradesEvent.OpenTrades)
+                {
+                    var existsTrades = context.ManagersAccountsOpenTrades
+                                              .Where(x => x.ManagerAccountId == openTrades.ManagerAccountId)
+                                              .ToList();
+                    context.RemoveRange(existsTrades);
+
+                    foreach (var trades in openTrades.Trades)
+                    {
+                        var t = new ManagersAccountsOpenTrades
+                                {
+                                    Id = Guid.NewGuid(),
+                                    DateUpdateFromTradePlatform = DateTime.Now,
+                                    ManagerAccountId = openTrades.ManagerAccountId,
+
+                                    Ticket = trades.Ticket,
+                                    Symbol = trades.Symbol,
+                                    Profit = trades.Price,
+                                    Price = trades.Price,
+                                    Direction = trades.Direction,
+                                    DateOpenOrder = trades.Date,
+                                    Volume = trades.Volume
+                                };
+                        context.Add(t);
+                    }
+                    context.SaveChanges();
+                }
+            });
+        }
+
+        public OperationResult<(List<OpenOrderModel>, int)> GetManagerOpenTrades(TradesFilter filter)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var query = context.ManagersAccountsOpenTrades
+                                   .Where(x => x.ManagerAccountId == filter.ManagerId &&
+                                               x.DateUpdateFromTradePlatform > DateTime.Now.AddMinutes(-10));
+
+                if (filter.DateFrom.HasValue)
+                    query = query.Where(x => x.DateOpenOrder >= filter.DateFrom.Value);
+                if (filter.DateTo.HasValue)
+                    query = query.Where(x => x.DateOpenOrder < filter.DateTo.Value);
+                if (!string.IsNullOrEmpty(filter.Symbol))
+                    query = query.Where(x => x.Symbol == filter.Symbol);
+
+                var total = query.Count();
+
+                if (filter.Skip.HasValue)
+                    query = query.Skip(filter.Skip.Value);
+                if (filter.Take.HasValue)
+                    query = query.Take(filter.Take.Value);
+
+                var result = query.Select(x => x.ToOpenOrder()).ToList();
+
+                return (result, total);
             });
         }
 

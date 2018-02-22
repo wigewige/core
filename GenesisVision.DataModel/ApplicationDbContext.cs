@@ -18,6 +18,7 @@ namespace GenesisVision.DataModel
         public DbSet<ManagerAccounts> ManagersAccounts { get; set; }
         public DbSet<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
         public DbSet<ManagersAccountsTrades> ManagersAccountsTrades { get; set; }
+        public DbSet<ManagersAccountsOpenTrades> ManagersAccountsOpenTrades { get; set; }
         public DbSet<InvestorAccounts> InvestorAccounts { get; set; }
         public DbSet<ManagerRequests> ManagerRequests { get; set; }
         public DbSet<InvestmentPrograms> InvestmentPrograms { get; set; }
@@ -121,6 +122,11 @@ namespace GenesisVision.DataModel
             builder.Entity<ManagersAccountsTrades>()
                    .HasOne(x => x.ManagerAccount)
                    .WithMany(x => x.ManagersAccountsTrades)
+                   .HasForeignKey(x => x.ManagerAccountId);
+
+            builder.Entity<ManagersAccountsOpenTrades>()
+                   .HasOne(x => x.ManagerAccount)
+                   .WithMany(x => x.ManagersAccountsOpenTrades)
                    .HasForeignKey(x => x.ManagerAccountId);
 
             builder.Entity<ProfitDistributionTransactions>()

@@ -363,6 +363,36 @@ namespace GenesisVision.Core.Migrations
                     b.ToTable("ManagerRequests");
                 });
 
+            modelBuilder.Entity("GenesisVision.DataModel.Models.ManagersAccountsOpenTrades", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("DateOpenOrder");
+
+                    b.Property<DateTime>("DateUpdateFromTradePlatform");
+
+                    b.Property<int>("Direction");
+
+                    b.Property<Guid>("ManagerAccountId");
+
+                    b.Property<decimal>("Price");
+
+                    b.Property<decimal>("Profit");
+
+                    b.Property<string>("Symbol");
+
+                    b.Property<long>("Ticket");
+
+                    b.Property<decimal>("Volume");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManagerAccountId");
+
+                    b.ToTable("ManagersAccountsOpenTrades");
+                });
+
             modelBuilder.Entity("GenesisVision.DataModel.Models.ManagersAccountsStatistics", b =>
                 {
                     b.Property<Guid>("Id")
@@ -811,6 +841,14 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
                         .WithMany("ManagerAccountRequests")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GenesisVision.DataModel.Models.ManagersAccountsOpenTrades", b =>
+                {
+                    b.HasOne("GenesisVision.DataModel.Models.ManagerAccounts", "ManagerAccount")
+                        .WithMany("ManagersAccountsOpenTrades")
+                        .HasForeignKey("ManagerAccountId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
