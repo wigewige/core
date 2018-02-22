@@ -66,7 +66,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Close existing investment program
         /// </summary>
-        [HttpGet]
+        [HttpPost]
         [Route("manager/investment/close")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]

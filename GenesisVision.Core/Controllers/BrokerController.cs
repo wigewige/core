@@ -110,7 +110,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Close investment period
         /// </summary>
-        [HttpGet]
+        [HttpPost]
         [Route("broker/period/close")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
@@ -130,7 +130,7 @@ namespace GenesisVision.Core.Controllers
         /// <summary>
         /// Set investment period start balance
         /// </summary>
-        [HttpGet]
+        [HttpPost]
         [Route("broker/period/setStartBalance")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
