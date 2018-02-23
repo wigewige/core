@@ -608,23 +608,47 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult<decimal> ProcessInvestmentRequests(Guid investmentProgramId)
+        public OperationResult<BalanceChange> ProcessInvestmentRequests(Guid investmentProgramId)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                decimal totalBalanceChange = 0;
+                decimal brokerBalanceChange = 0;
 
+                var nextPeriod = context.Periods
+                                        .Include(x => x.InvestmentRequests)
+                                        .First(x => x.Id == investmentProgramId && x.Status == PeriodStatus.Planned);
+
+                var investmentProgram = context.InvestmentPrograms
+                      .Include(x => x.ManagerAccount)
+                      .ThenInclude(x => x.BrokerTradeServer)
+                      .ThenInclude(x => x.Broker)
+                      .ThenInclude(x => x.User)
+                      .ThenInclude(x => x.Wallet)
+                      .First(x => x.Id == investmentProgramId);
+
+                var brokerWalletId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id;
+
+                foreach (var request in nextPeriod.InvestmentRequests.Where(i => i.UserId != investmentProgram.ManagerAccountId))
+                {
+                    request.Status = InvestmentRequestStatus.Executed;
+
+                    if (request.Type == InvestmentRequestType.Invest)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+
+                }
                 //ToDo: Manager's requests processing
 
-                var investment = context.InvestmentPrograms
-                                        .Include(x => x.Periods)
-                                        .First(x => x.Id == investmentProgramId);               
+                //ToDo: Broker wallet amount update
 
-                var plannedPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
+                context.SaveChanges();
 
-
-
-                return totalBalanceChange;
+                return new BalanceChange();
             });
         }
     }

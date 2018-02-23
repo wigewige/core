@@ -37,6 +37,6 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult CancelInvestmentRequest(Guid requestId);
 
-        OperationResult<decimal> ProcessInvestmentRequests(Guid investmentProgramId);
+        OperationResult<BalanceChange> ProcessInvestmentRequests(Guid investmentProgramId);
     }
 }
