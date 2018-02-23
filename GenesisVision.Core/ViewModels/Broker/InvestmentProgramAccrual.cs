@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GenesisVision.Core.ViewModels.Broker
 {
-    public class Accrual
+    public class InvestorAmount
     {
         public Guid InvestorId { get; set; }
 
@@ -16,6 +16,6 @@ namespace GenesisVision.Core.ViewModels.Broker
     {
         public Guid InvestmentProgramId { get; set; }
 
-        public List<Accrual> Accruals { get; set; }
+        public List<InvestorAmount> Accruals { get; set; }
     }
 }

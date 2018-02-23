@@ -356,10 +356,18 @@ namespace GenesisVision.Core.Services
 
                 var data = new ClosePeriodData
                            {
-                               NextPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned)?.ToPeriod(),
                                CurrentPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod()
                            };
+
                 data.CanCloseCurrentPeriod = data.CurrentPeriod != null && data.CurrentPeriod.DateTo <= DateTime.Now;
+                data.TokenHolders = context.Portfolios
+                                           .Where(x => x.ManagerTokenId == investment.ManagerTokensId)
+                                           .Select(x => new InvestorAmount
+                                                        {
+                                                            InvestorId = x.InvestorAccountId,
+                                                            Amount = x.Amount
+                                                        })
+                                           .ToList();
 
                 return data;
             });
