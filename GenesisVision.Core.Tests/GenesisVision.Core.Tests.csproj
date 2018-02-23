@@ -12,6 +12,7 @@
     <PackageReference Include="Moq" Version="4.8.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
     <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+    <PackageReference Include="NSubstitute" Version="3.1.0" />
     <PackageReference Include="NUnit" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
   </ItemGroup>
@@ -19,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GenesisVision.Core\GenesisVision.Core.csproj" />
     <ProjectReference Include="..\GenesisVision.DataModel\GenesisVision.DataModel.csproj" />
+    <ProjectReference Include="..\GenesisVision.PaymentService\GenesisVision.PaymentService.csproj" />
   </ItemGroup>
 
 </Project>

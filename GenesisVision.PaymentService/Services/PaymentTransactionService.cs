@@ -78,7 +78,12 @@ namespace GenesisVision.PaymentService.Services
                                          };
 
                     context.PaymentTransactions.Add(paymentTransaction);
-                    await context.SaveChangesAsync();
+                    if(paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
+                    {
+                        var wallet = context.Wallets.First(w => w.Id == paymentTransaction.BlockchainAddress.Wallet.Id);
+                        wallet.Amount += paymentTransaction.Amount;
+                        await context.SaveChangesAsync();
+                    }
                 }
 
                 transaction.Commit();
