@@ -15,6 +15,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GenesisVision.Common.Services.Interfaces;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -25,14 +26,16 @@ namespace GenesisVision.Core.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailSender emailSender;
         private readonly IUserService userService;
+        private readonly IEthService ethService;
         private readonly ILogger<AccountController> logger;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IUserService userService, ILogger<AccountController> logger)
+        public AccountController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IUserService userService, IEthService ethService, ILogger<AccountController> logger)
             : base(userManager)
         {
             this.userManager = userManager;
             this.emailSender = emailSender;
             this.userService = userService;
+            this.ethService = ethService;
             this.logger = logger;
         }
 
@@ -175,6 +178,7 @@ namespace GenesisVision.Core.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ErrorResult.GetResult(ModelState));
 
+            var address = ethService.GenerateAddress();
             var user = new ApplicationUser
                        {
                            UserName = model.Email,
@@ -183,6 +187,15 @@ namespace GenesisVision.Core.Controllers
                            Type = UserType.Manager,
                            Profile = new Profiles(),
                            Wallets = new List<Wallets> {new Wallets {Currency = WalletCurrency.GVT}},
+                           BlockchainAddresses = new List<BlockchainAddresses>
+                                                 {
+                                                     new BlockchainAddresses
+                                                     {
+                                                         Address = address.PublicAddress,
+                                                         Currency = WalletCurrency.ETH.ToString(),
+                                                         IsDefault = true
+                                                     }
+                                                 }
                        };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -218,6 +231,7 @@ namespace GenesisVision.Core.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ErrorResult.GetResult(ModelState));
 
+            var address = ethService.GenerateAddress();
             var user = new ApplicationUser
                        {
                            UserName = model.Email,
@@ -226,7 +240,16 @@ namespace GenesisVision.Core.Controllers
                            Type = UserType.Investor,
                            Profile = new Profiles(),
                            Wallets = new List<Wallets> {new Wallets {Currency = WalletCurrency.GVT}},
-                           InvestorAccount = new InvestorAccounts()
+                           InvestorAccount = new InvestorAccounts(),
+                           BlockchainAddresses = new List<BlockchainAddresses>
+                                                 {
+                                                     new BlockchainAddresses
+                                                     {
+                                                         Address = address.PublicAddress,
+                                                         Currency = WalletCurrency.ETH.ToString(),
+                                                         IsDefault = true
+                                                     }
+                                                 }
                        };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)

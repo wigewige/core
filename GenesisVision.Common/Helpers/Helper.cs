@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace GenesisVision.Core.Helpers
+namespace GenesisVision.Common.Helpers
 {
     public static class Helper
     {

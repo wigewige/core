@@ -1,4 +1,6 @@
-﻿using GenesisVision.Core.Helpers;
+﻿using GenesisVision.Common.Services;
+using GenesisVision.Common.Services.Interfaces;
+using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Helpers.TokenHelper;
 using GenesisVision.Core.Infrastructure.Filters;
 using GenesisVision.Core.Services;
@@ -187,6 +189,7 @@ namespace GenesisVision.Core
             services.AddTransient<IBrokerValidator, BrokerValidator>();
             services.AddTransient<IInvestorValidator, InvestorValidator>();
             services.AddTransient<IRateService, RateService>();
+            services.AddTransient<IEthService, EthService>();
 
             services.AddSingleton<IIpfsService, IpfsService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

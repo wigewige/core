@@ -1,5 +1,4 @@
-﻿using GenesisVision.Core.Helpers;
-using GenesisVision.DataModel;
+﻿using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using GenesisVision.PaymentService.Models;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GenesisVision.Common.Helpers;
 
 namespace GenesisVision.PaymentService.Services
 {
