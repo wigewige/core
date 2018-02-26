@@ -8,7 +8,7 @@ namespace GenesisVision.Core.Services
 {
     public class RateService : IRateService
     {
-        public double GetRate(string from, string to)
+        public decimal GetRate(string from, string to)
         {
             return 1;
         }

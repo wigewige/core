@@ -2,6 +2,6 @@
 {
     public interface IRateService
     {
-        double GetRate(string from, string to);
+        decimal GetRate(string from, string to);
     }
 }

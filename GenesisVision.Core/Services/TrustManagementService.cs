@@ -22,14 +22,16 @@ namespace GenesisVision.Core.Services
         private readonly IIpfsService ipfsService;
         private readonly ISmartContractService smartContractService;
         private readonly IStatisticService statisticService;
+        private readonly IRateService rateService;
         private readonly ILogger<TrustManagementService> logger;
 
-        public TrustManagementService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService, IStatisticService statisticService, ILogger<TrustManagementService> logger)
+        public TrustManagementService(ApplicationDbContext context, IIpfsService ipfsService, ISmartContractService smartContractService, IStatisticService statisticService, IRateService rateService, ILogger<TrustManagementService> logger)
         {
             this.context = context;
             this.ipfsService = ipfsService;
             this.smartContractService = smartContractService;
             this.statisticService = statisticService;
+            this.rateService = rateService;
             this.logger = logger;
         }
         
@@ -356,10 +358,18 @@ namespace GenesisVision.Core.Services
 
                 var data = new ClosePeriodData
                            {
-                               NextPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned)?.ToPeriod(),
                                CurrentPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod()
                            };
+
                 data.CanCloseCurrentPeriod = data.CurrentPeriod != null && data.CurrentPeriod.DateTo <= DateTime.Now;
+                data.TokenHolders = context.Portfolios
+                                           .Where(x => x.ManagerTokenId == investment.ManagerTokensId)
+                                           .Select(x => new InvestorAmount
+                                                        {
+                                                            InvestorId = x.InvestorAccountId,
+                                                            Amount = x.Amount
+                                                        })
+                                           .ToList();
 
                 return data;
             });
@@ -562,6 +572,8 @@ namespace GenesisVision.Core.Services
                     context.Add(investorProfitDistribution);
                 }
 
+                //ToDo: update manager's next period balance
+
                 context.SaveChanges();
             });
         }
@@ -600,23 +612,145 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult<decimal> ProcessInvestmentRequests(Guid investmentProgramId)
+        public OperationResult<BalanceChange> ProcessInvestmentRequests(Guid investmentProgramId)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                decimal totalBalanceChange = 0;
+                var result = new BalanceChange();
+                decimal brokerBalanceChange = 0;
 
-                //ToDo: Manager's requests processing
+                //Todo: manager's threshold amount
+                var managerThresholdAmount = 1000;
 
-                var investment = context.InvestmentPrograms
-                                        .Include(x => x.Periods)
-                                        .First(x => x.Id == investmentProgramId);               
+                var GVTUSDRate = rateService.GetRate("GVT", "USD");
 
-                var plannedPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
+                var nextPeriod = context.Periods
+                                        .Include(x => x.InvestmentRequests)
+                                        .First(x => x.Id == investmentProgramId && x.Status == PeriodStatus.Planned);
 
+                var investmentProgram = context.InvestmentPrograms
+                      .Include(x => x.Token)
+                      .Include(x => x.ManagerAccount)
+                      .ThenInclude(x => x.BrokerTradeServer)
+                      .ThenInclude(x => x.Broker)
+                      .ThenInclude(x => x.User)
+                      .ThenInclude(x => x.Wallet)                      
+                      .First(x => x.Id == investmentProgramId);
 
+                var brokerWalletId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id;
+                var GVTToManagerTokenRate = GVTUSDRate / investmentProgram.Token.InitialPrice;
+                
+                foreach (var request in nextPeriod.InvestmentRequests.Where(i => i.UserId != investmentProgram.ManagerAccountId))
+                {
+                    request.Status = InvestmentRequestStatus.Executed;
 
-                return totalBalanceChange;
+                    var investor = context.InvestorAccounts
+                                          .Include(x => x.Portfolios)
+                                          .Include(x => x.User)
+                                          .ThenInclude(x => x.Wallet)
+                                          .First(x => x.UserId == request.UserId);
+
+                    var portfolio = investor.Portfolios.FirstOrDefault(x => x.ManagerTokenId == investmentProgram.Token.Id);
+
+                    if (request.Type == InvestmentRequestType.Invest)
+                    {
+                        //ToDo: Actual value in manager's currency to request
+
+                        brokerBalanceChange += request.Amount;
+                        result.AccountBalanceChange += request.Amount * GVTUSDRate;
+
+                        if (portfolio == null)
+                        {
+                            var newPortfolio = new Portfolios
+                            {
+                                InvestorAccountId = request.UserId,
+                                ManagerTokenId = investmentProgram.Token.Id,
+                                Amount = request.Amount * GVTToManagerTokenRate
+                            };
+
+                            context.Add(newPortfolio);
+                        }
+                        else
+                        {
+                            portfolio.Amount += request.Amount * GVTToManagerTokenRate;
+                        }
+                    }
+                    else
+                    {
+                        var portfolioValue = portfolio.Amount * investmentProgram.Token.InitialPrice;
+
+                        //ToDo: Actual amount to request
+                        var amount = portfolioValue > request.Amount ? request.Amount : portfolioValue;
+
+                        var amountInGVT = amount / GVTUSDRate;
+
+                        brokerBalanceChange -= amountInGVT;
+                        result.AccountBalanceChange -= amount;
+
+                        portfolio.Amount -= amount / investmentProgram.Token.InitialPrice;
+
+                        investor.User.Wallet.Amount += amountInGVT;
+
+                        var investorTx = new WalletTransactions
+                        {
+                            Id = Guid.NewGuid(),
+                            Type = WalletTransactionsType.WithdrawFromProgram,
+                            UserId = request.UserId,
+                            Amount = amountInGVT,
+                            Date = DateTime.Now
+                        };
+
+                        context.Add(investorTx);
+                    }
+                }
+
+                foreach (var request in nextPeriod.InvestmentRequests.Where(i => i.UserId == investmentProgram.ManagerAccountId))
+                {
+                    request.Status = InvestmentRequestStatus.Executed;
+
+                    if (request.Type == InvestmentRequestType.Invest)
+                    {
+                        brokerBalanceChange += request.Amount;
+
+                        result.AccountBalanceChange += request.Amount * GVTUSDRate;
+                        result.ManagerBalanceChange += request.Amount * GVTUSDRate;
+                    }
+                    else
+                    {
+                        var amount = nextPeriod.ManagerStartBalance > request.Amount + managerThresholdAmount ? request.Amount : nextPeriod.ManagerStartBalance - managerThresholdAmount;
+
+                        var amountInGVT = amount / GVTUSDRate;
+
+                        brokerBalanceChange -= amountInGVT;
+
+                        result.AccountBalanceChange -= amount;
+                        result.ManagerBalanceChange -= amount;
+
+                        var manager = context.Users
+                                      .Include(x => x.Wallet)
+                                      .First(x => x.Id == investmentProgram.ManagerAccountId);
+
+                        manager.Wallet.Amount += amountInGVT;
+
+                        var managerTx = new WalletTransactions
+                        {
+                            Id = Guid.NewGuid(),
+                            Type = WalletTransactionsType.WithdrawFromProgram,
+                            UserId = request.UserId,
+                            Amount = amountInGVT,
+                            Date = DateTime.Now
+                        };
+
+                        context.Add(managerTx);
+                    }
+                }
+
+                //ToDo: Transaction record?
+                investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallet.Amount += brokerBalanceChange;
+
+                context.SaveChanges();
+
+                return new BalanceChange();
             });
         }
     }

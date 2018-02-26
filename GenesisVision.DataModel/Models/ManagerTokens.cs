@@ -9,6 +9,7 @@ namespace GenesisVision.DataModel.Models
         public string TokenSymbol { get; set; }
         public string TokenName { get; set; }
         public string TokenAddress { get; set; }
+        public decimal InitialPrice { get; set; }
 
         public InvestmentPrograms InvestmentProgram { get; set; }
 
