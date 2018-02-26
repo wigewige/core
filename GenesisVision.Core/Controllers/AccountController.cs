@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GenesisVision.Core.Controllers
@@ -181,7 +182,7 @@ namespace GenesisVision.Core.Controllers
                            IsEnabled = true,
                            Type = UserType.Manager,
                            Profile = new Profiles(),
-                           Wallet = new Wallets()
+                           Wallets = new List<Wallets> {new Wallets {Currency = WalletCurrency.GVT}},
                        };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -224,7 +225,7 @@ namespace GenesisVision.Core.Controllers
                            IsEnabled = true,
                            Type = UserType.Investor,
                            Profile = new Profiles(),
-                           Wallet = new Wallets(),
+                           Wallets = new List<Wallets> {new Wallets {Currency = WalletCurrency.GVT}},
                            InvestorAccount = new InvestorAccounts()
                        };
             var result = await userManager.CreateAsync(user, model.Password);

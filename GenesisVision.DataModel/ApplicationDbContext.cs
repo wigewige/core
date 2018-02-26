@@ -61,18 +61,10 @@ namespace GenesisVision.DataModel
             builder.Entity<Profiles>()
                    .HasIndex(x => x.UserName)
                    .IsUnique();
-
-            builder.Entity<ApplicationUser>()
-                   .HasOne(x => x.Wallet)
-                   .WithOne(x => x.User)
-                   .HasForeignKey<Wallets>(x => x.UserId);
-
+            
             builder.Entity<Wallets>()
-                   .HasKey(x => x.UserId);
-
-            builder.Entity<BlockchainAddresses>()
-                   .HasOne(x => x.Wallet)
-                   .WithMany(x => x.BlockchainAddresses)
+                   .HasOne(x => x.User)
+                   .WithMany(x => x.Wallets)
                    .HasForeignKey(x => x.UserId);
 
             builder.Entity<BlockchainAddresses>()
@@ -225,14 +217,9 @@ namespace GenesisVision.DataModel
                    .HasForeignKey<InvestmentPrograms>(x => x.ManagerTokensId);
             
             builder.Entity<WalletTransactions>()
-                   .HasOne(x => x.User)
-                   .WithMany(x => x.WalletTransactions)
-                   .HasForeignKey(x => x.UserId);
-
-            builder.Entity<WalletTransactions>()
                    .HasOne(x => x.Wallet)
                    .WithMany(x => x.WalletTransactions)
-                   .HasForeignKey(x => x.UserId);
+                   .HasForeignKey(x => x.WalletId);
 
             builder.Entity<WalletTransactions>()
                    .HasOne(x => x.InvestmentRequest)

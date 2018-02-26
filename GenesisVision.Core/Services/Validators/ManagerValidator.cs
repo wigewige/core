@@ -38,7 +38,7 @@ namespace GenesisVision.Core.Services.Validators
             if (context.ManagerTokens.Any(x => x.TokenSymbol == request.TokenSymbol))
                 result.Add("Token symbol is already exist");
 
-            var wallet = context.Wallets.FirstOrDefault(x => x.UserId == user.Id);
+            var wallet = context.Wallets.FirstOrDefault(x => x.UserId == user.Id && x.Currency == WalletCurrency.GVT);
             if (wallet == null || wallet.Amount < request.DepositAmount)
                 result.Add(ValidationMessages.NotEnoughMoney);
 
@@ -115,7 +115,7 @@ namespace GenesisVision.Core.Services.Validators
 
             var result = new List<string>();
 
-            var wallet = context.Wallets.First(x => x.UserId == model.UserId);
+            var wallet = context.Wallets.First(x => x.UserId == model.UserId && x.Currency == WalletCurrency.GVT);
             if (wallet.Amount < model.Amount)
                 return new List<string> { ValidationMessages.NotEnoughMoney };
 

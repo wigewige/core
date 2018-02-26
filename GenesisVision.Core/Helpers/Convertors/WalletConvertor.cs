@@ -12,7 +12,9 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Id = tx.Id,
                        Type = tx.Type,
                        Date = tx.Date,
-                       Amount = tx.Amount
+                       Amount = tx.Amount,
+                       WalletId = tx.Wallet.Id,
+                       WalletCurrency = tx.Wallet.Currency
                    };
         }
     }

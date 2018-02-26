@@ -7,6 +7,7 @@ using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GenesisVision.Core.Tests.Services
@@ -35,7 +36,7 @@ namespace GenesisVision.Core.Tests.Services
             var user = new ApplicationUser
                        {
                            Id = Guid.NewGuid(),
-                           Wallet = new Wallets {Amount = 1000}
+                           Wallets = new List<Wallets> {new Wallets {Amount = 1000, Currency = WalletCurrency.GVT}},
                        };
             var server = new BrokerTradeServers {Id = Guid.NewGuid()};
             context.Add(user);
@@ -82,11 +83,11 @@ namespace GenesisVision.Core.Tests.Services
             Assert.AreEqual(createInvestment.TokenName, investment.TokenName);
             Assert.AreEqual(createInvestment.TradePlatformPassword, investment.TradePlatformPassword);
 
-            var wallet = context.Wallets.FirstOrDefault(x => x.UserId == user.Id);
+            var wallet = context.Wallets.FirstOrDefault(x => x.UserId == user.Id && x.Currency == WalletCurrency.GVT);
             Assert.IsNotNull(wallet);
             Assert.AreEqual(800m, wallet.Amount);
-            
-            var tx = context.WalletTransactions.FirstOrDefault(x => x.UserId == user.Id);
+
+            var tx = context.WalletTransactions.FirstOrDefault(x => x.WalletId == wallet.Id);
             Assert.IsNotNull(tx);
             Assert.AreEqual(200m, tx.Amount);
             Assert.AreEqual(WalletTransactionsType.OpenProgram, tx.Type);

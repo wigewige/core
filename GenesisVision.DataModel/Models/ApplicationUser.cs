@@ -19,6 +19,8 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<WalletTransactions> WalletTransactions { get; set; }
 
+        public ICollection<Wallets> Wallets { get; set; }
+
         public InvestorAccounts InvestorAccount { get; set; }
 
         public BrokersAccounts BrokersAccount { get; set; }
@@ -28,7 +30,5 @@ namespace GenesisVision.DataModel.Models
         public UserType Type { get; set; }
 
         public Profiles Profile { get; set; }
-
-        public Wallets Wallet { get; set; }
     }
 }

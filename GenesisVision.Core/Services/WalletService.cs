@@ -5,6 +5,7 @@ using GenesisVision.Core.ViewModels.Wallet;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,9 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var query = context.WalletTransactions
+                                   .Include(x => x.Wallet)
                                    .OrderByDescending(x => x.Date)
-                                   .Where(x => x.UserId == userId);
+                                   .Where(x => x.Wallet.UserId == userId);
 
                 var count = query.Count();
 
@@ -47,8 +49,8 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var address = context.Wallets.First(w => w.UserId == userId).BlockchainAddresses.FirstOrDefault(x => x.IsDefault)?.Address ??
-                              context.Wallets.First(w => w.UserId == userId).BlockchainAddresses.FirstOrDefault()?.Address;
+                var address = context.Users.First(w => w.Id == userId).BlockchainAddresses.FirstOrDefault(x => x.IsDefault)?.Address ??
+                              context.Users.First(w => w.Id == userId).BlockchainAddresses.FirstOrDefault()?.Address;
                 return address;
             });
         }
@@ -57,9 +59,10 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var wallet = context.Wallets.Where(w => w.UserId == userId && w.Currency == request.Currency).First();
+                var wallet = context.Wallets.First(w => w.UserId == userId && w.Currency == request.Currency);
                 if (wallet.Amount < request.Amount)
                     throw new ApplicationException("Not enough funds");
+
                 // TODO wallet relation
                 var transaction = new PaymentTransactions
                 {

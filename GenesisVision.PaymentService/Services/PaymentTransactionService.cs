@@ -1,4 +1,5 @@
-﻿using GenesisVision.DataModel;
+﻿using GenesisVision.Core.Helpers;
+using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using GenesisVision.PaymentService.Models;
@@ -79,9 +80,11 @@ namespace GenesisVision.PaymentService.Services
                                          };
 
                     context.PaymentTransactions.Add(paymentTransaction);
-                    if(paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
+
+                    if (paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
                     {
-                        var wallet = context.Wallets.First(w => w.Id == paymentTransaction.BlockchainAddress.Wallet.Id);
+                        var wallet = context.Wallets.First(w => w.UserId == blockchainAddress.UserId &&
+                                                                w.Currency == blockchainAddress.Currency.ToCurrency());
                         wallet.Amount += paymentTransaction.Amount;
                         await context.SaveChangesAsync();
                     }

@@ -1,5 +1,4 @@
-﻿using GenesisVision.Core.Controllers;
-using GenesisVision.Core.Helpers.Convertors;
+﻿using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
@@ -58,14 +57,14 @@ namespace GenesisVision.Core.Services
                     {
                         foreach (var request in pendingInvests)
                         {
-                            var wallet = context.Wallets.First(x => x.UserId == request.UserId);
+                            var wallet = context.Wallets.First(x => x.UserId == request.UserId && x.Currency == WalletCurrency.GVT);
                             wallet.Amount += request.Amount;
 
                             var tx = new WalletTransactions
                                      {
                                          Id = Guid.NewGuid(),
                                          Type = WalletTransactionsType.CancelInvestmentRequest,
-                                         UserId = request.UserId,
+                                         WalletId = wallet.Id,
                                          Amount = request.Amount,
                                          Date = DateTime.Now
                                      };
@@ -180,9 +179,9 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var investor = context.Users
-                                      .Include(x => x.Wallet)
+                                      .Include(x => x.Wallets)
                                       .First(x => x.Id == model.UserId);
-
+                var wallet = investor.Wallets.First(x => x.Currency == WalletCurrency.GVT);
                 var lastPeriod = context.Periods
                                         .Where(x => x.InvestmentProgramId == model.InvestmentProgramId)
                                         .OrderByDescending(x => x.Number)
@@ -192,7 +191,7 @@ namespace GenesisVision.Core.Services
                          {
                              Id = Guid.NewGuid(),
                              Type = WalletTransactionsType.InvestToProgram,
-                             UserId = model.UserId,
+                             WalletId = wallet.Id,
                              Amount = model.Amount,
                              Date = DateTime.Now
                          };
@@ -210,7 +209,7 @@ namespace GenesisVision.Core.Services
                                      WalletTransactionId = tx.Id
                                  };
 
-                investor.Wallet.Amount -= model.Amount;
+                wallet.Amount -= model.Amount;
                 
                 context.Add(invRequest);
                 context.Add(tx);
@@ -515,31 +514,32 @@ namespace GenesisVision.Core.Services
                                         .First();
 
                 var investmentProgram = context.InvestmentPrograms
-                      .Include(x => x.ManagerAccount)
-                      .ThenInclude(x => x.BrokerTradeServer)
-                      .ThenInclude(x => x.Broker)
-                      .ThenInclude(x => x.User)
-                      .ThenInclude(x => x.Wallet)
-                      .First(x => x.Id == accrual.InvestmentProgramId);
+                                               .Include(x => x.ManagerAccount)
+                                               .ThenInclude(x => x.BrokerTradeServer)
+                                               .ThenInclude(x => x.Broker)
+                                               .ThenInclude(x => x.User)
+                                               .ThenInclude(x => x.Wallets)
+                                               .First(x => x.Id == accrual.InvestmentProgramId);
 
                 var totalProfit = accrual.Accruals.Sum(a => a.Amount);
 
-                investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallet.Amount -= totalProfit;
+                var wallet = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallets.First(x => x.Currency == WalletCurrency.GVT);
+                wallet.Amount -= totalProfit;
 
                 var brokerTx = new WalletTransactions
-                {
-                    Id = Guid.NewGuid(),
-                    Type = WalletTransactionsType.ProfitFromProgram,
-                    UserId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id,
-                    Amount = -totalProfit,
-                    Date = DateTime.Now
-                };
+                               {
+                                   Id = Guid.NewGuid(),
+                                   Type = WalletTransactionsType.ProfitFromProgram,
+                                   Amount = -totalProfit,
+                                   Date = DateTime.Now,
+                                   WalletId = wallet.Id
+                               };
 
                 var brokerProfitDistribution = new ProfitDistributionTransactions
-                {
-                    PeriodId = lastPeriod.Id,
-                    WalletTransactionId = brokerTx.Id
-                };
+                                               {
+                                                   PeriodId = lastPeriod.Id,
+                                                   WalletTransactionId = brokerTx.Id
+                                               };
 
                 context.Add(brokerTx);
                 context.Add(brokerProfitDistribution);
@@ -547,26 +547,27 @@ namespace GenesisVision.Core.Services
                 foreach (var acc in accrual.Accruals)
                 {
                     var investor = context.InvestorAccounts
-                      .Include(x => x.User)
-                      .ThenInclude(x => x.Wallet)
-                      .First(x => x.UserId == acc.InvestorId);
+                                          .Include(x => x.User)
+                                          .ThenInclude(x => x.Wallets)
+                                          .First(x => x.UserId == acc.InvestorId);
 
-                    investor.User.Wallet.Amount += acc.Amount;
+                    var investorWallet = investor.User.Wallets.First(x => x.Currency == WalletCurrency.GVT);
+                    investorWallet.Amount += acc.Amount;
 
                     var investorTx = new WalletTransactions
-                    {
-                        Id = Guid.NewGuid(),
-                        Type = WalletTransactionsType.ProfitFromProgram,
-                        UserId = acc.InvestorId,
-                        Amount = acc.Amount,
-                        Date = DateTime.Now
-                    };
+                                     {
+                                         Id = Guid.NewGuid(),
+                                         Type = WalletTransactionsType.ProfitFromProgram,
+                                         Amount = acc.Amount,
+                                         Date = DateTime.Now,
+                                         WalletId = investorWallet.Id
+                                     };
 
                     var investorProfitDistribution = new ProfitDistributionTransactions
-                    {
-                        PeriodId = lastPeriod.Id,
-                        WalletTransactionId = investorTx.Id
-                    };
+                                                     {
+                                                         PeriodId = lastPeriod.Id,
+                                                         WalletTransactionId = investorTx.Id
+                                                     };
 
                     context.Add(investorTx);
                     context.Add(investorProfitDistribution);
@@ -583,29 +584,29 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var investmentRequest = context.InvestmentRequests
-                                    .Include(x => x.User)
-                                    .ThenInclude(x => x.Wallet)
-                                    .FirstOrDefault(x => x.Id == requestId
-                                    && x.Status == InvestmentRequestStatus.New);
+                                               .Include(x => x.User)
+                                               .ThenInclude(x => x.Wallets)
+                                               .First(x => x.Id == requestId && x.Status == InvestmentRequestStatus.New);
 
                 investmentRequest.Status = InvestmentRequestStatus.Cancelled;
 
                 if (investmentRequest.Type == InvestmentRequestType.Invest)
                 {
                     var investor = investmentRequest.User;
+                    var wallet = investor.Wallets.First(x => x.Currency == WalletCurrency.GVT);
 
                     var tx = new WalletTransactions
                     {
                         Id = Guid.NewGuid(),
                         Type = WalletTransactionsType.CancelInvestmentRequest,
-                        UserId = investor.Id,
+                        WalletId = wallet.Id,
                         Amount = investmentRequest.Amount,
                         Date = DateTime.Now
                     };
 
                     context.Add(tx);
 
-                    investor.Wallet.Amount += investmentRequest.Amount;
+                    wallet.Amount += investmentRequest.Amount;
                 }
 
                 context.SaveChanges();
@@ -634,7 +635,7 @@ namespace GenesisVision.Core.Services
                       .ThenInclude(x => x.BrokerTradeServer)
                       .ThenInclude(x => x.Broker)
                       .ThenInclude(x => x.User)
-                      .ThenInclude(x => x.Wallet)                      
+                      .ThenInclude(x => x.Wallets)                      
                       .First(x => x.Id == investmentProgramId);
 
                 var brokerWalletId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id;
@@ -647,7 +648,7 @@ namespace GenesisVision.Core.Services
                     var investor = context.InvestorAccounts
                                           .Include(x => x.Portfolios)
                                           .Include(x => x.User)
-                                          .ThenInclude(x => x.Wallet)
+                                          .ThenInclude(x => x.Wallets)
                                           .First(x => x.UserId == request.UserId);
 
                     var portfolio = investor.Portfolios.FirstOrDefault(x => x.ManagerTokenId == investmentProgram.Token.Id);
@@ -688,17 +689,18 @@ namespace GenesisVision.Core.Services
                         result.AccountBalanceChange -= amount;
 
                         portfolio.Amount -= amount / investmentProgram.Token.InitialPrice;
-
-                        investor.User.Wallet.Amount += amountInGVT;
+                        
+                        var wallet = investor.User.Wallets.First(x => x.Currency == WalletCurrency.GVT);
+                        wallet.Amount += amountInGVT;
 
                         var investorTx = new WalletTransactions
-                        {
-                            Id = Guid.NewGuid(),
-                            Type = WalletTransactionsType.WithdrawFromProgram,
-                            UserId = request.UserId,
-                            Amount = amountInGVT,
-                            Date = DateTime.Now
-                        };
+                                         {
+                                             Id = Guid.NewGuid(),
+                                             Type = WalletTransactionsType.WithdrawFromProgram,
+                                             WalletId = wallet.Id,
+                                             Amount = amountInGVT,
+                                             Date = DateTime.Now
+                                         };
 
                         context.Add(investorTx);
                     }
@@ -727,26 +729,27 @@ namespace GenesisVision.Core.Services
                         result.ManagerBalanceChange -= amount;
 
                         var manager = context.Users
-                                      .Include(x => x.Wallet)
+                                      .Include(x => x.Wallets)
                                       .First(x => x.Id == investmentProgram.ManagerAccountId);
 
-                        manager.Wallet.Amount += amountInGVT;
+                        var wallet = manager.Wallets.First(x => x.Currency == WalletCurrency.GVT);
+                        wallet.Amount += amountInGVT;
 
                         var managerTx = new WalletTransactions
-                        {
-                            Id = Guid.NewGuid(),
-                            Type = WalletTransactionsType.WithdrawFromProgram,
-                            UserId = request.UserId,
-                            Amount = amountInGVT,
-                            Date = DateTime.Now
-                        };
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Type = WalletTransactionsType.WithdrawFromProgram,
+                                            Amount = amountInGVT,
+                                            Date = DateTime.Now,
+                                            WalletId = wallet.Id
+                                        };
 
                         context.Add(managerTx);
                     }
                 }
 
                 //ToDo: Transaction record?
-                investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallet.Amount += brokerBalanceChange;
+                investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallets.First(x => x.Currency == WalletCurrency.GVT).Amount += brokerBalanceChange;
 
                 context.SaveChanges();
 

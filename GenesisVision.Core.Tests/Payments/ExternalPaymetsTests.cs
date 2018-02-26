@@ -1,4 +1,5 @@
 ﻿using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using GenesisVision.PaymentService.Models;
 using GenesisVision.PaymentService.Services;
@@ -11,7 +12,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace GenesisVision.Core.Tests.Payments
 {
@@ -33,23 +33,16 @@ namespace GenesisVision.Core.Tests.Payments
 
             paymentService = new PaymentTransactionService(Substitute.For<ILogger<IPaymentTransactionService>>(), context);
 
-            var wallet = new Wallets { Amount = 0 };
             user = new ApplicationUser
-            {
-                Id = Guid.NewGuid(),
-                IsEnabled = true,
-                Wallet = wallet
-            };
-            wallet.UserId = user.Id;
-            wallet.BlockchainAddresses = new List<BlockchainAddresses>
-            {
-                new BlockchainAddresses
-                 {
-                     Id = Guid.NewGuid(),
-                     Address = "0x00"
-                 }
-            };
-            context.Add(wallet);
+                   {
+                       Id = Guid.NewGuid(),
+                       IsEnabled = true,
+                       Wallets = new List<Wallets> {new Wallets {Amount = 0, Currency = WalletCurrency.GVT}},
+                       BlockchainAddresses = new List<BlockchainAddresses>
+                                             {
+                                                 new BlockchainAddresses {Id = Guid.NewGuid(), Address = "0x00", Currency = "GVT"}
+                                             }
+                   };
             context.Add(user);
             context.SaveChanges();
         }
@@ -57,19 +50,20 @@ namespace GenesisVision.Core.Tests.Payments
         [Test]
         public void PaymentsCallbackTest1()
         {
-            var wallet = context.Wallets.First(w => w.UserId == user.Id);
+            var wallet = context.Wallets.First(w => w.UserId == user.Id && w.Currency == WalletCurrency.GVT);
             Assert.IsNull(wallet.WalletTransactions);
 
             var payment = new ProcessPaymentTransaction
-            {
-                Amount = 100,
-                Address = "0x00",
-                Status = DataModel.Enums.PaymentTransactionStatus.ConfirmedAndValidated
-            };
+                          {
+                              Amount = 100,
+                              Address = "0x00",
+                              Status = PaymentTransactionStatus.ConfirmedAndValidated,
+                              Currency = "GVT"
+                          };
 
             paymentService.ProcessCallback(payment);
 
-            Assert.AreEqual(100, context.Wallets.First(w => w.UserId == user.Id).Amount);
+            Assert.AreEqual(100, context.Wallets.First(w => w.UserId == user.Id && w.Currency == WalletCurrency.GVT).Amount);
         }
     }
 }

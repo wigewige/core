@@ -51,14 +51,14 @@ namespace GenesisVision.Core.Services
                               InvestMinAmount = request.InvestMinAmount
                           };
 
-                var wallet = context.Wallets.First(x => x.UserId == request.UserId);
+                var wallet = context.Wallets.First(x => x.UserId == request.UserId && x.Currency == WalletCurrency.GVT);
                 wallet.Amount -= req.DepositAmount;
 
                 var tx = new WalletTransactions
                          {
                              Id = Guid.NewGuid(),
                              Type = WalletTransactionsType.OpenProgram,
-                             UserId = request.UserId,
+                             WalletId = wallet.Id,
                              Amount = request.DepositAmount,
                              Date = DateTime.Now
                          };

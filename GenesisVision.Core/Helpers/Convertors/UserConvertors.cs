@@ -1,5 +1,7 @@
 ﻿using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GenesisVision.Core.Helpers.Convertors
 {
@@ -11,7 +13,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                    {
                        Id = user.Id,
                        Email = user.Email,
-                       Balance = user.Wallet?.Amount ?? 0
+                       Wallets = user.Wallets?.Select(x => x.ToWallet()) ?? new List<WalletViewModel>()
                    };
         }
 
@@ -32,7 +34,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                         {
                             Id = user.Id,
                             Email = user.Email,
-                            Balance = user.Wallet?.Amount ?? 0
+                            Wallets = user.Wallets?.Select(x => x.ToWallet()) ?? new List<WalletViewModel>()
                         };
             if (user.Profile != null)
             {
@@ -51,6 +53,16 @@ namespace GenesisVision.Core.Helpers.Convertors
                 model.Phone = user.Profile.Phone;
             }
             return model;
+        }
+
+        public static WalletViewModel ToWallet(this Wallets w)
+        {
+            return new WalletViewModel
+                   {
+                       Id = w.Id,
+                       Amount = w.Amount,
+                       Currency = w.Currency
+                   };
         }
     }
 }

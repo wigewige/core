@@ -11,7 +11,6 @@ namespace GenesisVision.DataModel.Models
         public bool IsDefault { get; set; }
 
         public ApplicationUser User { get; set; }
-        public Wallets Wallet { get; set; }
         public Guid UserId { get; set; }
 
         public ICollection<PaymentTransactions> PaymentTransactions { get; set; }
