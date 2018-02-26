@@ -10,5 +10,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult<(List<WalletTransaction>, int)> GetTransactionHistory(Guid userId, TransactionsFilter filter);
 
         OperationResult<string> GetUserWallet(Guid userId);
+
+        OperationResult WithdrawRequest(WalletWithdrawRequestModel request, Guid userId);
     }
 }

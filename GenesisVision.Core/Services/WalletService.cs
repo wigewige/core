@@ -3,6 +3,8 @@ using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Wallet;
 using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -48,6 +50,28 @@ namespace GenesisVision.Core.Services
                 var address = context.Wallets.First(w => w.UserId == userId).BlockchainAddresses.FirstOrDefault(x => x.IsDefault)?.Address ??
                               context.Wallets.First(w => w.UserId == userId).BlockchainAddresses.FirstOrDefault()?.Address;
                 return address;
+            });
+        }
+
+        public OperationResult WithdrawRequest(WalletWithdrawRequestModel request, Guid userId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var wallet = context.Wallets.Where(w => w.UserId == userId && w.Currency == request.Currency).First();
+                if (wallet.Amount < request.Amount)
+                    throw new ApplicationException("Not enough funds");
+                // TODO wallet relation
+                var transaction = new PaymentTransactions
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = request.Amount,
+                    Type = PaymentTransactionType.Withdrawn,
+                    DateCreated = DateTime.UtcNow,
+                    DestAddress = request.BlockchainAddress,
+                    Status = PaymentTransactionStatus.New
+                };
+
+                context.Add(transaction);
             });
         }
     }

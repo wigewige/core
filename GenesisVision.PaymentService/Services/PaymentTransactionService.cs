@@ -67,6 +67,7 @@ namespace GenesisVision.PaymentService.Services
                                          {
                                              Id = Guid.NewGuid(),
                                              Hash = request.TransactionHash,
+                                             Type = PaymentTransactionType.Deposit,
                                              BlockchainAddressId = blockchainAddress.Id,
                                              Amount = request.Amount,
                                              Fee = request.Fee,

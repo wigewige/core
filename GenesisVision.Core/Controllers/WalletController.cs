@@ -67,5 +67,22 @@ namespace GenesisVision.Core.Controllers
                           Address = address.Data
                       });
         }
+
+        /// <summary>
+        /// Withdraw request
+        /// </summary>
+        /// <returns></returns>
+        [Route("investor/wallet/withdrawrequest")]
+        [Route("manager/wallet/withdrawrequest")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult WithdrawRequest([FromBody]WalletWithdrawRequestModel request)
+        {
+            if(string.IsNullOrEmpty(request.BlockchainAddress) || request.Amount <= 0)
+                return BadRequest();
+
+            walletService.WithdrawRequest(request, CurrentUser.Id);
+            return Ok();
+        }
     }
 }
