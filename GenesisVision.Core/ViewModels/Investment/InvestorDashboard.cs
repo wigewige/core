@@ -11,7 +11,7 @@ namespace GenesisVision.Core.ViewModels.Investment
 
     public class InvestorProgram
     {
-        public InvestmentShort InvestmentProgram { get; set; }
+        public InvestmentProgramDetails InvestmentProgram { get; set; }
         public List<InvestmentRequest> Requests { get; set; }
 
         public decimal TotalIn

@@ -3,11 +3,69 @@ using GenesisVision.Core.ViewModels.Manager;
 using GenesisVision.DataModel.Models;
 using System.Collections.Generic;
 using System.Linq;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Helpers.Convertors
 {
     public static partial class Convertors
     {
+        public static InvestmentProgramDetails ToInvestmentProgramDetails(this InvestmentPrograms program)
+        {
+            var result = new InvestmentProgramDetails
+                         {
+                             Id = program.Id,
+                             Title = program.Title,
+                             Level = 1,
+                             Logo = program.Logo,
+                             Balance = 0m,
+                             TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
+                             InvestorsCount = program.InvestmentRequests
+                                                     .Where(r => r.Type == InvestmentRequestType.Invest)
+                                                     .Select(r => r.UserId)
+                                                     .Distinct()
+                                                     .Count(),
+                             PeriodDuration = program.Period,
+                             EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
+                             ProfitAvg = 0m,
+                             ProfitTotal = 0m,
+                             AvailableInvestment = 0m,
+                             InvestedTokens = 0,
+                             FeeSuccess = program.FeeSuccess,
+                             FeeManagement = program.FeeManagement,
+                             IsPending = false,
+                             IsHistoryEnable = false,
+                             IsInvestEnable = true,
+                             IsWithdrawEnable = false,
+                         };
+            return result;
+        }
+
+        public static InvestmentProgram ToInvestmentProgram(this InvestmentPrograms program)
+        {
+            var result = new InvestmentProgram
+                         {
+                             Id = program.Id,
+                             Title = program.Title,
+                             Level = 1,
+                             Logo = program.Logo,
+                             Balance = 0m,
+                             TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
+                             InvestorsCount = program.InvestmentRequests
+                                                     .Where(r => r.Type == InvestmentRequestType.Invest)
+                                                     .Select(r => r.UserId)
+                                                     .Distinct()
+                                                     .Count(),
+                             PeriodDuration = program.Period,
+                             EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
+                             ProfitAvg = 0m,
+                             AvailableInvestment = 0m,
+                             FeeSuccess = program.FeeSuccess,
+                             FeeManagement = program.FeeManagement,
+                             IsPending = false,
+                         };
+            return result;
+        }
+
         public static Period ToPeriod(this Periods p)
         {
             return new Period
@@ -47,76 +105,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Amount = inv.Amount
                    };
         }
-
-        public static InvestmentProgram ToInvestmentProgram(this InvestmentPrograms inv)
-        {
-            return new InvestmentProgram
-                   {
-                       Manager = inv.ManagerAccount.User?.ToProfilePublic(),
-                       Account = new ManagerAccount
-                                 {
-                                     Id = inv.ManagerAccount.Id,
-                                     Login = inv.ManagerAccount.Login,
-                                     Currency = inv.ManagerAccount.Currency,
-                                     IpfsHash = inv.ManagerAccount.IpfsHash,
-                                     IsConfirmed = inv.ManagerAccount.IsConfirmed,
-                                     RegistrationDate = inv.ManagerAccount.RegistrationDate,
-                                     BrokerTradeServer = inv.ManagerAccount.BrokerTradeServer?.ToBrokerTradeServers(),
-                                 },
-                       Investment = inv.ToInvestment(),
-                       Token = new ManagerToken
-                               {
-                                   Id = inv.Token.Id,
-                                   TokenSymbol = inv.Token.TokenSymbol,
-                                   TokenAddress = inv.Token.TokenAddress,
-                                   TokenName = inv.Token.TokenName
-                               }
-                   };
-        }
-
-        public static Investment ToInvestment(this InvestmentPrograms inv)
-        {
-            return new Investment
-                   {
-                       Id = inv.Id,
-                       InvestMinAmount = inv.InvestMinAmount,
-                       InvestMaxAmount = inv.InvestMaxAmount,
-                       Description = inv.Description,
-                       Title = inv.Title,
-                       IsEnabled = inv.IsEnabled,
-                       FeeEntrance = inv.FeeEntrance,
-                       FeeSuccess = inv.FeeSuccess,
-                       FeeManagement = inv.FeeManagement,
-                       DateFrom = inv.DateFrom,
-                       DateTo = inv.DateTo,
-                       Period = inv.Period,
-                       ManagerAccountId = inv.ManagerAccountId,
-                       ManagerTokensId = inv.ManagerTokensId,
-                       Logo = inv.Logo,
-                       Rating = inv.Rating,
-                       OrdersCount = inv.OrdersCount,
-                       TotalProfit = inv.TotalProfit,
-                       LastPeriod = inv.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod()
-                   };
-        }
-
-        public static InvestmentShort ToInvestmentShort(this InvestmentPrograms inv)
-        {
-            return new InvestmentShort
-                   {
-                       Id = inv.Id,
-                       Description = inv.Description,
-                       Title = inv.Title,
-                       IsEnabled = inv.IsEnabled,
-                       ManagerAccountId = inv.ManagerAccountId,
-                       ManagerTokensId = inv.ManagerTokensId,
-                       Logo = inv.Logo,
-                       Rating = inv.Rating,
-                       OrdersCount = inv.OrdersCount,
-                       TotalProfit = inv.TotalProfit
-                   };
-        }
-
+        
         public static InvestmentProgramStatistic ToInvestmentProgramStatistic(this ManagersAccountsStatistics statistic)
         {
             return new InvestmentProgramStatistic

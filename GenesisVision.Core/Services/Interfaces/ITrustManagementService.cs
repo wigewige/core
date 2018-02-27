@@ -17,7 +17,7 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult<Guid> CreateInvestmentProgram(NewManager request);
 
-        OperationResult<(List<InvestmentProgram>, int)> GetInvestments(InvestmentsFilter filter);
+        OperationResult<(List<InvestmentProgram>, int)> GetInvestmentPrograms(InvestmentProgramsFilter filter);
 
         OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
 
@@ -29,7 +29,7 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult<(List<BrokerTradeServer>, int)> GetBrokerTradeServers(BrokersFilter filter);
 
-        OperationResult<InvestmentProgram> GetInvestment(Guid investmentId);
+        OperationResult<InvestmentProgramDetails> GetInvestmentProgram(Guid investmentId);
 
         OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId);
 

@@ -44,7 +44,7 @@ namespace GenesisVision.Core.Controllers
         /// Invest in manager
         /// </summary>
         [HttpPost]
-        [Route("investor/investments/invest")]
+        [Route("investor/investmentPrograms/invest")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfileShortViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult Invest([FromBody]Invest model)
@@ -67,7 +67,7 @@ namespace GenesisVision.Core.Controllers
         /// Withdraw from investment program
         /// </summary>
         [HttpPost]
-        [Route("investor/investments/withdraw")]
+        [Route("investor/investmentPrograms/withdraw")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult RequestForWithdraw([FromBody]Invest model)
@@ -89,7 +89,7 @@ namespace GenesisVision.Core.Controllers
         /// Cancel investment request
         /// </summary>
         [HttpPost]
-        [Route("investor/investments/cancelInvestmentRequest")]
+        [Route("investor/investmentPrograms/cancelInvestmentRequest")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult CancelInvestmentRequest(Guid requestId)
@@ -106,16 +106,16 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Get investments by filter
+        /// Get public investment program's list
         /// </summary>
         [HttpPost]
         [AllowAnonymous]
-        [Route("investor/investments")]
+        [Route("investor/investmentPrograms")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramsViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult GetInvestments([FromBody]InvestmentsFilter filter)
+        public IActionResult GetInvestmentPrograms([FromBody]InvestmentProgramsFilter filter)
         {
-            var data = trustManagementService.GetInvestments(filter ?? new InvestmentsFilter());
+            var data = trustManagementService.GetInvestmentPrograms(filter ?? new InvestmentProgramsFilter());
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 
@@ -123,6 +123,31 @@ namespace GenesisVision.Core.Controllers
                       {
                           Investments = data.Data.Item1,
                           Total = data.Data.Item2
+                      });
+        }
+
+        /// <summary>
+        /// Get investment program details by id
+        /// </summary>
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("investor/investmentProgram")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetInvestmentProgram(Guid investmentProgramId)
+        {
+            var investment = trustManagementService.GetInvestmentProgram(investmentProgramId);
+            if (!investment.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(investment));
+
+            var statistic = statisticService.GetInvestmentProgramStatistic(investmentProgramId);
+            if (!statistic.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(statistic));
+
+            return Ok(new InvestmentProgramViewModel
+                      {
+                          InvestmentProgram = investment.Data,
+                          Statistic = statistic.Data
                       });
         }
         
@@ -143,35 +168,10 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Get investment program with statistic by id
-        /// </summary>
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("investor/investment")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramViewModel))]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult GetInvestmentProgram(Guid investmentProgramId)
-        {
-            var investment = trustManagementService.GetInvestment(investmentProgramId);
-            if (!investment.IsSuccess)
-                return BadRequest(ErrorResult.GetResult(investment));
-
-            var statistic = statisticService.GetInvestmentProgramStatistic(investmentProgramId);
-            if (!statistic.IsSuccess)
-                return BadRequest(ErrorResult.GetResult(statistic));
-
-            return Ok(new InvestmentProgramViewModel
-                      {
-                          InvestmentProgram = investment.Data,
-                          Statistic = statistic.Data
-                      });
-        }
-
-        /// <summary>
         /// Get manager trade history
         /// </summary>
         [HttpPost]
-        [Route("investor/investment/trades")]
+        [Route("investor/investmentProgram/trades")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TradesViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetManagerTrades([FromBody]TradesFilter filter)
@@ -191,7 +191,7 @@ namespace GenesisVision.Core.Controllers
         /// Get manager open trades
         /// </summary>
         [HttpPost]
-        [Route("investor/investment/openTrades")]
+        [Route("investor/investmentProgram/openTrades")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(OpenTradesViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetManagerOpenTrades([FromBody]TradesFilter filter)

@@ -15,7 +15,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         ByOrdersDesc = 5
     }
 
-    public class InvestmentsFilter : PagingFilter
+    public class InvestmentProgramsFilter : PagingFilter
     {
         public Guid? ManagerId { get; set; }
         public Guid? BrokerId { get; set; }
