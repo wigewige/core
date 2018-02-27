@@ -174,7 +174,7 @@ namespace GenesisVision.Core.Controllers
                                                      new BlockchainAddresses
                                                      {
                                                          Address = address.PublicAddress,
-                                                         Currency = Currency.ETH,
+                                                         Currency = Currency.GVT,
                                                          IsDefault = true
                                                      }
                                                  }
@@ -228,7 +228,7 @@ namespace GenesisVision.Core.Controllers
                                                      new BlockchainAddresses
                                                      {
                                                          Address = address.PublicAddress,
-                                                         Currency = Currency.ETH,
+                                                         Currency = Currency.GVT,
                                                          IsDefault = true
                                                      }
                                                  }
