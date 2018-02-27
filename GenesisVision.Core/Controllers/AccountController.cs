@@ -92,25 +92,7 @@ namespace GenesisVision.Core.Controllers
 
             return BadRequest(ErrorResult.GetResult(ValidationMessages.AccessDenied));
         }
-
-        /// <summary>
-        /// Get short profile
-        /// </summary>
-        [HttpGet]
-        [Authorize]
-        [Route("manager/profile")]
-        [Route("investor/profile")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfileShortViewModel))]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult ProfileShort()
-        {
-            var user = userService.GetUserProfileShort(CurrentUser.Id);
-            if (!user.IsSuccess)
-                return BadRequest(ErrorResult.GetResult(user));
-
-            return Ok(user.Data);
-        }
-
+        
         /// <summary>
         /// Get public profile
         /// </summary>

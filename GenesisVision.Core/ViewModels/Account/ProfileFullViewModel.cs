@@ -2,8 +2,10 @@
 
 namespace GenesisVision.Core.ViewModels.Account
 {
-    public class ProfileFullViewModel : ProfileShortViewModel
+    public class ProfileFullViewModel
     {
+        public Guid Id { get; set; }
+        public string Email { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
         public string LastName { get; set; }

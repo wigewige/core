@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 
-namespace GenesisVision.Core.ViewModels.Account
+namespace GenesisVision.Core.ViewModels.Wallet
 {
     public class WalletViewModel
     {

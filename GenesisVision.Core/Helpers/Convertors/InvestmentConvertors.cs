@@ -9,15 +9,45 @@ namespace GenesisVision.Core.Helpers.Convertors
 {
     public static partial class Convertors
     {
-        public static InvestmentProgramDetails ToInvestmentProgramDetails(this InvestmentPrograms program)
+        public static InvestmentProgram ToInvestmentProgram(this InvestmentPrograms program)
         {
-            var result = new InvestmentProgramDetails
+            var result = new InvestmentProgram
                          {
                              Id = program.Id,
                              Title = program.Title,
                              Level = 1,
                              Logo = program.Logo,
                              Balance = 0m,
+                             Currency = program.ManagerAccount.Currency,
+                             TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
+                             InvestorsCount = program.InvestmentRequests
+                                                     .Where(r => r.Type == InvestmentRequestType.Invest)
+                                                     .Select(r => r.UserId)
+                                                     .Distinct()
+                                                     .Count(),
+                             PeriodDuration = program.Period,
+                             EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
+                             ProfitAvg = 0m,
+                             ProfitTotal = 0m,
+                             AvailableInvestment = 0m,
+                             FeeSuccess = program.FeeSuccess,
+                             FeeManagement = program.FeeManagement,
+                             IsPending = false,
+                         };
+            return result;
+        }
+
+        public static InvestmentProgramDetails ToInvestmentProgramDetails(this InvestmentPrograms program)
+        {
+            var result = new InvestmentProgramDetails
+                         {
+                             Id = program.Id,
+                             Title = program.Title,
+                             Description = program.Description,
+                             Level = 1,
+                             Logo = program.Logo,
+                             Balance = 0m,
+                             Currency = program.ManagerAccount.Currency,
                              TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
                              InvestorsCount = program.InvestmentRequests
                                                      .Where(r => r.Type == InvestmentRequestType.Invest)
@@ -32,6 +62,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              InvestedTokens = 0,
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
+                             Manager = program.ManagerAccount.User.ToProfilePublic(),
                              IsPending = false,
                              IsHistoryEnable = false,
                              IsInvestEnable = true,
@@ -40,15 +71,16 @@ namespace GenesisVision.Core.Helpers.Convertors
             return result;
         }
 
-        public static InvestmentProgram ToInvestmentProgram(this InvestmentPrograms program)
+        public static InvestmentProgramDashboard ToInvestmentProgramDashboard(this InvestmentPrograms program)
         {
-            var result = new InvestmentProgram
+            var result = new InvestmentProgramDashboard
                          {
                              Id = program.Id,
                              Title = program.Title,
                              Level = 1,
                              Logo = program.Logo,
                              Balance = 0m,
+                             Currency = program.ManagerAccount.Currency,
                              TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
                              InvestorsCount = program.InvestmentRequests
                                                      .Where(r => r.Type == InvestmentRequestType.Invest)
@@ -58,10 +90,16 @@ namespace GenesisVision.Core.Helpers.Convertors
                              PeriodDuration = program.Period,
                              EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
                              ProfitAvg = 0m,
+                             ProfitTotal = 0m,
                              AvailableInvestment = 0m,
+                             InvestedTokens = 0,
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
+                             Manager = program.ManagerAccount.User.ToProfilePublic(),
                              IsPending = false,
+                             IsHistoryEnable = false,
+                             IsInvestEnable = true,
+                             IsWithdrawEnable = false,
                          };
             return result;
         }
@@ -103,16 +141,6 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Status = inv.Status,
                        Type = inv.Type,
                        Amount = inv.Amount
-                   };
-        }
-        
-        public static InvestmentProgramStatistic ToInvestmentProgramStatistic(this ManagersAccountsStatistics statistic)
-        {
-            return new InvestmentProgramStatistic
-                   {
-                       Date = statistic.Date,
-                       CurrentBalance = statistic.CurrentBalance,
-                       Profit = statistic.Profit
                    };
         }
     }

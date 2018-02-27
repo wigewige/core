@@ -22,7 +22,7 @@ namespace GenesisVision.Core.Services
             this.context = context;
         }
 
-        public OperationResult<List<InvestmentProgramStatistic>> GetInvestmentProgramStatistic(Guid invProgramId, DateTime? dateFrom = null, DateTime? dateTo = null)
+        public OperationResult GetInvestmentProgramStatistic(Guid invProgramId, DateTime? dateFrom = null, DateTime? dateTo = null)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
@@ -34,11 +34,9 @@ namespace GenesisVision.Core.Services
                 if (dateTo.HasValue)
                     statistic = statistic.Where(x => x.Date <= dateTo);
 
-                var result = statistic
-                    .Select(x => x.ToInvestmentProgramStatistic())
-                    .ToList();
+                var result = statistic.ToList();
 
-                return result;
+                return;
             });
         }
 
