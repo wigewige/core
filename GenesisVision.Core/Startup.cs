@@ -197,6 +197,8 @@ namespace GenesisVision.Core
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            Constants.IsDevelopment = true; // todo: remove it
+
             if (env.IsDevelopment())
             {
                 Constants.IsDevelopment = true;

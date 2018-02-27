@@ -72,6 +72,7 @@ namespace GenesisVision.Core.Controllers
         /// Withdraw request
         /// </summary>
         /// <returns></returns>
+        [HttpPost]
         [Route("investor/wallet/withdrawrequest")]
         [Route("manager/wallet/withdrawrequest")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]

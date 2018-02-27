@@ -1,26 +1,25 @@
 ﻿using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
-using Ipfs.Api;
-using System.IO;
 
 namespace GenesisVision.Core.Services
 {
     public class IpfsService : IIpfsService
     {
-        private readonly IpfsClient ipfs;
+        //private readonly IpfsClient ipfs;
 
         public IpfsService()
         {
-            ipfs = new IpfsClient(Constants.IpfsHost);
+            //ipfs = new IpfsClient(Constants.IpfsHost);
         }
 
         public OperationResult<string> GetIpfsText(string hash)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var data = ipfs.FileSystem.ReadAllTextAsync(hash).Result;
-                return data;
+                return "";
+                //var data = ipfs.FileSystem.ReadAllTextAsync(hash).Result;
+                //return data;
             });
         }
 
@@ -28,8 +27,10 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var res = ipfs.FileSystem.AddTextAsync(text).Result;
-                return res.Id.Hash.ToString();
+                return "";
+
+                //var res = ipfs.FileSystem.AddTextAsync(text).Result;
+                //return res.Id.Hash.ToString();
             });
         }
 
@@ -37,12 +38,14 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                using (var stream = ipfs.FileSystem.ReadFileAsync(hash).Result)
-                using (var data = new MemoryStream())
-                {
-                    stream.CopyTo(data);
-                    return data.ToArray();
-                }
+                return new byte[0];
+
+                //using (var stream = ipfs.FileSystem.ReadFileAsync(hash).Result)
+                //using (var data = new MemoryStream())
+                //{
+                //    stream.CopyTo(data);
+                //    return data.ToArray();
+                //}
             });
         }
     }
