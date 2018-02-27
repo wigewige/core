@@ -84,7 +84,7 @@ namespace GenesisVision.PaymentService.Services
                     if (paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
                     {
                         var wallet = context.Wallets.First(w => w.UserId == blockchainAddress.UserId &&
-                                                                w.Currency == blockchainAddress.Currency.ToCurrency());
+                                                                w.Currency == blockchainAddress.Currency);
                         wallet.Amount += paymentTransaction.Amount;
                         await context.SaveChangesAsync();
                     }
@@ -97,7 +97,7 @@ namespace GenesisVision.PaymentService.Services
                                              TransactionId = paymentTransaction.Id,
                                              TransactionHash = paymentTransaction.Hash,
                                              Amount = paymentTransaction.Amount,
-                                             Currency = request.Currency,
+                                             Currency = request.Currency.ToString(),
                                              GatewayCode = request.GatewayCode,
                                              Status = paymentTransaction.Status,
                                              IsValid = true

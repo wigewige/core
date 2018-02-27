@@ -35,7 +35,7 @@ namespace GenesisVision.Core.Tests.Validators
                        Id = Guid.NewGuid(),
                        IsEnabled = true,
                        Type = UserType.Investor,
-                       Wallets = new List<Wallets> {new Wallets {Amount = 1000, Currency = WalletCurrency.GVT}},
+                       Wallets = new List<Wallets> {new Wallets {Amount = 1000, Currency = Currency.GVT}},
                    };
             investment = new InvestmentPrograms
                          {

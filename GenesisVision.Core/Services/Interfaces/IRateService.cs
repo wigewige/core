@@ -1,7 +1,9 @@
-﻿namespace GenesisVision.Core.Services.Interfaces
+﻿using GenesisVision.DataModel.Enums;
+
+namespace GenesisVision.Core.Services.Interfaces
 {
     public interface IRateService
     {
-        decimal GetRate(string from, string to);
+        decimal GetRate(Currency from, Currency to);
     }
 }

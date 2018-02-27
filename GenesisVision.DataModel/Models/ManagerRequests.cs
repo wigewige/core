@@ -11,7 +11,7 @@ namespace GenesisVision.DataModel.Models
         public ManagerRequestStatus Status { get; set; }
         
         public decimal DepositAmount { get; set; }
-        public string TradePlatformCurrency { get; set; }
+        public Currency TradePlatformCurrency { get; set; }
         public string TradePlatformPassword { get; set; }
 
         public string TokenName { get; set; }

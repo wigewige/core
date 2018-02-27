@@ -37,10 +37,10 @@ namespace GenesisVision.Core.Tests.Payments
                    {
                        Id = Guid.NewGuid(),
                        IsEnabled = true,
-                       Wallets = new List<Wallets> {new Wallets {Amount = 0, Currency = WalletCurrency.GVT}},
+                       Wallets = new List<Wallets> {new Wallets {Amount = 0, Currency = Currency.GVT}},
                        BlockchainAddresses = new List<BlockchainAddresses>
                                              {
-                                                 new BlockchainAddresses {Id = Guid.NewGuid(), Address = "0x00", Currency = "GVT"}
+                                                 new BlockchainAddresses {Id = Guid.NewGuid(), Address = "0x00", Currency = Currency.GVT}
                                              }
                    };
             context.Add(user);
@@ -50,7 +50,7 @@ namespace GenesisVision.Core.Tests.Payments
         [Test]
         public void PaymentsCallbackTest1()
         {
-            var wallet = context.Wallets.First(w => w.UserId == user.Id && w.Currency == WalletCurrency.GVT);
+            var wallet = context.Wallets.First(w => w.UserId == user.Id && w.Currency == Currency.GVT);
             Assert.IsNull(wallet.WalletTransactions);
 
             var payment = new ProcessPaymentTransaction
@@ -58,12 +58,12 @@ namespace GenesisVision.Core.Tests.Payments
                               Amount = 100,
                               Address = "0x00",
                               Status = PaymentTransactionStatus.ConfirmedAndValidated,
-                              Currency = "GVT"
+                              Currency = Currency.GVT
                           };
 
             paymentService.ProcessCallback(payment);
 
-            Assert.AreEqual(100, context.Wallets.First(w => w.UserId == user.Id && w.Currency == WalletCurrency.GVT).Amount);
+            Assert.AreEqual(100, context.Wallets.First(w => w.UserId == user.Id && w.Currency == Currency.GVT).Amount);
         }
     }
 }

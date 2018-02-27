@@ -35,7 +35,7 @@ namespace GenesisVision.Core.Services
                               BrokerTradeServerId = request.BrokerTradeServerId,
                               DepositAmount = request.DepositAmount,
                               TradePlatformPassword = request.TradePlatformPassword,
-                              TradePlatformCurrency = "USD",
+                              TradePlatformCurrency = Currency.USD,
                               TokenName = request.TokenName,
                               TokenSymbol = request.TokenSymbol,
                               Logo = request.Logo,
@@ -51,7 +51,7 @@ namespace GenesisVision.Core.Services
                               InvestMinAmount = request.InvestMinAmount
                           };
 
-                var wallet = context.Wallets.First(x => x.UserId == request.UserId && x.Currency == WalletCurrency.GVT);
+                var wallet = context.Wallets.First(x => x.UserId == request.UserId && x.Currency == Currency.GVT);
                 wallet.Amount -= req.DepositAmount;
 
                 var tx = new WalletTransactions

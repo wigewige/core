@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.DataModel.Models
 {
@@ -7,7 +8,7 @@ namespace GenesisVision.DataModel.Models
     {
         public Guid Id { get; set; }
         public string Login { get; set; }
-        public string Currency { get; set; }
+        public Currency Currency { get; set; }
         public DateTime RegistrationDate { get; set; }
         public string IpfsHash { get; set; }
         public bool IsConfirmed { get; set; }

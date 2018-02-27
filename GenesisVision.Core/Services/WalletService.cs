@@ -16,9 +16,9 @@ namespace GenesisVision.Core.Services
     public class WalletService : IWalletService
     {
         private readonly ApplicationDbContext context;
-        private readonly ILogger<WalletService> logger;
+        private readonly ILogger<IWalletService> logger;
 
-        public WalletService(ApplicationDbContext context, ILogger<WalletService> logger)
+        public WalletService(ApplicationDbContext context, ILogger<IWalletService> logger)
         {
             this.context = context;
             this.logger = logger;

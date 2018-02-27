@@ -37,7 +37,7 @@ namespace GenesisVision.PaymentService.Controllers
                         TransactionHash = model.Tx_hash,
                         Address = model.Address,
                         Amount = model.Amount,
-                        Currency = "ETH", // TODO
+                        Currency = Currency.ETH, // TODO
                         Status = model.Confirmations >= 12 ? PaymentTransactionStatus.ConfirmedByGate : PaymentTransactionStatus.Pending,
                         CustomKey = customKey // TODO check
                     };

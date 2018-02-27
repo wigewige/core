@@ -8,7 +8,7 @@ namespace GenesisVision.DataModel.Models
     {
         public Guid Id { get; set; }
         public decimal Amount { get; set; }
-        public WalletCurrency Currency { get; set; }
+        public Currency Currency { get; set; }
 
         public Guid UserId { get; set; }
         public ApplicationUser User { get; set; }

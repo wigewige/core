@@ -19,6 +19,6 @@ namespace GenesisVision.Core.ViewModels.Wallet
         public Guid WalletId { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public WalletCurrency WalletCurrency { get; set; }
+        public Currency Currency { get; set; }
     }
 }

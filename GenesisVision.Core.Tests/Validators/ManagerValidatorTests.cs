@@ -37,7 +37,7 @@ namespace GenesisVision.Core.Tests.Validators
                                   Id = Guid.NewGuid(),
                                   IsEnabled = true,
                                   Type = UserType.Manager,
-                                  Wallets = new List<Wallets> {new Wallets {Amount = 10000, Currency = WalletCurrency.GVT}},
+                                  Wallets = new List<Wallets> {new Wallets {Amount = 10000, Currency = Currency.GVT}},
                               };
             broker = new BrokersAccounts
                      {
@@ -62,7 +62,7 @@ namespace GenesisVision.Core.Tests.Validators
                              {
                                  Id = Guid.NewGuid(),
                                  BrokerTradeServerId = brokerTradeServer.Id,
-                                 Currency = "USD",
+                                 Currency = Currency.USD,
                                  Login = "111111",
                                  RegistrationDate = DateTime.Now,
                                  UserId = applicationUser.Id,

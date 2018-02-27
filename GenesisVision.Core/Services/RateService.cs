@@ -1,14 +1,11 @@
 ﻿using GenesisVision.Core.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Services
 {
     public class RateService : IRateService
     {
-        public decimal GetRate(string from, string to)
+        public decimal GetRate(Currency from, Currency to)
         {
             return 1;
         }

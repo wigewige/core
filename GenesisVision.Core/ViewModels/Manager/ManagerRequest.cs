@@ -1,4 +1,7 @@
 ﻿using System;
+using GenesisVision.DataModel.Enums;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GenesisVision.Core.ViewModels.Manager
 {
@@ -8,7 +11,8 @@ namespace GenesisVision.Core.ViewModels.Manager
         public Guid RequestId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public string Currency { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Currency Currency { get; set; }
         public string Password { get; set; }
     }
 }

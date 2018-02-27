@@ -9,7 +9,7 @@ namespace GenesisVision.Core.ViewModels.Wallet
     {
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
-        public WalletCurrency Currency { get; set; }
+        public Currency Currency { get; set; }
 
         [Required]
         public decimal Amount { get; set; }

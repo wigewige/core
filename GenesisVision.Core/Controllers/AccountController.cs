@@ -186,13 +186,13 @@ namespace GenesisVision.Core.Controllers
                            IsEnabled = true,
                            Type = UserType.Manager,
                            Profile = new Profiles(),
-                           Wallets = new List<Wallets> {new Wallets {Currency = WalletCurrency.GVT}},
+                           Wallets = new List<Wallets> {new Wallets {Currency = Currency.GVT}},
                            BlockchainAddresses = new List<BlockchainAddresses>
                                                  {
                                                      new BlockchainAddresses
                                                      {
                                                          Address = address.PublicAddress,
-                                                         Currency = WalletCurrency.ETH.ToString(),
+                                                         Currency = Currency.ETH,
                                                          IsDefault = true
                                                      }
                                                  }
@@ -239,14 +239,14 @@ namespace GenesisVision.Core.Controllers
                            IsEnabled = true,
                            Type = UserType.Investor,
                            Profile = new Profiles(),
-                           Wallets = new List<Wallets> {new Wallets {Currency = WalletCurrency.GVT}},
+                           Wallets = new List<Wallets> {new Wallets {Currency = Currency.GVT}},
                            InvestorAccount = new InvestorAccounts(),
                            BlockchainAddresses = new List<BlockchainAddresses>
                                                  {
                                                      new BlockchainAddresses
                                                      {
                                                          Address = address.PublicAddress,
-                                                         Currency = WalletCurrency.ETH.ToString(),
+                                                         Currency = Currency.ETH,
                                                          IsDefault = true
                                                      }
                                                  }
