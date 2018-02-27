@@ -78,10 +78,16 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult WithdrawRequest([FromBody]WalletWithdrawRequestModel request)
         {
-            if(string.IsNullOrEmpty(request.BlockchainAddress) || request.Amount <= 0)
-                return BadRequest();
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
 
-            walletService.WithdrawRequest(request, CurrentUser.Id);
+            if (request.Amount <= 0)
+                return BadRequest(ErrorResult.GetResult("Wrong amount"));
+
+            var result = walletService.WithdrawRequest(request, CurrentUser.Id);
+            if (!result.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(result));
+
             return Ok();
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace GenesisVision.PaymentService.Models
+﻿namespace GenesisVision.Common.Models
 {
     public class EthAccount
     {

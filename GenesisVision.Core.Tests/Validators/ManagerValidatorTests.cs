@@ -8,6 +8,7 @@ using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GenesisVision.Core.Tests.Validators
@@ -36,7 +37,7 @@ namespace GenesisVision.Core.Tests.Validators
                                   Id = Guid.NewGuid(),
                                   IsEnabled = true,
                                   Type = UserType.Manager,
-                                  Wallet = new Wallets {Amount = 10000m}
+                                  Wallets = new List<Wallets> {new Wallets {Amount = 10000, Currency = WalletCurrency.GVT}},
                               };
             broker = new BrokersAccounts
                      {

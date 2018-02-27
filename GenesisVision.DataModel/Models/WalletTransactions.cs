@@ -10,9 +10,8 @@ namespace GenesisVision.DataModel.Models
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
 
-        public Guid UserId { get; set; }
+        public Guid WalletId { get; set; }
         public Wallets Wallet { get; set; }
-        public ApplicationUser User { get; set; }
 
         public PaymentTransactions PaymentTransaction { get; set; }
 

@@ -23,7 +23,7 @@ namespace GenesisVision.Core.Services
             return InvokeOperations.InvokeOperation(() =>
             {
                 var user = context.Users
-                                  .Include(x => x.Wallet)
+                                  .Include(x => x.Wallets)
                                   .First(x => x.Id == userId);
                 return user.ToProfileShort();
             });
@@ -35,7 +35,7 @@ namespace GenesisVision.Core.Services
             {
                 var user = context.Users
                                   .Include(x => x.Profile)
-                                  .Include(x => x.Wallet)
+                                  .Include(x => x.Wallets)
                                   .First(x => x.Id == userId);
                 return user.ToProfileFull();
             });

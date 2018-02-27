@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GenesisVision.DataModel.Enums;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 
 namespace GenesisVision.Core.ViewModels.Wallet
 {
     public class WalletWithdrawRequestModel
     {
-        public string Currency { get; set; }
+        [Required]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public WalletCurrency Currency { get; set; }
+
+        [Required]
         public decimal Amount { get; set; }
+
+        [Required]
         public string BlockchainAddress { get; set; }
     }
 }

@@ -498,6 +498,8 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<DateTime>("DateCreated");
 
+                    b.Property<string>("DestAddress");
+
                     b.Property<string>("ExtraData");
 
                     b.Property<decimal>("Fee");
@@ -517,6 +519,8 @@ namespace GenesisVision.Core.Migrations
                     b.Property<string>("PayoutTxHash");
 
                     b.Property<int>("Status");
+
+                    b.Property<int>("Type");
 
                     b.Property<Guid>("WalletTransactionId");
 
@@ -637,15 +641,18 @@ namespace GenesisVision.Core.Migrations
 
             modelBuilder.Entity("GenesisVision.DataModel.Models.Wallets", b =>
                 {
-                    b.Property<Guid>("UserId");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<decimal>("Amount");
 
-                    b.Property<string>("Currency");
+                    b.Property<int>("Currency");
 
-                    b.Property<Guid>("Id");
+                    b.Property<Guid>("UserId");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Wallets");
                 });
@@ -657,15 +664,19 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<decimal>("Amount");
 
+                    b.Property<Guid?>("ApplicationUserId");
+
                     b.Property<DateTime>("Date");
 
                     b.Property<int>("Type");
 
-                    b.Property<Guid>("UserId");
+                    b.Property<Guid>("WalletId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("WalletId");
 
                     b.ToTable("WalletTransactions");
                 });
@@ -754,11 +765,6 @@ namespace GenesisVision.Core.Migrations
             modelBuilder.Entity("GenesisVision.DataModel.Models.BlockchainAddresses", b =>
                 {
                     b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
-                        .WithMany("BlockchainAddresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("GenesisVision.DataModel.Models.Wallets", "Wallet")
                         .WithMany("BlockchainAddresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -950,21 +956,20 @@ namespace GenesisVision.Core.Migrations
             modelBuilder.Entity("GenesisVision.DataModel.Models.Wallets", b =>
                 {
                     b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
-                        .WithOne("Wallet")
-                        .HasForeignKey("GenesisVision.DataModel.Models.Wallets", "UserId")
+                        .WithMany("Wallets")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GenesisVision.DataModel.Models.WalletTransactions", b =>
                 {
-                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
+                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser")
                         .WithMany("WalletTransactions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("GenesisVision.DataModel.Models.Wallets", "Wallet")
                         .WithMany("WalletTransactions")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("WalletId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

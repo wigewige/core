@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GenesisVision.Common.Helpers;
 
 namespace GenesisVision.PaymentService.Services
 {
@@ -79,9 +80,11 @@ namespace GenesisVision.PaymentService.Services
                                          };
 
                     context.PaymentTransactions.Add(paymentTransaction);
-                    if(paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
+
+                    if (paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
                     {
-                        var wallet = context.Wallets.First(w => w.Id == paymentTransaction.BlockchainAddress.Wallet.Id);
+                        var wallet = context.Wallets.First(w => w.UserId == blockchainAddress.UserId &&
+                                                                w.Currency == blockchainAddress.Currency.ToCurrency());
                         wallet.Amount += paymentTransaction.Amount;
                         await context.SaveChangesAsync();
                     }
