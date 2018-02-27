@@ -249,5 +249,26 @@ namespace GenesisVision.Core.Controllers
 
             return Ok();
         }
+
+        /// <summary>
+        /// Update manager token initial price/total supply after loss
+        /// </summary>
+        [HttpPost]
+        [Route("broker/trades/reevaluateManagerToken")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult ReevaluateManagerToken(Guid investmentProgramId, decimal investorLossShare)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
+
+            var errors = brokerValidator.ValidateReevaluateManagerToken(CurrentUser, investmentProgramId);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            trustManagementService.ReevaluateManagerToken(investmentProgramId, investorLossShare);
+
+            return Ok();
+        }
     }
 }
