@@ -240,7 +240,9 @@ namespace GenesisVision.Core.Tests.Services
                                        BrokerTradeServerId = brokerTradeServer.Id,
                                        DepositAmount = 5000,
                                        TradePlatformCurrency = Currency.USD,
-                                       TradePlatformPassword = "PWD"
+                                       TradePlatformPassword = "PWD",
+                                       Logo = "logo.png",
+                                       Title = "Inv #1"
                                    };
             context.Add(createInvestment);
             context.SaveChanges();

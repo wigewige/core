@@ -105,7 +105,7 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<string>("Address");
 
-                    b.Property<string>("Currency");
+                    b.Property<int>("Currency");
 
                     b.Property<bool>("IsDefault");
 
@@ -277,7 +277,7 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<Guid>("BrokerTradeServerId");
 
-                    b.Property<string>("Currency");
+                    b.Property<int>("Currency");
 
                     b.Property<string>("IpfsHash");
 
@@ -337,7 +337,7 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<string>("TokenSymbol");
 
-                    b.Property<string>("TradePlatformCurrency");
+                    b.Property<int>("TradePlatformCurrency");
 
                     b.Property<string>("TradePlatformPassword");
 

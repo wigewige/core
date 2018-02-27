@@ -333,6 +333,8 @@ namespace GenesisVision.Core.Services
             {
                 var brokerInvestments = context.InvestmentPrograms
                                                .Include(x => x.ManagerAccount)
+                                               .ThenInclude(x => x.ManagersAccountsTrades)
+                                               .Include(x => x.InvestmentRequests)
                                                .Include(x => x.Token)
                                                .Include(x => x.Periods)
                                                .Where(x =>
@@ -496,10 +498,10 @@ namespace GenesisVision.Core.Services
         {
             var investmentProgram = context.InvestmentPrograms
                                            .Include(x => x.ManagerAccount)
-                                           .ThenInclude(x => x.User)
-                                           .ThenInclude(x => x.Profile)
+                                           .ThenInclude(x => x.ManagersAccountsTrades)
                                            .Include(x => x.Token)
                                            .Include(x => x.Periods)
+                                           .Include(x => x.InvestmentRequests)
                                            .First(x => x.Id == investmentId);
 
             var json = JsonConvert.SerializeObject(investmentProgram.ToInvestmentProgram());
