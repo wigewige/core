@@ -468,6 +468,8 @@ namespace GenesisVision.Core.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<decimal>("FreeTokens");
+
                     b.Property<decimal>("InitialPrice");
 
                     b.Property<string>("TokenAddress");
