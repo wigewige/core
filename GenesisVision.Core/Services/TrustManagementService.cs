@@ -389,19 +389,11 @@ namespace GenesisVision.Core.Services
 
                 var currentPeriod = investment.Periods.First(x => x.Status == PeriodStatus.InProccess);
                 currentPeriod.Status = PeriodStatus.Closed;
-
-                // todo: proportional accrual of money
                 
                 var nextPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
                 if (nextPeriod != null)
                 {
                     nextPeriod.Status = PeriodStatus.InProccess;
-
-                    var investments = nextPeriod.InvestmentRequests
-                                                .Where(x => x.Type == InvestmentRequestType.Invest &&
-                                                            x.Status == InvestmentRequestStatus.New)
-                                                .ToList();
-                    nextPeriod.StartBalance = investments.Sum(x => x.Amount);
                 }
 
                 if (!investment.DateTo.HasValue || DateTime.Now < investment.DateTo.Value)
@@ -429,12 +421,18 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult SetPeriodStartBalance(Guid periodId, decimal balance)
+        public OperationResult SetPeriodStartValues(Guid investmentProgramId, decimal balance, decimal managerBalance, decimal managerShare)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var period = context.Periods.First(x => x.Id == periodId);
-                period.StartBalance = balance;
+                var nextPeriod = context.Periods
+                                        .Include(x => x.InvestmentRequests)
+                                        .First(x => x.Id == investmentProgramId && x.Status == PeriodStatus.Planned);
+
+                nextPeriod.StartBalance = balance;
+                nextPeriod.ManagerStartBalance = managerBalance;
+                nextPeriod.ManagerStartShare = managerShare;
+
                 context.SaveChanges();
             });
         }
@@ -648,7 +646,7 @@ namespace GenesisVision.Core.Services
                 var brokerWalletId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id;
                 var GVTToManagerTokenRate = GVTUSDRate / investmentProgram.Token.InitialPrice;
                 
-                foreach (var request in nextPeriod.InvestmentRequests.OrderByDescending(x => x.Type).ThenBy(x => x.Date).Where(i => i.UserId != investmentProgram.ManagerAccountId))
+                foreach (var request in nextPeriod.InvestmentRequests.OrderByDescending(x => x.Type).ThenBy(x => x.Date).Where(i => i.Status == InvestmentRequestStatus.New && i.UserId != investmentProgram.ManagerAccountId))
                 {
                     request.Status = InvestmentRequestStatus.Executed;
 
@@ -745,7 +743,7 @@ namespace GenesisVision.Core.Services
                     }
                 }
 
-                foreach (var request in nextPeriod.InvestmentRequests.Where(i => i.UserId == investmentProgram.ManagerAccountId))
+                foreach (var request in nextPeriod.InvestmentRequests.Where(i => i.Status == InvestmentRequestStatus.New && i.UserId == investmentProgram.ManagerAccountId))
                 {
                     request.Status = InvestmentRequestStatus.Executed;
 
@@ -794,7 +792,7 @@ namespace GenesisVision.Core.Services
 
                 context.SaveChanges();
 
-                return new BalanceChange();
+                return result;
             });
         }
 
