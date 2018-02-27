@@ -104,7 +104,9 @@ namespace GenesisVision.Core.Services
                                 Id = Guid.NewGuid(),
                                 TokenAddress = string.Empty,
                                 TokenName = managerRequest.TokenName,
-                                TokenSymbol = managerRequest.TokenSymbol
+                                TokenSymbol = managerRequest.TokenSymbol,
+                                InitialPrice = 1,
+                                FreeTokens = 1000
                             };
                 var inv = new InvestmentPrograms
                           {
@@ -751,6 +753,21 @@ namespace GenesisVision.Core.Services
                 context.SaveChanges();
 
                 return new BalanceChange();
+            });
+        }
+
+        public OperationResult ReevaluateManagerToken(Guid investmentProgramId, decimal investorLossShare)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var managerToken = context.ManagerTokens
+                                          .Include(x => x.InvestmentProgram)
+                                          .First(x => x.InvestmentProgram.Id == investmentProgramId);
+
+                managerToken.InitialPrice -= managerToken.InitialPrice * investorLossShare;
+                managerToken.FreeTokens = managerToken.FreeTokens / (1 - investorLossShare);
+
+                context.SaveChanges();
             });
         }
     }

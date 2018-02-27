@@ -38,5 +38,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult CancelInvestmentRequest(Guid requestId);
 
         OperationResult<BalanceChange> ProcessInvestmentRequests(Guid investmentProgramId);
+
+        OperationResult ReevaluateManagerToken(Guid investmentProgramId, decimal investorLossShare);
     }
 }

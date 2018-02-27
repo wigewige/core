@@ -10,6 +10,7 @@ namespace GenesisVision.DataModel.Models
         public string TokenName { get; set; }
         public string TokenAddress { get; set; }
         public decimal InitialPrice { get; set; }
+        public decimal FreeTokens { get; set; }
 
         public InvestmentPrograms InvestmentProgram { get; set; }
 

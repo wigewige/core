@@ -205,5 +205,16 @@ namespace GenesisVision.Core.Services.Validators
 
             return result;
         }
+
+        public List<string> ValidateReevaluateManagerToken(ApplicationUser user, Guid investmentProgramId)
+        {
+            var result = new List<string>();
+
+            var periodErrors = ValidateClosePeriod(user, investmentProgramId);
+            if (periodErrors.Any())
+                return periodErrors;
+
+            return result;
+        }
     }
 }
