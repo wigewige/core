@@ -49,8 +49,8 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var address = context.Users.First(w => w.Id == userId).BlockchainAddresses.FirstOrDefault(x => x.IsDefault) ??
-                              context.Users.First(w => w.Id == userId).BlockchainAddresses.FirstOrDefault();
+                var address = context.BlockchainAddresses.FirstOrDefault(x => x.UserId == userId && x.IsDefault) ??
+                              context.BlockchainAddresses.FirstOrDefault(x => x.UserId == userId);
 
                 var result = new WalletAddressViewModel
                              {
