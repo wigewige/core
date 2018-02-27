@@ -107,35 +107,14 @@ namespace GenesisVision.Core.Services.Validators
             return result;
         }
 
-        public List<string> ValidateSetPeriodStartBalance(ApplicationUser user, Guid periodId, decimal balance)
+        public List<string> ValidateSetPeriodStartValues(ApplicationUser user, Guid investmentProgramId)
         {
-            if (!user.IsEnabled || user.Type != UserType.Broker)
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            var period = context.Periods
-                                .Include(x => x.InvestmentProgram)
-                                .ThenInclude(x => x.ManagerAccount)
-                                .ThenInclude(x => x.BrokerTradeServer)
-                                .ThenInclude(x => x.Broker)
-                                .Include(x => x.InvestmentRequests)
-                                .FirstOrDefault(x => x.Id == periodId);
-            if (period == null)
-                return new List<string> {$"Does not find period id \"{periodId}\""};
-
-            if (user.Id != period.InvestmentProgram.ManagerAccount.BrokerTradeServer.Broker.UserId)
-                return new List<string> {ValidationMessages.AccessDenied};
-
-            if (period.Status != PeriodStatus.InProccess)
-                return new List<string> {$"Period has status {period.Status}"};
-
             var result = new List<string>();
 
-            var investmentsAmount = period.InvestmentRequests
-                                          .Where(x => x.Type == InvestmentRequestType.Invest)
-                                          .Sum(x => x.Amount);
-            if (balance < investmentsAmount)
-                result.Add("Balance could not be less than total investments");
-            
+            var periodErrors = ValidateClosePeriod(user, investmentProgramId);
+            if (periodErrors.Any())
+                return periodErrors;
+
             return result;
         }
 

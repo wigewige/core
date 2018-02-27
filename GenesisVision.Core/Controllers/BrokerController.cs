@@ -128,19 +128,19 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
-        /// Set investment period start balance
+        /// Set investment period start balance, manager share, manager balance
         /// </summary>
         [HttpPost]
-        [Route("broker/period/setStartBalance")]
+        [Route("broker/period/setStartValues")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult SetPeriodStartBalance(Guid periodId, decimal balance)
+        public IActionResult SetPeriodStartValues(Guid investmentProgramId, decimal balance, decimal managerBalance, decimal managerShare)
         {
-            var errors = brokerValidator.ValidateSetPeriodStartBalance(CurrentUser, periodId, balance);
+            var errors = brokerValidator.ValidateSetPeriodStartValues(CurrentUser, investmentProgramId, balance);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
-            var result = trustManagementService.SetPeriodStartBalance(periodId, balance);
+            var result = trustManagementService.SetPeriodStartValues(investmentProgramId, balance, managerBalance, managerShare);
             if (!result.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(result.Errors));
 
