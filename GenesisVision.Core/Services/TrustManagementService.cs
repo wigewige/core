@@ -648,7 +648,7 @@ namespace GenesisVision.Core.Services
                 var brokerWalletId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id;
                 var GVTToManagerTokenRate = GVTUSDRate / investmentProgram.Token.InitialPrice;
                 
-                foreach (var request in nextPeriod.InvestmentRequests.Where(i => i.UserId != investmentProgram.ManagerAccountId))
+                foreach (var request in nextPeriod.InvestmentRequests.OrderByDescending(x => x.Type).ThenBy(x => x.Date).Where(i => i.UserId != investmentProgram.ManagerAccountId))
                 {
                     request.Status = InvestmentRequestStatus.Executed;
 
@@ -663,9 +663,38 @@ namespace GenesisVision.Core.Services
                     if (request.Type == InvestmentRequestType.Invest)
                     {
                         //ToDo: Actual value in manager's currency to request
+                        
+                        var tokensAmount = request.Amount * GVTToManagerTokenRate;
+                        var gvtAmount = request.Amount;
 
-                        brokerBalanceChange += request.Amount;
-                        result.AccountBalanceChange += request.Amount * GVTUSDRate;
+                        if (investmentProgram.Token.FreeTokens == 0)
+                        {
+                            //ToDo: separate refund transaction?
+                            CancelInvestmentRequest(request.Id);
+                            continue;
+                        }
+                        if (tokensAmount > investmentProgram.Token.FreeTokens)
+                        {
+                            gvtAmount = GVTUSDRate / (investmentProgram.Token.FreeTokens * investmentProgram.Token.InitialPrice);
+                            tokensAmount = investmentProgram.Token.FreeTokens;
+
+                            var wallet = investor.User.Wallets.First(x => x.Currency == Currency.GVT);
+                            wallet.Amount += request.Amount - gvtAmount;
+
+                            var tx = new WalletTransactions
+                            {
+                                Id = Guid.NewGuid(),
+                                Type = WalletTransactionsType.PartialInvestmentExecutionRefund,
+                                WalletId = wallet.Id,
+                                Amount = request.Amount - gvtAmount,
+                                Date = DateTime.Now
+                            };
+
+                            context.Add(tx);
+                        }
+
+                        brokerBalanceChange += gvtAmount;
+                        result.AccountBalanceChange += gvtAmount * GVTUSDRate;
 
                         if (portfolio == null)
                         {
@@ -673,14 +702,14 @@ namespace GenesisVision.Core.Services
                             {
                                 InvestorAccountId = request.UserId,
                                 ManagerTokenId = investmentProgram.Token.Id,
-                                Amount = request.Amount * GVTToManagerTokenRate
+                                Amount = tokensAmount
                             };
 
                             context.Add(newPortfolio);
                         }
                         else
                         {
-                            portfolio.Amount += request.Amount * GVTToManagerTokenRate;
+                            portfolio.Amount += tokensAmount;
                         }
                     }
                     else
@@ -695,8 +724,11 @@ namespace GenesisVision.Core.Services
                         brokerBalanceChange -= amountInGVT;
                         result.AccountBalanceChange -= amount;
 
-                        portfolio.Amount -= amount / investmentProgram.Token.InitialPrice;
-                        
+                        var tokensAmount = amount / investmentProgram.Token.InitialPrice;
+                        portfolio.Amount -= tokensAmount;
+                        investmentProgram.Token.FreeTokens += tokensAmount;
+
+
                         var wallet = investor.User.Wallets.First(x => x.Currency == Currency.GVT);
                         wallet.Amount += amountInGVT;
 
