@@ -136,7 +136,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult SetPeriodStartValues(Guid investmentProgramId, decimal balance, decimal managerBalance, decimal managerShare)
         {
-            var errors = brokerValidator.ValidateSetPeriodStartValues(CurrentUser, investmentProgramId, balance);
+            var errors = brokerValidator.ValidateSetPeriodStartValues(CurrentUser, investmentProgramId);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
