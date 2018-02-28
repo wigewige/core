@@ -13,6 +13,7 @@ using System;
 namespace GenesisVision.Core.Controllers
 {
     [Route("api/files")]
+    [ApiVersion("1.0")]
     public class FilesController : BaseController
     {
         private readonly IFileService fileService;

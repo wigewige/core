@@ -624,6 +624,8 @@ namespace GenesisVision.Core.Services
                 var managerThresholdAmount = 1000;
 
                 var GVTUSDRate = rateService.GetRate(Currency.GVT, Currency.USD);
+                if (!GVTUSDRate.IsSuccess)
+                    throw new Exception("Error at GetRate: " + string.Join(", ", GVTUSDRate.Errors));
 
                 var nextPeriod = context.Periods
                                         .Include(x => x.InvestmentRequests)
@@ -639,7 +641,7 @@ namespace GenesisVision.Core.Services
                       .First(x => x.Id == investmentProgramId);
 
                 var brokerWalletId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id;
-                var GVTToManagerTokenRate = GVTUSDRate / investmentProgram.Token.InitialPrice;
+                var GVTToManagerTokenRate = GVTUSDRate.Data / investmentProgram.Token.InitialPrice;
                 
                 foreach (var request in nextPeriod.InvestmentRequests.OrderByDescending(x => x.Type).ThenBy(x => x.Date).Where(i => i.Status == InvestmentRequestStatus.New && i.UserId != investmentProgram.ManagerAccountId))
                 {
@@ -668,7 +670,7 @@ namespace GenesisVision.Core.Services
                         }
                         if (tokensAmount > investmentProgram.Token.FreeTokens)
                         {
-                            gvtAmount = GVTUSDRate / (investmentProgram.Token.FreeTokens * investmentProgram.Token.InitialPrice);
+                            gvtAmount = GVTUSDRate.Data / (investmentProgram.Token.FreeTokens * investmentProgram.Token.InitialPrice);
                             tokensAmount = investmentProgram.Token.FreeTokens;
 
                             var wallet = investor.User.Wallets.First(x => x.Currency == Currency.GVT);
@@ -687,7 +689,7 @@ namespace GenesisVision.Core.Services
                         }
 
                         brokerBalanceChange += gvtAmount;
-                        result.AccountBalanceChange += gvtAmount * GVTUSDRate;
+                        result.AccountBalanceChange += gvtAmount * GVTUSDRate.Data;
 
                         if (portfolio == null)
                         {
@@ -712,7 +714,7 @@ namespace GenesisVision.Core.Services
                         //ToDo: Actual amount to request
                         var amount = portfolioValue > request.Amount ? request.Amount : portfolioValue;
 
-                        var amountInGVT = amount / GVTUSDRate;
+                        var amountInGVT = amount / GVTUSDRate.Data;
 
                         brokerBalanceChange -= amountInGVT;
                         result.AccountBalanceChange -= amount;
@@ -746,8 +748,8 @@ namespace GenesisVision.Core.Services
                     {
                         brokerBalanceChange += request.Amount;
 
-                        result.AccountBalanceChange += request.Amount * GVTUSDRate;
-                        result.ManagerBalanceChange += request.Amount * GVTUSDRate;
+                        result.AccountBalanceChange += request.Amount * GVTUSDRate.Data;
+                        result.ManagerBalanceChange += request.Amount * GVTUSDRate.Data;
                     }
                     else
                     {
@@ -755,7 +757,7 @@ namespace GenesisVision.Core.Services
                             ? request.Amount
                             : nextPeriod.ManagerStartBalance - managerThresholdAmount;
 
-                        var amountInGVT = amount / GVTUSDRate;
+                        var amountInGVT = amount / GVTUSDRate.Data;
 
                         brokerBalanceChange -= amountInGVT;
 
