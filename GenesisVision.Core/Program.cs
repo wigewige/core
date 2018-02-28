@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using NLog.Web;
 using System;
+using System.IO;
 
 namespace GenesisVision.Core
 {
@@ -26,7 +27,9 @@ namespace GenesisVision.Core
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                   .UseKestrel()
                    .UseIISIntegration()
+                   .UseContentRoot(Directory.GetCurrentDirectory())
                    .UseStartup<Startup>()
                    .UseNLog()
                    .Build();

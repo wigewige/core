@@ -31,6 +31,7 @@ namespace GenesisVision.DataModel
         public DbSet<WalletTransactions> WalletTransactions { get; set; }
         public DbSet<PaymentTransactions> PaymentTransactions { get; set; }
         public DbSet<ProfitDistributionTransactions> ProfitDistributionTransactions { get; set; }
+        public DbSet<Files> Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -70,6 +71,11 @@ namespace GenesisVision.DataModel
             builder.Entity<BlockchainAddresses>()
                    .HasOne(x => x.User)
                    .WithMany(x => x.BlockchainAddresses)
+                   .HasForeignKey(x => x.UserId);
+
+            builder.Entity<Files>()
+                   .HasOne(x => x.User)
+                   .WithMany(x => x.Files)
                    .HasForeignKey(x => x.UserId);
 
             builder.Entity<Portfolios>()
