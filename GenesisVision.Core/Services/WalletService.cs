@@ -45,13 +45,19 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult<string> GetUserWallet(Guid userId)
+        public OperationResult<WalletAddressViewModel> GetUserDefaultBlockchainAddress(Guid userId)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var address = context.Users.First(w => w.Id == userId).BlockchainAddresses.FirstOrDefault(x => x.IsDefault)?.Address ??
-                              context.Users.First(w => w.Id == userId).BlockchainAddresses.FirstOrDefault()?.Address;
-                return address;
+                var address = context.BlockchainAddresses.FirstOrDefault(x => x.UserId == userId && x.IsDefault) ??
+                              context.BlockchainAddresses.FirstOrDefault(x => x.UserId == userId);
+
+                var result = new WalletAddressViewModel
+                             {
+                                 Address = address?.Address,
+                                 Currency = address?.Currency ?? Currency.Undefined
+                             };
+                return result;
             });
         }
 
@@ -75,6 +81,18 @@ namespace GenesisVision.Core.Services
                 };
 
                 context.Add(transaction);
+            });
+        }
+
+        public OperationResult<WalletsViewModel> GetUserWallets(Guid userId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var wallets = context.Wallets.Where(w => w.UserId == userId);
+                return new WalletsViewModel
+                       {
+                           Wallets = wallets.Select(x => x.ToWallet()).ToList()
+                       };
             });
         }
     }

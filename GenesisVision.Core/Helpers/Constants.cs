@@ -6,6 +6,8 @@
 
         public static bool IsDevelopment = false;
 
+        public static string UploadPath { get; set; }
+
         #endregion
 
         #region Ipfs
@@ -38,7 +40,7 @@
 
         public static string JwtValidAudience { get; set; }
 
-        public static int JwtExpiryInMinutes = 60;
+        public static int JwtExpiryInMinutes { get; set; } = 60;
 
         #endregion
     }

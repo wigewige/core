@@ -173,6 +173,28 @@ namespace GenesisVision.Core.Migrations
                     b.ToTable("BrokerTradeServers");
                 });
 
+            modelBuilder.Entity("GenesisVision.DataModel.Models.Files", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ContentType");
+
+                    b.Property<string>("FileName");
+
+                    b.Property<string>("Path");
+
+                    b.Property<DateTime>("UploadDate");
+
+                    b.Property<Guid?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Files");
+                });
+
             modelBuilder.Entity("GenesisVision.DataModel.Models.InvestmentPrograms", b =>
                 {
                     b.Property<Guid>("Id")
@@ -786,6 +808,13 @@ namespace GenesisVision.Core.Migrations
                         .WithMany("BrokerTradeServers")
                         .HasForeignKey("BrokerId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GenesisVision.DataModel.Models.Files", b =>
+                {
+                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
+                        .WithMany("Files")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("GenesisVision.DataModel.Models.InvestmentPrograms", b =>

@@ -1,22 +1,11 @@
 ﻿using GenesisVision.Core.ViewModels.Account;
+using GenesisVision.Core.ViewModels.Wallet;
 using GenesisVision.DataModel.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GenesisVision.Core.Helpers.Convertors
 {
     public static partial class Convertors
     {
-        public static ProfileShortViewModel ToProfileShort(this ApplicationUser user)
-        {
-            return new ProfileShortViewModel
-                   {
-                       Id = user.Id,
-                       Email = user.Email,
-                       Wallets = user.Wallets?.Select(x => x.ToWallet()) ?? new List<WalletViewModel>()
-                   };
-        }
-
         public static ProfilePublicViewModel ToProfilePublic(this ApplicationUser user)
         {
             return new ProfilePublicViewModel
@@ -33,8 +22,7 @@ namespace GenesisVision.Core.Helpers.Convertors
             var model = new ProfileFullViewModel
                         {
                             Id = user.Id,
-                            Email = user.Email,
-                            Wallets = user.Wallets?.Select(x => x.ToWallet()) ?? new List<WalletViewModel>()
+                            Email = user.Email
                         };
             if (user.Profile != null)
             {

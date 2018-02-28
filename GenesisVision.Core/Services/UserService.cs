@@ -18,17 +18,6 @@ namespace GenesisVision.Core.Services
             this.context = context;
         }
 
-        public OperationResult<ProfileShortViewModel> GetUserProfileShort(Guid userId)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                var user = context.Users
-                                  .Include(x => x.Wallets)
-                                  .First(x => x.Id == userId);
-                return user.ToProfileShort();
-            });
-        }
-
         public OperationResult<ProfileFullViewModel> GetUserProfileFull(Guid userId)
         {
             return InvokeOperations.InvokeOperation(() =>

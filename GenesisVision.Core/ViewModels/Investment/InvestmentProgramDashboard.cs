@@ -1,11 +1,12 @@
 ﻿using System;
+using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
-    public class InvestmentProgram
+    public class InvestmentProgramDashboard
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
@@ -14,6 +15,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal Balance { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Currency Currency { get; set; }
+        public int InvestedTokens { get; set; }
         public int TradesCount { get; set; }
         public int InvestorsCount { get; set; }
         public int PeriodDuration { get; set; }
@@ -24,6 +26,11 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal FeeSuccess { get; set; }
         public decimal FeeManagement { get; set; }
 
+        public ProfilePublicViewModel Manager { get; set; }
+
         public bool IsPending { get; set; }
+        public bool IsHistoryEnable { get; set; }
+        public bool IsInvestEnable { get; set; }
+        public bool IsWithdrawEnable { get; set; }
     }
 }

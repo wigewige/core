@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
 using GenesisVision.Core.ViewModels.Trades;
+using GenesisVision.Core.ViewModels.Wallet;
 
 namespace GenesisVision.Core.Controllers
 {
@@ -27,9 +28,10 @@ namespace GenesisVision.Core.Controllers
         private readonly IUserService userService;
         private readonly IStatisticService statisticService;
         private readonly ITradesService tradesService;
+        private readonly IWalletService walletService;
         private readonly ILogger<InvestorController> logger;
 
-        public InvestorController(ITrustManagementService trustManagementService, IUserService userService, IInvestorValidator investorValidator, UserManager<ApplicationUser> userManager, IStatisticService statisticService, ITradesService tradesService, ILogger<InvestorController> logger)
+        public InvestorController(ITrustManagementService trustManagementService, IUserService userService, IInvestorValidator investorValidator, UserManager<ApplicationUser> userManager, IStatisticService statisticService, ITradesService tradesService, IWalletService walletService, ILogger<InvestorController> logger)
             : base(userManager)
         {
             this.trustManagementService = trustManagementService;
@@ -37,6 +39,7 @@ namespace GenesisVision.Core.Controllers
             this.userService = userService;
             this.statisticService = statisticService;
             this.tradesService = tradesService;
+            this.walletService = walletService;
             this.logger = logger;
         }
 
@@ -45,7 +48,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpPost]
         [Route("investor/investmentPrograms/invest")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ProfileShortViewModel))]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(WalletsViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult Invest([FromBody]Invest model)
         {
@@ -59,8 +62,8 @@ namespace GenesisVision.Core.Controllers
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res.Errors));
 
-            var user = userService.GetUserProfileShort(CurrentUser.Id);
-            return Ok(user.Data);
+            var wallets = walletService.GetUserWallets(CurrentUser.Id);
+            return Ok(wallets.Data);
         }
 
         /// <summary>
@@ -121,7 +124,7 @@ namespace GenesisVision.Core.Controllers
 
             return Ok(new InvestmentProgramsViewModel
                       {
-                          Investments = data.Data.Item1,
+                          InvestmentPrograms = data.Data.Item1,
                           Total = data.Data.Item2
                       });
         }
@@ -146,8 +149,7 @@ namespace GenesisVision.Core.Controllers
 
             return Ok(new InvestmentProgramViewModel
                       {
-                          InvestmentProgram = investment.Data,
-                          Statistic = statistic.Data
+                          InvestmentProgram = investment.Data
                       });
         }
         

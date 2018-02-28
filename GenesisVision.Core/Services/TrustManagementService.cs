@@ -321,6 +321,9 @@ namespace GenesisVision.Core.Services
                 var program = context.InvestmentPrograms
                                      .Include(x => x.ManagerAccount)
                                      .ThenInclude(x => x.ManagersAccountsTrades)
+                                     .Include(x => x.ManagerAccount)
+                                     .ThenInclude(x => x.User)
+                                     .ThenInclude(x => x.Profile)
                                      .Include(x => x.InvestmentRequests)
                                      .Include(x => x.Periods)
                                      .First(x => x.Id == investmentId);
@@ -328,7 +331,31 @@ namespace GenesisVision.Core.Services
                 return program.ToInvestmentProgramDetails();
             });
         }
-        
+
+        public OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var requests = context.InvestmentRequests
+                                      .Include(x => x.InvestmentProgram)
+                                      .ThenInclude(x => x.ManagerAccount)
+                                      .ThenInclude(x => x.ManagersAccountsTrades)
+                                      .Include(x => x.InvestmentProgram)
+                                      .ThenInclude(x => x.ManagerAccount)
+                                      .ThenInclude(x => x.User)
+                                      .ThenInclude(x => x.Profile)
+                                      .Include(x => x.InvestmentProgram.Periods)
+                                      .Where(x => x.InvestorAccount.UserId == investorUserId)
+                                      .ToList()
+                                      .GroupBy(x => x.InvestmentProgram, (program, reqs) => program.ToInvestmentProgramDashboard())
+                                      .ToList();
+
+                var result = new InvestorDashboard {InvestmentPrograms = requests};
+
+                return result;
+            });
+        }
+
         public OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId)
         {
             return InvokeOperations.InvokeOperation(() =>
@@ -465,35 +492,7 @@ namespace GenesisVision.Core.Services
                 return (brokerTradeServers, count);
             });
         }
-
-        public OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId)
-        {
-            return InvokeOperations.InvokeOperation(() =>
-            {
-                var requests = context.InvestmentRequests
-                                      .Include(x => x.InvestmentProgram)
-                                      .ThenInclude(x => x.ManagerAccount)
-                                      .ThenInclude(x => x.ManagersAccountsTrades)
-                                      .Include(x => x.InvestmentProgram.Periods)
-                                      .Where(x => x.InvestorAccount.UserId == investorUserId)
-                                      .ToList()
-                                      .GroupBy(x => x.InvestmentProgram,
-                                          (program, reqs) => new InvestorProgram
-                                                             {
-                                                                 InvestmentProgram = program.ToInvestmentProgramDetails(),
-                                                                 Requests = reqs.Select(x => x.ToInvestmentRequest()).ToList()
-                                                             })
-                                      .ToList();
-
-                var result = new InvestorDashboard
-                             {
-                                 Programs = requests
-                             };
-
-                return result;
-            });
-        }
-
+        
         private OperationResult<string> UpdateInvestmentInIpfs(Guid investmentId)
         {
             var investmentProgram = context.InvestmentPrograms

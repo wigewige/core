@@ -28,6 +28,24 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
+        /// Get user wallets
+        /// </summary>
+        [HttpGet]
+        [Authorize]
+        [Route("manager/wallet")]
+        [Route("investor/wallet")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(WalletsViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetUserWallets()
+        {
+            var wallets = walletService.GetUserWallets(CurrentUser.Id);
+            if (!wallets.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(wallets));
+
+            return Ok(wallets.Data);
+        }
+
+        /// <summary>
         /// Get user wallet transactions
         /// </summary>
         [HttpPost]
@@ -58,14 +76,11 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetWalletAddress()
         {
-            var address = walletService.GetUserWallet(CurrentUser.Id);
+            var address = walletService.GetUserDefaultBlockchainAddress(CurrentUser.Id);
             if (!address.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(address));
 
-            return Ok(new WalletAddressViewModel
-                      {
-                          Address = address.Data
-                      });
+            return Ok(address.Data);
         }
 
         /// <summary>
@@ -73,8 +88,8 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("investor/wallet/withdrawrequest")]
-        [Route("manager/wallet/withdrawrequest")]
+        [Route("investor/wallet/withdrawRequest")]
+        [Route("manager/wallet/withdrawRequest")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult WithdrawRequest([FromBody]WalletWithdrawRequestModel request)

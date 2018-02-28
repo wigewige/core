@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -108,6 +109,11 @@ namespace GenesisVision.Core
                                       .AllowCredentials());
             });
 
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = GetMultipartBodyLengthLimit();
+            });
+
             services.AddMvcCore()
                     .AddApiExplorer()
                     .AddAuthorization()
@@ -143,6 +149,7 @@ namespace GenesisVision.Core
                 c.DescribeAllEnumsAsStrings();
                 c.TagActionsBy(x => x.RelativePath.Split("/").Take(2).Last());
                 c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+                c.OperationFilter<FileUploadOperation>();
 
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, "GenesisVision.Core.xml");
                 c.IncludeXmlComments(xmlPath);
@@ -174,6 +181,17 @@ namespace GenesisVision.Core
             Constants.SendGridFromName = Configuration["EmailSender:SendGrid:FromName"];
         }
 
+        private int GetMultipartBodyLengthLimit()
+        {
+            var multipartBodyLengthLimit = 2097152;
+
+            var str = Configuration["MultipartBodyLengthLimit"];
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out var expiryInMinutes))
+                multipartBodyLengthLimit = expiryInMinutes;
+
+            return multipartBodyLengthLimit;
+        }
+
         private void ConfigureCustomServices(IServiceCollection services)
         {
             services.AddTransient<ITrustManagementService, TrustManagementService>();
@@ -184,12 +202,13 @@ namespace GenesisVision.Core
             services.AddTransient<IStatisticService, StatisticService>();
             services.AddTransient<ITradesService, TradesService>();
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<IRateService, RateService>();
+            services.AddTransient<IEthService, EthService>();
+            services.AddTransient<IFileService, FileService>();
 
             services.AddTransient<IManagerValidator, ManagerValidator>();
             services.AddTransient<IBrokerValidator, BrokerValidator>();
             services.AddTransient<IInvestorValidator, InvestorValidator>();
-            services.AddTransient<IRateService, RateService>();
-            services.AddTransient<IEthService, EthService>();
 
             services.AddSingleton<IIpfsService, IpfsService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -197,6 +216,7 @@ namespace GenesisVision.Core
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            Constants.UploadPath = Path.Combine(env.WebRootPath, "uploads");
             Constants.IsDevelopment = true; // todo: remove it
 
             if (env.IsDevelopment())
@@ -217,9 +237,8 @@ namespace GenesisVision.Core
                                        });
 
             app.UseCors("CorsPolicy");
-
             app.UseAuthentication();
-
+            app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
 
             app.UseSwagger();

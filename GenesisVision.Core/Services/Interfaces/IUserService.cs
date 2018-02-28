@@ -6,8 +6,6 @@ namespace GenesisVision.Core.Services.Interfaces
 {
     public interface IUserService
     {
-        OperationResult<ProfileShortViewModel> GetUserProfileShort(Guid userId);
-
         OperationResult<ProfileFullViewModel> GetUserProfileFull(Guid userId);
 
         OperationResult<ProfilePublicViewModel> GetUserPublicProfile(Guid userId);
