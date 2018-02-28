@@ -1,5 +1,4 @@
-﻿using GenesisVision.Core.ViewModels.Investment;
-using GenesisVision.Core.ViewModels.Manager;
+﻿using GenesisVision.Core.ViewModels.Manager;
 using System.Collections.Generic;
 
 namespace GenesisVision.Core.ViewModels.Broker
@@ -7,6 +6,6 @@ namespace GenesisVision.Core.ViewModels.Broker
     public class BrokerInitData
     {
         public List<ManagerRequest> NewManagerRequest { get; set; }
-        public List<InvestmentProgram> Investments { get; set; }
+        public List<BrokerInvestmentProgram> Investments { get; set; }
     }
 }

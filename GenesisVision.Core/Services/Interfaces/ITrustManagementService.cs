@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using GenesisVision.Core.Models;
+﻿using GenesisVision.Core.Models;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
-using GenesisVision.Core.ViewModels.Manager;
+using System;
+using System.Collections.Generic;
 
 namespace GenesisVision.Core.Services.Interfaces
 {
@@ -19,7 +18,7 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult<(List<InvestmentProgram>, int)> GetInvestmentPrograms(InvestmentProgramsFilter filter);
 
-        OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
+        OperationResult<List<BrokerInvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
 
         OperationResult<ClosePeriodData> GetClosingPeriodData(Guid investmentProgramId);
 

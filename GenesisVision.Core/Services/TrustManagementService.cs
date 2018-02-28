@@ -356,24 +356,20 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult<List<InvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId)
+        public OperationResult<List<BrokerInvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var brokerInvestments = context.InvestmentPrograms
-                                               .Include(x => x.ManagerAccount)
-                                               .ThenInclude(x => x.ManagersAccountsTrades)
-                                               .Include(x => x.InvestmentRequests)
-                                               .Include(x => x.Token)
-                                               .Include(x => x.Periods)
-                                               .Where(x =>
-                                                   x.ManagerAccount.BrokerTradeServerId == brokerTradeServerId &&
-                                                   x.IsEnabled &&
-                                                   x.DateFrom < DateTime.Now &&
-                                                   (x.DateTo == null || x.DateTo > DateTime.Now))
-                                               .Select(x => x.ToInvestmentProgram())
-                                               .ToList();
-                return brokerInvestments;
+                var res = context.InvestmentPrograms
+                                 .Include(x => x.ManagerAccount)
+                                 .Include(x => x.Periods)
+                                 .Where(x => x.ManagerAccount.BrokerTradeServerId == brokerTradeServerId &&
+                                             x.IsEnabled &&
+                                             x.DateFrom < DateTime.Now &&
+                                             (x.DateTo == null || x.DateTo > DateTime.Now))
+                                 .Select(x => x.ToBrokerInvestmentProgram())
+                                 .ToList();
+                return res;
             });
         }
 

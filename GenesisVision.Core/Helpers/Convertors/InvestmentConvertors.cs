@@ -1,14 +1,38 @@
-﻿using GenesisVision.Core.ViewModels.Investment;
+﻿using GenesisVision.Core.ViewModels.Broker;
+using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
+using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using System.Collections.Generic;
 using System.Linq;
-using GenesisVision.DataModel.Enums;
 
 namespace GenesisVision.Core.Helpers.Convertors
 {
     public static partial class Convertors
     {
+        public static BrokerInvestmentProgram ToBrokerInvestmentProgram(this InvestmentPrograms program)
+        {
+            var result = new BrokerInvestmentProgram
+                         {
+                             Id = program.Id,
+                             FeeEntrance = program.FeeEntrance,
+                             FeeSuccess = program.FeeSuccess,
+                             FeeManagement = program.FeeManagement,
+                             IsEnabled = program.IsEnabled,
+                             DateFrom = program.DateFrom,
+                             DateTo = program.DateTo,
+                             Description = program.Description,
+                             Period = program.Period,
+                             InvestMinAmount = program.InvestMinAmount,
+                             InvestMaxAmount = program.InvestMaxAmount,
+                             LastPeriod = program.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod(),
+                             ManagerAccountId = program.ManagerAccountId,
+                             Login = program.ManagerAccount.Login,
+                             IpfsHash = program.ManagerAccount.IpfsHash
+                         };
+            return result;
+        }
+
         public static InvestmentProgram ToInvestmentProgram(this InvestmentPrograms program)
         {
             var result = new InvestmentProgram

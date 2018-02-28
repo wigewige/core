@@ -114,6 +114,7 @@ namespace GenesisVision.Core.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("investor/investmentPrograms")]
+        [Route("manager/investmentPrograms")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramsViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestmentPrograms([FromBody]InvestmentProgramsFilter filter)
@@ -135,6 +136,7 @@ namespace GenesisVision.Core.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("investor/investmentProgram")]
+        [Route("manager/investmentProgram")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestmentProgram(Guid investmentProgramId)

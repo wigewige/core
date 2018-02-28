@@ -14,7 +14,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenesisVision.Core.Services.Interfaces;
 
 namespace GenesisVision.Core.Tests.Services
 {
@@ -480,20 +479,16 @@ namespace GenesisVision.Core.Tests.Services
             var result = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServer.Id);
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(2, result.Data.Count);
-            //Assert.AreEqual(inv1.Description, result.Data.First(x => x.Investment.Id == inv1.Id).Investment.Description);
-            //Assert.AreEqual(inv1.DateFrom, result.Data.First(x => x.Investment.Id == inv1.Id).Investment.DateFrom);
-            //Assert.IsNotNull(result.Data.First(x => x.Investment.Id == inv1.Id).Investment.LastPeriod);
-            //Assert.AreEqual(period2.Id, result.Data.First(x => x.Investment.Id == inv1.Id).Investment.LastPeriod.Id);
-            //Assert.AreEqual(period2.Number, result.Data.First(x => x.Investment.Id == inv1.Id).Investment.LastPeriod.Number);
-            //Assert.AreEqual(period2.Status, result.Data.First(x => x.Investment.Id == inv1.Id).Investment.LastPeriod.Status);
-            //Assert.AreEqual(inv2.Period, result.Data.First(x => x.Investment.Id == inv2.Id).Investment.Period);
-            //Assert.AreEqual(inv2.DateTo, result.Data.First(x => x.Investment.Id == inv2.Id).Investment.DateTo);
-            //Assert.AreEqual(inv1.Token.TokenName, result.Data.First(x => x.Investment.Id == inv1.Id).Token.TokenName);
-            //Assert.AreEqual(inv2.Token.TokenSymbol, result.Data.First(x => x.Investment.Id == inv2.Id).Token.TokenSymbol);
-            //Assert.AreEqual(inv2.Token.TokenAddress, result.Data.First(x => x.Investment.Id == inv2.Id).Token.TokenAddress);
-            //Assert.AreEqual(inv2.ManagerAccount.Login, result.Data.First(x => x.Investment.Id == inv2.Id).Account.Login);
-            //Assert.AreEqual(inv2.ManagerAccount.RegistrationDate, result.Data.First(x => x.Investment.Id == inv2.Id).Account.RegistrationDate);
-            //Assert.AreEqual(inv1.ManagerAccount.IpfsHash, result.Data.First(x => x.Investment.Id == inv1.Id).Account.IpfsHash);
+            Assert.AreEqual(inv1.Description, result.Data.First(x => x.Id == inv1.Id).Description);
+            Assert.AreEqual(inv1.DateFrom, result.Data.First(x => x.Id == inv1.Id).DateFrom);
+            Assert.IsNotNull(result.Data.First(x => x.Id == inv1.Id).LastPeriod);
+            Assert.AreEqual(period2.Id, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Id);
+            Assert.AreEqual(period2.Number, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Number);
+            Assert.AreEqual(period2.Status, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Status);
+            Assert.AreEqual(inv2.Period, result.Data.First(x => x.Id == inv2.Id).Period);
+            Assert.AreEqual(inv2.DateTo, result.Data.First(x => x.Id == inv2.Id).DateTo);
+            Assert.AreEqual(inv2.ManagerAccount.Login, result.Data.First(x => x.Id == inv2.Id).Login);
+            Assert.AreEqual(inv1.ManagerAccount.IpfsHash, result.Data.First(x => x.Id == inv1.Id).IpfsHash);
         }
 
         [Test]
