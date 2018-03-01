@@ -28,7 +28,7 @@ namespace GenesisVision.Core.ViewModels.Investment
 
         public ProfilePublicViewModel Manager { get; set; }
 
-        public bool IsPending { get; set; }
+        public bool HasNewRequests { get; set; }
         public bool IsHistoryEnable { get; set; }
         public bool IsInvestEnable { get; set; }
         public bool IsWithdrawEnable { get; set; }

@@ -24,6 +24,6 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal FeeSuccess { get; set; }
         public decimal FeeManagement { get; set; }
 
-        public bool IsPending { get; set; }
+        public bool HasNewRequests { get; set; }
     }
 }

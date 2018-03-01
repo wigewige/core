@@ -119,7 +119,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestmentPrograms([FromBody]InvestmentProgramsFilter filter)
         {
-            var data = trustManagementService.GetInvestmentPrograms(filter ?? new InvestmentProgramsFilter());
+            var data = trustManagementService.GetInvestmentPrograms(filter ?? new InvestmentProgramsFilter(), CurrentUser?.Id);
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 
@@ -141,7 +141,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestmentProgram(Guid investmentProgramId)
         {
-            var investment = trustManagementService.GetInvestmentProgram(investmentProgramId);
+            var investment = trustManagementService.GetInvestmentProgram(investmentProgramId, CurrentUser?.Id);
             if (!investment.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(investment));
 
@@ -164,7 +164,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult InvestorDashboard()
         {
-            var data = trustManagementService.GetInvestorDashboard(CurrentUser.Id);
+            var data = trustManagementService.GetInvestorDashboard(CurrentUser.Id, CurrentUser?.Id);
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 
