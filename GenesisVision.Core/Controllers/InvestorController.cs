@@ -117,7 +117,7 @@ namespace GenesisVision.Core.Controllers
         [Route("manager/investmentPrograms")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramsViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult GetInvestmentPrograms([FromBody]InvestmentProgramsFilter filter)
+        public IActionResult GetInvestmentPrograms([FromHeader(Name = "Authorization")] string token, [FromBody]InvestmentProgramsFilter filter)
         {
             var data = trustManagementService.GetInvestmentPrograms(filter ?? new InvestmentProgramsFilter(), CurrentUser?.Id);
             if (!data.IsSuccess)
@@ -139,7 +139,7 @@ namespace GenesisVision.Core.Controllers
         [Route("manager/investmentProgram")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult GetInvestmentProgram(Guid investmentProgramId)
+        public IActionResult GetInvestmentProgram([FromHeader(Name = "Authorization")] string token, Guid investmentProgramId)
         {
             var investment = trustManagementService.GetInvestmentProgram(investmentProgramId, CurrentUser?.Id);
             if (!investment.IsSuccess)
