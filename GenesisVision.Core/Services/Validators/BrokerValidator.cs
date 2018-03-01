@@ -167,6 +167,18 @@ namespace GenesisVision.Core.Services.Validators
             return result;
         }
 
+        public List<string> ValidateUpdateManagerHistoryIpfsHash(ApplicationUser user, ManagerHistoryIpfsHash data)
+        {
+            var result = new List<string>();
+
+            var ids = data.ManagersHashes.Select(x => x.ManagerId).Distinct().ToList();
+            var mangerAccountCount = context.ManagersAccounts.Count(x => ids.Contains(x.Id));
+            if (mangerAccountCount != ids.Count)
+                result.Add("Manager account does not exist");
+
+            return result;
+        }
+
         public List<string> ValidateNewOpenTrades(ApplicationUser user, NewOpenTradesEvent trades)
         {
             var result = new List<string>();

@@ -27,6 +27,8 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal AvailableInvestment { get; set; }
         public decimal FeeSuccess { get; set; }
         public decimal FeeManagement { get; set; }
+        public string IpfsHash { get; set; }
+        public string TradeIpfsHash { get; set; }
 
         public ProfilePublicViewModel Manager { get; set; }
 

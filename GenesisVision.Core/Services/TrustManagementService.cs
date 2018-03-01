@@ -838,5 +838,23 @@ namespace GenesisVision.Core.Services
                 return (programs, count);
             });
         }
+
+        public OperationResult UpdateManagerHistoryIpfsHash(ManagerHistoryIpfsHash data)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                foreach (var manager in data.ManagersHashes)
+                {
+                    var managerData = context.ManagersAccounts.FirstOrDefault(x => x.Id == manager.ManagerId);
+                    if (managerData == null)
+                        continue;
+
+                    managerData.TradeIpfsHash = manager.IpfsHash;
+                }
+
+                if (data.ManagersHashes.Any())
+                    context.SaveChanges();
+            });
+        }
     }
 }

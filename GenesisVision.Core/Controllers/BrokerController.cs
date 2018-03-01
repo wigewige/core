@@ -173,7 +173,7 @@ namespace GenesisVision.Core.Controllers
         /// </summary>
         [HttpPost]
         [Route("broker/period/accrueProfits")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult AccrueProfits([FromBody]InvestmentProgramAccrual accrual)
         {
@@ -185,7 +185,27 @@ namespace GenesisVision.Core.Controllers
             if (!result.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(result));
 
-            return Ok(result);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Update manager history ipfs hash
+        /// </summary>
+        [HttpPost]
+        [Route("broker/trades/ipfsHash/update")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult UpdateManagerHistoryIpfsHash([FromBody]ManagerHistoryIpfsHash data)
+        {
+            var errors = brokerValidator.ValidateUpdateManagerHistoryIpfsHash(CurrentUser, data);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var result = trustManagementService.UpdateManagerHistoryIpfsHash(data);
+            if (!result.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(result));
+
+            return Ok();
         }
 
         /// <summary>

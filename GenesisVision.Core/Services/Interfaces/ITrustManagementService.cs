@@ -41,5 +41,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult ReevaluateManagerToken(Guid investmentProgramId, decimal investorLossShare);
 
         OperationResult<(List<InvestmentProgramRequest>, int)> GetInvestmentProgramRequests(InvestmentProgramRequestsFilter filter, Guid userId);
+
+        OperationResult UpdateManagerHistoryIpfsHash(ManagerHistoryIpfsHash data);
     }
 }

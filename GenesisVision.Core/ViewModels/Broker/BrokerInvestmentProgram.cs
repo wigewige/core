@@ -20,5 +20,6 @@ namespace GenesisVision.Core.ViewModels.Broker
         public Period LastPeriod { get; set; }
         public string Login { get; set; }
         public string IpfsHash { get; set; }
+        public string TradeIpfsHash { get; set; }
     }
 }

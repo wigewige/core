@@ -11,6 +11,7 @@ namespace GenesisVision.DataModel.Models
         public Currency Currency { get; set; }
         public DateTime RegistrationDate { get; set; }
         public string IpfsHash { get; set; }
+        public string TradeIpfsHash { get; set; }
         public bool IsConfirmed { get; set; }
 
         public ApplicationUser User { get; set; }

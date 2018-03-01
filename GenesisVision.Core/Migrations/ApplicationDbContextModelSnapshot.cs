@@ -309,6 +309,8 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<DateTime>("RegistrationDate");
 
+                    b.Property<string>("TradeIpfsHash");
+
                     b.Property<Guid>("UserId");
 
                     b.HasKey("Id");

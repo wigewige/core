@@ -29,7 +29,8 @@ namespace GenesisVision.Core.Helpers.Convertors
                              LastPeriod = program.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod(),
                              ManagerAccountId = program.ManagerAccountId,
                              Login = program.ManagerAccount.Login,
-                             IpfsHash = program.ManagerAccount.IpfsHash
+                             IpfsHash = program.ManagerAccount.IpfsHash,
+                             TradeIpfsHash = program.ManagerAccount.TradeIpfsHash
                          };
             return result;
         }
@@ -80,6 +81,8 @@ namespace GenesisVision.Core.Helpers.Convertors
                              InvestedTokens = 0,
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
+                             IpfsHash = program.ManagerAccount.IpfsHash,
+                             TradeIpfsHash = program.ManagerAccount.TradeIpfsHash,
                              Manager = program.ManagerAccount.User.ToProfilePublic(),
                              HasNewRequests = GetHasNewRequests(program, userId),
                              IsHistoryEnable = GetIsHistoryEnable(program, userId),

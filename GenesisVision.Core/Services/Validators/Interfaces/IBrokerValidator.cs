@@ -27,5 +27,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateNewOpenTrades(ApplicationUser user, NewOpenTradesEvent trades);
 
         List<string> ValidateReevaluateManagerToken(ApplicationUser user, Guid investmentProgramId);
+
+        List<string> ValidateUpdateManagerHistoryIpfsHash(ApplicationUser user, ManagerHistoryIpfsHash data);
     }
 }
