@@ -114,7 +114,8 @@ namespace GenesisVision.Core
                 options.MultipartBodyLengthLimit = GetMultipartBodyLengthLimit();
             });
 
-            services.AddMvcCore()
+            services.AddMemoryCache()
+                    .AddMvcCore()
                     .AddApiExplorer()
                     .AddAuthorization()
                     .AddDataAnnotations()

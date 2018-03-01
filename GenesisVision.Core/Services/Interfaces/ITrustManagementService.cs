@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
 using System;

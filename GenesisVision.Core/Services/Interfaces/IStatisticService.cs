@@ -1,7 +1,5 @@
-﻿using GenesisVision.Core.Models;
-using GenesisVision.Core.ViewModels.Investment;
+﻿using GenesisVision.Common.Models;
 using System;
-using System.Collections.Generic;
 
 namespace GenesisVision.Core.Services.Interfaces
 {

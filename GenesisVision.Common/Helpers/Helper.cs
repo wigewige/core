@@ -40,5 +40,18 @@ namespace GenesisVision.Common.Helpers
 
             return Currency.Undefined;
         }
+
+        public static List<string> GetAllCurrencies()
+        {
+            var result = new List<string>();
+            foreach (Currency x in Enum.GetValues(typeof(Currency)))
+            {
+                if (x == Currency.Undefined)
+                    continue;
+
+                result.Add(x.ToString());
+            }
+            return result;
+        }
     }
 }

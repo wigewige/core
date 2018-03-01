@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
 using GenesisVision.Core.ViewModels.Wallet;
 using System;
 using System.Collections.Generic;

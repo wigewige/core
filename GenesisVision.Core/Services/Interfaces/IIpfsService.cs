@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
 
 namespace GenesisVision.Core.Services.Interfaces
 {

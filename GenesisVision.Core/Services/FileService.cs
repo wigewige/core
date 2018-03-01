@@ -1,14 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GenesisVision.Common.Models;
 using GenesisVision.Core.Helpers;
-using GenesisVision.Core.Models;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Files;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Http;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace GenesisVision.Core.Services
 {

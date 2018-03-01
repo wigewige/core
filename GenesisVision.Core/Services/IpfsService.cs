@@ -1,5 +1,5 @@
-﻿using GenesisVision.Core.Helpers;
-using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
+using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Services.Interfaces;
 using Ipfs.Api;
 using System.IO;

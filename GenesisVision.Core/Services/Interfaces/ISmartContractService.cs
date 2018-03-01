@@ -1,9 +1,4 @@
-﻿using GenesisVision.Core.Models;
-using GenesisVision.Core.ViewModels.Manager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GenesisVision.Common.Models;
 
 namespace GenesisVision.Core.Services.Interfaces
 {

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GenesisVision.Core.Helpers.Convertors;
-using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
 using GenesisVision.Core.Services.Interfaces;
-using GenesisVision.Core.ViewModels.Investment;
-using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
-using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace GenesisVision.Core.Services
 {

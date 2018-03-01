@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
+using GenesisVision.Common.Services.Interfaces;
 using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;

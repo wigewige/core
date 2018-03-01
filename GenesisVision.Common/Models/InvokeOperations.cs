@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenesisVision.Core.Models
+namespace GenesisVision.Common.Models
 {
     public static class InvokeOperations
     {

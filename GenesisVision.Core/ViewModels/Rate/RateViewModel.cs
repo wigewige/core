@@ -2,6 +2,6 @@
 {
     public class RateViewModel : RequestRate
     {
-        public decimal Amount { get; set; }
+        public decimal Rate { get; set; }
     }
 }

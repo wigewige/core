@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.ViewModels.Common;
+﻿using GenesisVision.Common.Models;
+using GenesisVision.Core.ViewModels.Common;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;

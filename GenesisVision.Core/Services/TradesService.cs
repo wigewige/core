@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
+using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.Core.ViewModels.Trades.Interfaces;
@@ -11,7 +12,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using GenesisVision.Core.Helpers.Convertors;
 
 namespace GenesisVision.Core.Services
 {

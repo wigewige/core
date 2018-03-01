@@ -1,5 +1,5 @@
-﻿using GenesisVision.Core.Models;
-using GenesisVision.Core.Services.Interfaces;
+﻿using GenesisVision.Common.Services.Interfaces;
+using GenesisVision.Core.Models;
 using GenesisVision.Core.ViewModels.Common;
 using GenesisVision.Core.ViewModels.Rate;
 using GenesisVision.DataModel.Models;
@@ -45,7 +45,7 @@ namespace GenesisVision.Core.Controllers
                       {
                           From = model.From,
                           To = model.To,
-                          Amount = rate.Data
+                          Rate = rate.Data
                       });
         }
     }

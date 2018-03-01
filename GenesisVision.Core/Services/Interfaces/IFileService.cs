@@ -1,4 +1,4 @@
-﻿using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
 using GenesisVision.Core.ViewModels.Files;
 using GenesisVision.DataModel.Models;
 using Microsoft.AspNetCore.Http;

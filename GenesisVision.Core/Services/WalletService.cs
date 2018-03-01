@@ -1,5 +1,5 @@
-﻿using GenesisVision.Core.Helpers.Convertors;
-using GenesisVision.Core.Models;
+﻿using GenesisVision.Common.Models;
+using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Wallet;
 using GenesisVision.DataModel;
