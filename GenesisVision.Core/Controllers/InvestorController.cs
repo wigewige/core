@@ -154,6 +154,33 @@ namespace GenesisVision.Core.Controllers
                           InvestmentProgram = investment.Data
                       });
         }
+
+        /// <summary>
+        /// Get investment program's requests
+        /// </summary>
+        [HttpPost]
+        [Route("investor/investmentProgram/requests")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(InvestmentProgramRequests))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetInvestmentProgramRequests([FromBody]InvestmentProgramRequestsFilter filter)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
+
+            var errors = investorValidator.ValidateInvestor(CurrentUser);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            var requests = trustManagementService.GetInvestmentProgramRequests(filter, CurrentUser.Id);
+            if (!requests.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(requests));
+
+            return Ok(new InvestmentProgramRequests
+                      {
+                          Requests = requests.Data.Item1,
+                          Total = requests.Data.Item2
+                      });
+        }
         
         /// <summary>
         /// Get investor dashboard

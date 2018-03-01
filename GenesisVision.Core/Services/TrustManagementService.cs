@@ -807,5 +807,35 @@ namespace GenesisVision.Core.Services
                 context.SaveChanges();
             });
         }
+
+        public OperationResult<(List<InvestmentProgramRequest>, int)> GetInvestmentProgramRequests(InvestmentProgramRequestsFilter filter, Guid userId)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var query = context.InvestmentRequests
+                                   .Where(x => x.InvestmentProgramtId == filter.InvestmentProgramId &&
+                                               x.UserId == userId);
+
+                if (filter.Status.HasValue)
+                    query = query.Where(x => x.Status == filter.Status.Value);
+                if (filter.Type.HasValue)
+                    query = query.Where(x => x.Type == filter.Type.Value);
+                if (filter.DateFrom.HasValue)
+                    query = query.Where(x => x.Date >= filter.DateFrom.Value);
+                if (filter.DateTo.HasValue)
+                    query = query.Where(x => x.Date < filter.DateTo.Value);
+
+                var count = query.Count();
+
+                if (filter.Skip.HasValue)
+                    query = query.Skip(filter.Skip.Value);
+                if (filter.Take.HasValue)
+                    query = query.Take(filter.Take.Value);
+
+                var programs = query.Select(x => x.ToInvestmentRequest()).ToList();
+
+                return (programs, count);
+            });
+        }
     }
 }

@@ -68,6 +68,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              Level = 1,
                              Logo = program.Logo,
                              Balance = 0m,
+                             OwnBalance = 0m,
                              Currency = program.ManagerAccount.Currency,
                              TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
                              InvestorsCount = GetInvestorsCount(program),

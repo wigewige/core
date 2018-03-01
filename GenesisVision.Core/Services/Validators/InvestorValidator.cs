@@ -20,20 +20,28 @@ namespace GenesisVision.Core.Services.Validators
             this.context = context;
         }
 
+        public List<string> ValidateInvestor(ApplicationUser user)
+        {
+            if (!user.IsEnabled || user.Type != UserType.Investor)
+                return new List<string> {ValidationMessages.AccessDenied};
+
+            return new List<string>();
+        }
+
         public List<string> ValidateCancelInvestmentRequest(ApplicationUser user, Guid requestId)
         {
             if (!user.IsEnabled || user.Type != UserType.Investor)
-                return new List<string> { ValidationMessages.AccessDenied };
+                return new List<string> {ValidationMessages.AccessDenied};
 
             var result = new List<string>();
 
             var investmentRequest = context.InvestmentRequests
-                                    .FirstOrDefault(x => x.Id == requestId 
-                                    && x.Status == InvestmentRequestStatus.New
-                                    && x.UserId == user.Id);
+                                           .FirstOrDefault(x => x.Id == requestId &&
+                                                                x.Status == InvestmentRequestStatus.New &&
+                                                                x.UserId == user.Id);
 
             if (investmentRequest == null)
-                return new List<string> { "No investment request found" };
+                return new List<string> {"No investment request found"};
 
             return result;
         }

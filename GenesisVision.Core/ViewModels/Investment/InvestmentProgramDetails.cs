@@ -14,6 +14,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public int Level { get; set; }
         public string Logo { get; set; }
         public decimal Balance { get; set; }
+        public decimal OwnBalance { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Currency Currency { get; set; }
         public int InvestedTokens { get; set; }

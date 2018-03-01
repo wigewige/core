@@ -1,12 +1,11 @@
-﻿using System;
-using GenesisVision.DataModel.Enums;
-using GenesisVision.DataModel.Models;
+﻿using GenesisVision.DataModel.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 
 namespace GenesisVision.Core.ViewModels.Investment
 {
-    public class InvestmentRequest
+    public class InvestmentProgramRequest
     {
         public Guid Id { get; set; }
         public DateTime Date { get; set; }

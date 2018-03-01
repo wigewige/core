@@ -18,6 +18,6 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal StartBalance { get; set; }
         public decimal ManagerStartBalance { get; set; }
         public decimal ManagerStartShare { get; set; }
-        public List<InvestmentRequest> InvestmentRequest { get; set; }
+        public List<InvestmentProgramRequest> InvestmentRequest { get; set; }
     }
 }
