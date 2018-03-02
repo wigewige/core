@@ -452,9 +452,7 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var nextPeriod = context.Periods
-                                        .Include(x => x.InvestmentRequests)
-                                        .First(x => x.Id == values.InvestmentProgramId && x.Status == PeriodStatus.Planned);
+                var nextPeriod = context.Periods.First(x => x.InvestmentProgramId == values.InvestmentProgramId && x.Status == PeriodStatus.Planned);
 
                 nextPeriod.StartBalance = values.Balance;
                 nextPeriod.ManagerStartBalance = values.ManagerBalance;
@@ -633,7 +631,7 @@ namespace GenesisVision.Core.Services
 
                 var nextPeriod = context.Periods
                                         .Include(x => x.InvestmentRequests)
-                                        .First(x => x.Id == investmentProgramId && x.Status == PeriodStatus.Planned);
+                                        .First(x => x.InvestmentProgramId == investmentProgramId && x.Status == PeriodStatus.Planned);
 
                 var investmentProgram = context.InvestmentPrograms
                       .Include(x => x.Token)
