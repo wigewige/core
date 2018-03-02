@@ -674,7 +674,7 @@ namespace GenesisVision.Core.Services
                         }
                         if (tokensAmount > investmentProgram.Token.FreeTokens)
                         {
-                            gvtAmount = GVTUSDRate.Data / (investmentProgram.Token.FreeTokens * investmentProgram.Token.InitialPrice);
+                            gvtAmount =  investmentProgram.Token.FreeTokens * investmentProgram.Token.InitialPrice / GVTUSDRate.Data;
                             tokensAmount = investmentProgram.Token.FreeTokens;
 
                             var wallet = investor.User.Wallets.First(x => x.Currency == Currency.GVT);
@@ -710,6 +710,8 @@ namespace GenesisVision.Core.Services
                         {
                             portfolio.Amount += tokensAmount;
                         }
+
+                        investmentProgram.Token.FreeTokens -= tokensAmount;
                     }
                     else
                     {
