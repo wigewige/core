@@ -1,10 +1,12 @@
-﻿using GenesisVision.Core.Services;
+﻿using GenesisVision.Common.Services.Interfaces;
+using GenesisVision.Core.Services;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,7 @@ namespace GenesisVision.Core.Tests.Services
         private ApplicationDbContext context;
 
         private IManagerService managerService;
+        private Mock<IRateService> rateService;
 
         [SetUp]
         public void Init()
@@ -25,8 +28,10 @@ namespace GenesisVision.Core.Tests.Services
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("databaseManagerService");
             context = new ApplicationDbContext(optionsBuilder.Options);
-            
-            managerService = new ManagerService(context);
+
+            rateService = new Mock<IRateService>();
+
+            managerService = new ManagerService(context, rateService.Object);
         }
 
 
@@ -46,7 +51,6 @@ namespace GenesisVision.Core.Tests.Services
             var createInvestment = new NewInvestmentRequest
                                    {
                                        Description = "#1 New investment program",
-                                       FeeEntrance = 123,
                                        FeeManagement = 456,
                                        FeeSuccess = 789,
                                        Period = 5,
@@ -71,7 +75,6 @@ namespace GenesisVision.Core.Tests.Services
             Assert.AreEqual(createInvestment.Description, investment.Description);
             Assert.AreEqual(createInvestment.DateFrom, investment.DateFrom);
             Assert.AreEqual(createInvestment.DateTo, investment.DateTo);
-            Assert.AreEqual(createInvestment.FeeEntrance, investment.FeeEntrance);
             Assert.AreEqual(createInvestment.FeeSuccess, investment.FeeSuccess);
             Assert.AreEqual(createInvestment.FeeManagement, investment.FeeManagement);
             Assert.AreEqual(createInvestment.Period, investment.Period);

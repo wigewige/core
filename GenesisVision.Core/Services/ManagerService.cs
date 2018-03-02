@@ -47,11 +47,11 @@ namespace GenesisVision.Core.Services
                               DateFrom = request.DateFrom ?? DateTime.Now,
                               DateTo = request.DateTo,
                               Period = request.Period,
-                              FeeSuccess = request.FeeSuccess,
-                              FeeManagement = request.FeeManagement,
-                              FeeEntrance = request.FeeEntrance,
+                              FeeSuccess = request.FeeSuccess ?? 0,
+                              FeeManagement = request.FeeManagement ?? 0,
+                              FeeEntrance = 0,
                               InvestMaxAmount = request.InvestMaxAmount,
-                              InvestMinAmount = request.InvestMinAmount
+                              InvestMinAmount = request.InvestMinAmount ?? 0
                           };
 
                 var wallet = context.Wallets.First(x => x.UserId == request.UserId && x.Currency == Currency.GVT);

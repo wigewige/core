@@ -12,7 +12,7 @@ using System;
 
 namespace GenesisVision.Core.Controllers
 {
-    [Route("api/files")]
+    [Route("api")]
     [ApiVersion("1.0")]
     public class FilesController : BaseController
     {
@@ -30,7 +30,7 @@ namespace GenesisVision.Core.Controllers
         /// Upload file
         /// </summary>
         [HttpPost]
-        [Route("upload")]
+        [Route("files/upload")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(UploadResult))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult UploadFile(IFormFile uploadedFile)
@@ -46,8 +46,8 @@ namespace GenesisVision.Core.Controllers
         /// Download file
         /// </summary>
         [HttpGet]
-        [Route("get")]
-        [Route("get/{id}")]
+        [Route("files")]
+        [Route("files/{id}")]
         public FileResult Get(Guid id)
         {
             var result = fileService.GetFile(id);

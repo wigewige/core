@@ -25,11 +25,9 @@ namespace GenesisVision.Core.ViewModels.Manager
         [Required]
         public string Title { get; set; }
         public string Description { get; set; }
-        public decimal FeeEntrance { get; set; }
-        public decimal FeeManagement { get; set; }
-        public decimal FeeSuccess { get; set; }
-        [Required]
-        public decimal InvestMinAmount { get; set; }
+        public decimal? FeeManagement { get; set; }
+        public decimal? FeeSuccess { get; set; }
+        public decimal? InvestMinAmount { get; set; }
         public decimal? InvestMaxAmount { get; set; }
         [Required]
         public int Period { get; set; }
