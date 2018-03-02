@@ -41,7 +41,7 @@ namespace GenesisVision.Core.Services.Validators
             var wallet = context.Wallets.FirstOrDefault(x => x.UserId == user.Id && x.Currency == Currency.GVT);
             if (wallet == null || wallet.Amount < request.DepositAmount)
                 result.Add(ValidationMessages.NotEnoughMoney);
-
+            
             if (context.ManagerRequests.Any(x => x.Title == request.Title))
                 result.Add("Title already exists");
 
@@ -66,10 +66,7 @@ namespace GenesisVision.Core.Services.Validators
 
             if (request.FeeManagement.HasValue && request.FeeManagement < 0)
                 result.Add("FeeManagement must be greater or equal zero");
-
-            if (string.IsNullOrEmpty(request.Description))
-                result.Add("'Description' is empty");
-
+            
             if (request.Period <= 0)
                 result.Add("Period must be greater than zero");
 
