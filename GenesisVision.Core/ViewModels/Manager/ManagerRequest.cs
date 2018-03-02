@@ -1,7 +1,7 @@
-﻿using System;
-using GenesisVision.DataModel.Enums;
+﻿using GenesisVision.DataModel.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 
 namespace GenesisVision.Core.ViewModels.Manager
 {
@@ -14,5 +14,6 @@ namespace GenesisVision.Core.ViewModels.Manager
         [JsonConverter(typeof(StringEnumConverter))]
         public Currency Currency { get; set; }
         public string Password { get; set; }
+        public decimal DepositInUsd { get; set; }
     }
 }
