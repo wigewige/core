@@ -30,14 +30,14 @@ namespace GenesisVision.PaymentService.Controllers
             {
                 logger.LogInformation("Start processing callback {Notify} ", nameof(Notify), customKey);
 
-                if (ModelState.IsValid)
+				if (ModelState.IsValid)
                 {
                     var request = new ProcessPaymentTransaction()
                     {
                         TransactionHash = model.Tx_hash,
                         Address = model.Address,
                         Amount = model.Amount,
-                        Currency = Currency.ETH, // TODO
+                        Currency = Enum.Parse<Currency>(model.Currency), // TODO
                         Status = model.Confirmations >= 12 ? PaymentTransactionStatus.ConfirmedByGate : PaymentTransactionStatus.Pending,
                         CustomKey = customKey // TODO check
                     };
