@@ -133,8 +133,11 @@ namespace GenesisVision.Core.Services
                                       DateTo = inv.DateFrom.AddDays(inv.Period),
                                       Status = PeriodStatus.InProccess,
                                       InvestmentProgramId = inv.Id,
-                                      Number = 1
-                                  };
+                                      Number = 1,
+                                      StartBalance = managerRequest.DepositInUsd,
+                                      ManagerStartBalance = managerRequest.DepositInUsd,
+                                      ManagerStartShare = 1
+                };
                 if (!inv.DateTo.HasValue || inv.DateTo > inv.DateFrom.AddDays(inv.Period))
                 {
                     var plannedPeriod = new Periods
