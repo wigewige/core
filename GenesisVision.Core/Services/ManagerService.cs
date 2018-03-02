@@ -28,6 +28,10 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var rate = rateService.GetRate(Currency.GVT, Currency.USD);
+                if (!rate.IsSuccess)
+                    throw new Exception("Cann't get rate GVT/USD");
+
                 var req = new ManagerRequests
                           {
                               Id = Guid.NewGuid(),
@@ -37,6 +41,7 @@ namespace GenesisVision.Core.Services
                               Status = ManagerRequestStatus.Created,
                               BrokerTradeServerId = request.BrokerTradeServerId,
                               DepositAmount = request.DepositAmount,
+                              DepositInUsd = request.DepositAmount * rate.Data,
                               TradePlatformPassword = request.TradePlatformPassword,
                               TradePlatformCurrency = Currency.USD,
                               TokenName = request.TokenName,

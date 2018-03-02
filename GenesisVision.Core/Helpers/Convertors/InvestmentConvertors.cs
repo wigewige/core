@@ -140,10 +140,6 @@ namespace GenesisVision.Core.Helpers.Convertors
 
         public static ManagerRequest ToManagerRequest(this ManagerRequests request, IRateService rateService)
         {
-            var rate = rateService.GetRate(Currency.GVT, Currency.USD);
-            if (!rate.IsSuccess)
-                throw new Exception("Cann't get rate GVT/USD");
-
             return new ManagerRequest
                    {
                        UserId = request.Id,
@@ -152,7 +148,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Password = request.TradePlatformPassword,
                        Name = $"{request.User?.Profile?.FirstName} {request.User?.Profile?.MiddleName} {request.User?.Profile?.LastName}",
                        Email = request.User?.Email,
-                       DepositInUsd = request.DepositAmount * rate.Data
+                       DepositInUsd = request.DepositInUsd
                    };
         }
 
