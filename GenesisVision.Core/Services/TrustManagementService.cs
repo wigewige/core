@@ -445,17 +445,17 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult SetPeriodStartValues(Guid investmentProgramId, decimal balance, decimal managerBalance, decimal managerShare)
+        public OperationResult SetPeriodStartValues(StartValues values)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
                 var nextPeriod = context.Periods
                                         .Include(x => x.InvestmentRequests)
-                                        .First(x => x.Id == investmentProgramId && x.Status == PeriodStatus.Planned);
+                                        .First(x => x.Id == values.InvestmentProgramId && x.Status == PeriodStatus.Planned);
 
-                nextPeriod.StartBalance = balance;
-                nextPeriod.ManagerStartBalance = managerBalance;
-                nextPeriod.ManagerStartShare = managerShare;
+                nextPeriod.StartBalance = values.Balance;
+                nextPeriod.ManagerStartBalance = values.ManagerBalance;
+                nextPeriod.ManagerStartShare = values.ManagerShare;
 
                 context.SaveChanges();
             });

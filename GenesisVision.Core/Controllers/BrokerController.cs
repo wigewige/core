@@ -134,13 +134,13 @@ namespace GenesisVision.Core.Controllers
         [Route("broker/period/setStartValues")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult SetPeriodStartValues(Guid investmentProgramId, decimal balance, decimal managerBalance, decimal managerShare)
+        public IActionResult SetPeriodStartValues([FromBody]StartValues model)
         {
-            var errors = brokerValidator.ValidateSetPeriodStartValues(CurrentUser, investmentProgramId);
+            var errors = brokerValidator.ValidateSetPeriodStartValues(CurrentUser, model.InvestmentProgramId);
             if (errors.Any())
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
-            var result = trustManagementService.SetPeriodStartValues(investmentProgramId, balance, managerBalance, managerShare);
+            var result = trustManagementService.SetPeriodStartValues(model);
             if (!result.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(result.Errors));
 
