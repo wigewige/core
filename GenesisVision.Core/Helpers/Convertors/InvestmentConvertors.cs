@@ -1,4 +1,5 @@
-﻿using GenesisVision.Core.ViewModels.Broker;
+﻿using GenesisVision.Common.Services.Interfaces;
+using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
 using GenesisVision.Core.ViewModels.Manager;
 using GenesisVision.DataModel.Enums;
@@ -26,7 +27,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              Period = program.Period,
                              InvestMinAmount = program.InvestMinAmount,
                              InvestMaxAmount = program.InvestMaxAmount,
-                             LastPeriod = program.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod(),
+                             LastPeriod = program.Periods?.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod(),
                              ManagerAccountId = program.ManagerAccountId,
                              Login = program.ManagerAccount.Login,
                              IpfsHash = program.ManagerAccount.IpfsHash,
@@ -67,6 +68,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              Title = program.Title,
                              Description = program.Description,
                              Level = 1,
+                             Login = program.ManagerAccount.Login,
                              Logo = program.Logo,
                              Balance = 0m,
                              OwnBalance = 0m,
@@ -131,12 +133,14 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Status = p.Status,
                        Number = p.Number,
                        StartBalance = p.StartBalance,
+                       ManagerStartBalance = p.ManagerStartBalance,
+                       ManagerStartShare = p.ManagerStartShare,
                        InvestmentRequest = p.InvestmentRequests?.Select(ToInvestmentRequest).ToList() ??
                                            new List<InvestmentProgramRequest>()
                    };
         }
 
-        public static ManagerRequest ToManagerRequest(this ManagerRequests request)
+        public static ManagerRequest ToManagerRequest(this ManagerRequests request, IRateService rateService)
         {
             return new ManagerRequest
                    {
@@ -146,6 +150,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Password = request.TradePlatformPassword,
                        Name = $"{request.User?.Profile?.FirstName} {request.User?.Profile?.MiddleName} {request.User?.Profile?.LastName}",
                        Email = request.User?.Email,
+                       DepositInUsd = request.DepositInUsd
                    };
         }
 

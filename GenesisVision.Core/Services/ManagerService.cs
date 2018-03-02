@@ -1,4 +1,5 @@
 ﻿using GenesisVision.Common.Models;
+using GenesisVision.Common.Services.Interfaces;
 using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Manager;
@@ -15,16 +16,22 @@ namespace GenesisVision.Core.Services
     public class ManagerService : IManagerService
     {
         private readonly ApplicationDbContext context;
+        private readonly IRateService rateService;
 
-        public ManagerService(ApplicationDbContext context)
+        public ManagerService(ApplicationDbContext context, IRateService rateService)
         {
             this.context = context;
+            this.rateService = rateService;
         }
 
         public OperationResult<Guid> CreateNewInvestmentRequest(NewInvestmentRequest request)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var rate = rateService.GetRate(Currency.GVT, Currency.USD);
+                if (!rate.IsSuccess)
+                    throw new Exception("Cann't get rate GVT/USD");
+
                 var req = new ManagerRequests
                           {
                               Id = Guid.NewGuid(),
@@ -34,6 +41,7 @@ namespace GenesisVision.Core.Services
                               Status = ManagerRequestStatus.Created,
                               BrokerTradeServerId = request.BrokerTradeServerId,
                               DepositAmount = request.DepositAmount,
+                              DepositInUsd = request.DepositAmount * rate.Data,
                               TradePlatformPassword = request.TradePlatformPassword,
                               TradePlatformCurrency = Currency.USD,
                               TokenName = request.TokenName,
@@ -44,11 +52,11 @@ namespace GenesisVision.Core.Services
                               DateFrom = request.DateFrom ?? DateTime.Now,
                               DateTo = request.DateTo,
                               Period = request.Period,
-                              FeeSuccess = request.FeeSuccess,
-                              FeeManagement = request.FeeManagement,
-                              FeeEntrance = request.FeeEntrance,
+                              FeeSuccess = request.FeeSuccess ?? 0,
+                              FeeManagement = request.FeeManagement ?? 0,
+                              FeeEntrance = 0,
                               InvestMaxAmount = request.InvestMaxAmount,
-                              InvestMinAmount = request.InvestMinAmount
+                              InvestMinAmount = request.InvestMinAmount ?? 0
                           };
 
                 var wallet = context.Wallets.First(x => x.UserId == request.UserId && x.Currency == Currency.GVT);
@@ -79,7 +87,7 @@ namespace GenesisVision.Core.Services
                                     .Include(x => x.User)
                                     .ThenInclude(x => x.Profile)
                                     .Where(x => x.BrokerTradeServerId == brokerTradeServerId && x.Status == ManagerRequestStatus.Created)
-                                    .Select(x => x.ToManagerRequest())
+                                    .Select(x => x.ToManagerRequest(rateService))
                                     .ToList();
                 return result;
             });

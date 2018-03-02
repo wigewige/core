@@ -133,8 +133,11 @@ namespace GenesisVision.Core.Services
                                       DateTo = inv.DateFrom.AddDays(inv.Period),
                                       Status = PeriodStatus.InProccess,
                                       InvestmentProgramId = inv.Id,
-                                      Number = 1
-                                  };
+                                      Number = 1,
+                                      StartBalance = managerRequest.DepositInUsd,
+                                      ManagerStartBalance = managerRequest.DepositInUsd,
+                                      ManagerStartShare = 1
+                };
                 if (!inv.DateTo.HasValue || inv.DateTo > inv.DateFrom.AddDays(inv.Period))
                 {
                     var plannedPeriod = new Periods
@@ -445,17 +448,17 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult SetPeriodStartValues(Guid investmentProgramId, decimal balance, decimal managerBalance, decimal managerShare)
+        public OperationResult SetPeriodStartValues(StartValues values)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
                 var nextPeriod = context.Periods
                                         .Include(x => x.InvestmentRequests)
-                                        .First(x => x.Id == investmentProgramId && x.Status == PeriodStatus.Planned);
+                                        .First(x => x.Id == values.InvestmentProgramId && x.Status == PeriodStatus.Planned);
 
-                nextPeriod.StartBalance = balance;
-                nextPeriod.ManagerStartBalance = managerBalance;
-                nextPeriod.ManagerStartShare = managerShare;
+                nextPeriod.StartBalance = values.Balance;
+                nextPeriod.ManagerStartBalance = values.ManagerBalance;
+                nextPeriod.ManagerStartShare = values.ManagerShare;
 
                 context.SaveChanges();
             });

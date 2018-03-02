@@ -12,6 +12,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public string Title { get; set; }
         public string Description { get; set; }
         public int Level { get; set; }
+        public string Login { get; set; }
         public string Logo { get; set; }
         public decimal Balance { get; set; }
         public decimal OwnBalance { get; set; }
