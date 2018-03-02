@@ -27,7 +27,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              Period = program.Period,
                              InvestMinAmount = program.InvestMinAmount,
                              InvestMaxAmount = program.InvestMaxAmount,
-                             LastPeriod = program.Periods?.OrderByDescending(x => x.Number).FirstOrDefault()?.ToPeriod(),
+                             LastPeriod = program.Periods?.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod(),
                              ManagerAccountId = program.ManagerAccountId,
                              Login = program.ManagerAccount.Login,
                              IpfsHash = program.ManagerAccount.IpfsHash,
@@ -133,6 +133,8 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Status = p.Status,
                        Number = p.Number,
                        StartBalance = p.StartBalance,
+                       ManagerStartBalance = p.ManagerStartBalance,
+                       ManagerStartShare = p.ManagerStartShare,
                        InvestmentRequest = p.InvestmentRequests?.Select(ToInvestmentRequest).ToList() ??
                                            new List<InvestmentProgramRequest>()
                    };
