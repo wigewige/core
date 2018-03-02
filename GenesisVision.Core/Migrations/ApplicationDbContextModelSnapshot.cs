@@ -337,6 +337,8 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<decimal>("DepositAmount");
 
+                    b.Property<decimal>("DepositInUsd");
+
                     b.Property<string>("Description");
 
                     b.Property<decimal>("FeeEntrance");
