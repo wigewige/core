@@ -510,6 +510,10 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var GVTUSDRate = rateService.GetRate(Currency.GVT, Currency.USD);
+                if (!GVTUSDRate.IsSuccess)
+                    throw new Exception("Error at GetRate: " + string.Join(", ", GVTUSDRate.Errors));
+
                 var lastPeriod = context.Periods
                                         .Where(x => x.InvestmentProgramId == accrual.InvestmentProgramId)
                                         .OrderByDescending(x => x.Number)
@@ -526,13 +530,14 @@ namespace GenesisVision.Core.Services
                 var totalProfit = accrual.Accruals.Sum(a => a.Amount);
 
                 var wallet = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallets.First(x => x.Currency == Currency.GVT);
-                wallet.Amount -= totalProfit;
+                var brokerAmount = totalProfit / GVTUSDRate.Data;
+                wallet.Amount -= brokerAmount;
 
                 var brokerTx = new WalletTransactions
                                {
                                    Id = Guid.NewGuid(),
                                    Type = WalletTransactionsType.ProfitFromProgram,
-                                   Amount = -totalProfit,
+                                   Amount = -brokerAmount,
                                    Date = DateTime.Now,
                                    WalletId = wallet.Id
                                };
@@ -554,13 +559,14 @@ namespace GenesisVision.Core.Services
                                           .First(x => x.UserId == acc.InvestorId);
 
                     var investorWallet = investor.User.Wallets.First(x => x.Currency == Currency.GVT);
-                    investorWallet.Amount += acc.Amount;
+                    var investorAmount = acc.Amount / GVTUSDRate.Data;
+                    investorWallet.Amount += investorAmount;
 
                     var investorTx = new WalletTransactions
                                      {
                                          Id = Guid.NewGuid(),
                                          Type = WalletTransactionsType.ProfitFromProgram,
-                                         Amount = acc.Amount,
+                                         Amount = investorAmount,
                                          Date = DateTime.Now,
                                          WalletId = investorWallet.Id
                                      };
