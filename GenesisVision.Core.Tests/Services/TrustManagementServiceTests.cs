@@ -57,7 +57,7 @@ namespace GenesisVision.Core.Tests.Services
             investmentProgram = new InvestmentPrograms
                                 {
                                     Id = Guid.NewGuid(),
-                                    DateFrom = DateTime.Now.AddYears(-1),
+                                    DateFrom = DateTime.UtcNow.AddYears(-1),
                                     FeeEntrance = 100m,
                                     FeeSuccess = 120m,
                                     FeeManagement = 10m,
@@ -80,7 +80,7 @@ namespace GenesisVision.Core.Tests.Services
                          Description = string.Empty,
                          IsEnabled = true,
                          Name = "Broker #1",
-                         RegistrationDate = DateTime.Now
+                         RegistrationDate = DateTime.UtcNow
                      };
             brokerTradeServer = new BrokerTradeServers
                                 {
@@ -88,7 +88,7 @@ namespace GenesisVision.Core.Tests.Services
                                     Name = "Server #1",
                                     IsEnabled = true,
                                     Host = string.Empty,
-                                    RegistrationDate = DateTime.Now,
+                                    RegistrationDate = DateTime.UtcNow,
                                     Type = BrokerTradeServerType.MetaTrader4,
                                     BrokerId = broker.Id
                                 };
@@ -119,8 +119,8 @@ namespace GenesisVision.Core.Tests.Services
                           {
                               InvestmentProgramId = investmentProgram.Id,
                               Id = Guid.NewGuid(),
-                              DateFrom = DateTime.Now.AddDays(-1),
-                              DateTo = DateTime.Now.AddDays(9),
+                              DateFrom = DateTime.UtcNow.AddDays(-1),
+                              DateTo = DateTime.UtcNow.AddDays(9),
                               Number = 1,
                               Status = PeriodStatus.InProccess
                           };
@@ -128,8 +128,8 @@ namespace GenesisVision.Core.Tests.Services
                           {
                               InvestmentProgramId = investmentProgram.Id,
                               Id = Guid.NewGuid(),
-                              DateFrom = DateTime.Now.AddDays(9),
-                              DateTo = DateTime.Now.AddDays(19),
+                              DateFrom = DateTime.UtcNow.AddDays(9),
+                              DateTo = DateTime.UtcNow.AddDays(19),
                               Number = 2,
                               Status = PeriodStatus.Planned
                           };
@@ -156,8 +156,8 @@ namespace GenesisVision.Core.Tests.Services
                           {
                               InvestmentProgramId = investmentProgram.Id,
                               Id = Guid.NewGuid(),
-                              DateFrom = DateTime.Now.AddDays(-15),
-                              DateTo = DateTime.Now.AddDays(-5),
+                              DateFrom = DateTime.UtcNow.AddDays(-15),
+                              DateTo = DateTime.UtcNow.AddDays(-5),
                               Number = 1,
                               Status = PeriodStatus.InProccess
                           };
@@ -165,8 +165,8 @@ namespace GenesisVision.Core.Tests.Services
                           {
                               InvestmentProgramId = investmentProgram.Id,
                               Id = Guid.NewGuid(),
-                              DateFrom = DateTime.Now.AddDays(-5),
-                              DateTo = DateTime.Now.AddDays(5),
+                              DateFrom = DateTime.UtcNow.AddDays(-5),
+                              DateTo = DateTime.UtcNow.AddDays(5),
                               Number = 2,
                               Status = PeriodStatus.Planned
                           };
@@ -231,13 +231,13 @@ namespace GenesisVision.Core.Tests.Services
                                        FeeManagement = 456,
                                        FeeSuccess = 789,
                                        Period = 5,
-                                       DateFrom = DateTime.Now.AddDays(20).AddHours(15).AddMinutes(10).AddSeconds(5),
-                                       DateTo = DateTime.Now.AddDays(100),
+                                       DateFrom = DateTime.UtcNow.AddDays(20).AddHours(15).AddMinutes(10).AddSeconds(5),
+                                       DateTo = DateTime.UtcNow.AddDays(100),
                                        InvestMinAmount = 0.9999m,
                                        InvestMaxAmount = 100000.01m,
                                        Status = ManagerRequestStatus.Created,
                                        Type = ManagerRequestType.FromCabinet,
-                                       Date = DateTime.Now,
+                                       Date = DateTime.UtcNow,
                                        BrokerTradeServerId = brokerTradeServer.Id,
                                        DepositAmount = 5000,
                                        TradePlatformCurrency = Currency.USD,
@@ -317,11 +317,11 @@ namespace GenesisVision.Core.Tests.Services
                                        FeeManagement = 456,
                                        FeeSuccess = 789,
                                        Period = 25,
-                                       DateFrom = DateTime.Now,
+                                       DateFrom = DateTime.UtcNow,
                                        DateTo = null,
                                        Status = ManagerRequestStatus.Created,
                                        Type = ManagerRequestType.FromCabinet,
-                                       Date = DateTime.Now,
+                                       Date = DateTime.UtcNow,
                                        BrokerTradeServerId = brokerTradeServer.Id,
                                        DepositAmount = 1000,
                                        TradePlatformCurrency = Currency.USD,
@@ -342,15 +342,15 @@ namespace GenesisVision.Core.Tests.Services
             var investment = context.InvestmentPrograms.FirstOrDefault(x => x.ManagerAccountId == result.Data);
             Assert.IsNotNull(investment);
             Assert.AreEqual(createInvestment.Description, investment.Description);
-            Assert.IsTrue(Math.Abs((DateTime.Now - investment.DateFrom).TotalSeconds) < 3);
+            Assert.IsTrue(Math.Abs((DateTime.UtcNow - investment.DateFrom).TotalSeconds) < 3);
             Assert.IsNull(investment.DateTo);
 
             Assert.AreEqual(2, context.Periods.Count(x => x.InvestmentProgramId == investment.Id));
 
             var period = context.Periods.FirstOrDefault(x => x.InvestmentProgramId == investment.Id && x.Status == PeriodStatus.InProccess);
             Assert.IsNotNull(period);
-            Assert.IsTrue(Math.Abs((DateTime.Now - period.DateFrom).TotalSeconds) < 3);
-            Assert.IsTrue(Math.Abs((DateTime.Now.AddDays(createInvestment.Period) - period.DateTo).TotalSeconds) < 3);
+            Assert.IsTrue(Math.Abs((DateTime.UtcNow - period.DateFrom).TotalSeconds) < 3);
+            Assert.IsTrue(Math.Abs((DateTime.UtcNow.AddDays(createInvestment.Period) - period.DateTo).TotalSeconds) < 3);
         }
 
         [Test]
@@ -399,7 +399,7 @@ namespace GenesisVision.Core.Tests.Services
             Assert.AreEqual(invest.Amount, investRequest.Amount);
             Assert.AreEqual(InvestmentRequestStatus.New, investRequest.Status);
             Assert.AreEqual(InvestmentRequestType.Invest, investRequest.Type);
-            Assert.IsTrue(Math.Abs((DateTime.Now - investRequest.Date).TotalSeconds) < 3);
+            Assert.IsTrue(Math.Abs((DateTime.UtcNow - investRequest.Date).TotalSeconds) < 3);
 
             var tx = context.WalletTransactions
                             .Include(x => x.Wallet)
@@ -407,7 +407,7 @@ namespace GenesisVision.Core.Tests.Services
             Assert.IsNotNull(tx);
             Assert.AreEqual(invest.Amount, tx.Amount);
             Assert.AreEqual(WalletTransactionsType.InvestToProgram, tx.Type);
-            Assert.IsTrue(Math.Abs((DateTime.Now - tx.Date).TotalSeconds) < 3);
+            Assert.IsTrue(Math.Abs((DateTime.UtcNow - tx.Date).TotalSeconds) < 3);
             Assert.AreEqual(4500, tx.Wallet.Amount);
         }
 
@@ -423,8 +423,8 @@ namespace GenesisVision.Core.Tests.Services
                        {
                            Id = Guid.NewGuid(),
                            IsEnabled = true,
-                           DateFrom = DateTime.Now.AddDays(-1),
-                           DateTo = DateTime.Now.AddDays(1),
+                           DateFrom = DateTime.UtcNow.AddDays(-1),
+                           DateTo = DateTime.UtcNow.AddDays(1),
                            Period = 5,
                            ManagerAccountId = manager1.Id,
                            Description = "#1",
@@ -457,8 +457,8 @@ namespace GenesisVision.Core.Tests.Services
                        {
                            Id = Guid.NewGuid(),
                            IsEnabled = true,
-                           DateFrom = DateTime.Now.AddDays(-1),
-                           DateTo = DateTime.Now.AddDays(1),
+                           DateFrom = DateTime.UtcNow.AddDays(-1),
+                           DateTo = DateTime.UtcNow.AddDays(1),
                            Period = 7,
                            ManagerAccountId = manager2.Id,
                            Description = "#2",
@@ -504,8 +504,8 @@ namespace GenesisVision.Core.Tests.Services
                        {
                            Id = Guid.NewGuid(),
                            IsEnabled = true,
-                           DateFrom = DateTime.Now.AddDays(-10),
-                           DateTo = DateTime.Now.AddDays(-3),
+                           DateFrom = DateTime.UtcNow.AddDays(-10),
+                           DateTo = DateTime.UtcNow.AddDays(-3),
                            ManagerAccountId = manager1.Id,
                            Token = new ManagerTokens
                                    {
@@ -523,8 +523,8 @@ namespace GenesisVision.Core.Tests.Services
                        {
                            Id = Guid.NewGuid(),
                            IsEnabled = true,
-                           DateFrom = DateTime.Now.AddDays(10),
-                           DateTo = DateTime.Now.AddDays(17),
+                           DateFrom = DateTime.UtcNow.AddDays(10),
+                           DateTo = DateTime.UtcNow.AddDays(17),
                            ManagerAccountId = manager2.Id,
                            Token = new ManagerTokens
                                    {
@@ -543,8 +543,8 @@ namespace GenesisVision.Core.Tests.Services
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(0, result.Data.Count);
 
-            inv1.DateTo = DateTime.Now.AddMinutes(1);
-            inv2.DateFrom = DateTime.Now.AddMinutes(-1);
+            inv1.DateTo = DateTime.UtcNow.AddMinutes(1);
+            inv2.DateFrom = DateTime.UtcNow.AddMinutes(-1);
             context.SaveChanges();
 
             result = trustManagementService.GetBrokerInvestmentsInitData(brokerTradeServer.Id);
@@ -564,7 +564,7 @@ namespace GenesisVision.Core.Tests.Services
                        {
                            Id = Guid.NewGuid(),
                            IsEnabled = true,
-                           DateFrom = DateTime.Now.AddDays(-10),
+                           DateFrom = DateTime.UtcNow.AddDays(-10),
                            ManagerAccountId = manager1.Id,
                            Token = new ManagerTokens
                                    {
@@ -581,7 +581,7 @@ namespace GenesisVision.Core.Tests.Services
                        {
                            Id = Guid.NewGuid(),
                            IsEnabled = false,
-                           DateFrom = DateTime.Now.AddDays(-10),
+                           DateFrom = DateTime.UtcNow.AddDays(-10),
                            ManagerAccountId = manager2.Id,
                            Token = new ManagerTokens
                                    {

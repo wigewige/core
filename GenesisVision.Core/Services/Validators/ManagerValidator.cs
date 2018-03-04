@@ -45,7 +45,7 @@ namespace GenesisVision.Core.Services.Validators
             if (context.ManagerRequests.Any(x => x.Title == request.Title))
                 result.Add("Title already exists");
 
-            if (request.DateFrom.HasValue && request.DateFrom.Value.Date <= DateTime.Now.Date)
+            if (request.DateFrom.HasValue && request.DateFrom.Value.Date <= DateTime.UtcNow.Date)
                 result.Add("DateFrom must be greater than today");
 
             if (request.DateFrom.HasValue && request.DateTo.HasValue)
@@ -58,7 +58,7 @@ namespace GenesisVision.Core.Services.Validators
                 if (request.Period > 0 && request.DateFrom.Value.Date.AddDays(request.Period) > request.DateTo.Value.Date)
                     result.Add("DateTo must be greater first period");
             }
-            else if (request.DateTo.HasValue && request.DateTo.Value.Date <= DateTime.Now.Date.AddDays(1))
+            else if (request.DateTo.HasValue && request.DateTo.Value.Date <= DateTime.UtcNow.Date.AddDays(1))
                 result.Add("DateTo must be greater than today");
             
             if (request.FeeSuccess.HasValue && request.FeeSuccess < 0)
@@ -89,7 +89,7 @@ namespace GenesisVision.Core.Services.Validators
             if (investment.ManagerAccount.UserId != user.Id)
                 return new List<string> {ValidationMessages.AccessDenied};
 
-            if (investment.DateTo.HasValue && investment.DateTo < DateTime.Now)
+            if (investment.DateTo.HasValue && investment.DateTo < DateTime.UtcNow)
                 result.Add("Investment already closed");
 
             return result;

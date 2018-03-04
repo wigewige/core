@@ -44,7 +44,7 @@ namespace GenesisVision.Core.Tests.Validators
                          IsEnabled = true,
                          Name = "Broker #1",
                          Logo = "logo.png",
-                         RegistrationDate = DateTime.Now
+                         RegistrationDate = DateTime.UtcNow
                      };
             brokerTradeServer = new BrokerTradeServers
                                 {
@@ -52,7 +52,7 @@ namespace GenesisVision.Core.Tests.Validators
                                     Name = "Server #1",
                                     IsEnabled = true,
                                     Host = string.Empty,
-                                    RegistrationDate = DateTime.Now,
+                                    RegistrationDate = DateTime.UtcNow,
                                     Type = BrokerTradeServerType.MetaTrader4,
                                     BrokerId = broker.Id
                                 };

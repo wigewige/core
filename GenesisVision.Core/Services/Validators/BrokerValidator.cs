@@ -74,7 +74,7 @@ namespace GenesisVision.Core.Services.Validators
             var period = context.Periods
                                 .FirstOrDefault(x => x.InvestmentProgramId == investmentProgramId &&
                                                      x.Status == PeriodStatus.InProccess &&
-                                                     x.DateTo <= DateTime.Now);
+                                                     x.DateTo <= DateTime.UtcNow);
             if (period == null)
                 return new List<string> {"Does not find period for closing"};
 
@@ -217,7 +217,7 @@ namespace GenesisVision.Core.Services.Validators
                 return periodErrors;
 
             var investmentProgram = context.InvestmentPrograms.First(x => x.Id == investmentProgramId);
-            if (investmentProgram.DateTo == null || investmentProgram.DateTo > DateTime.Now)
+            if (investmentProgram.DateTo == null || investmentProgram.DateTo > DateTime.UtcNow)
                 result.Add("Investment program is still running and can't be closed");
 
             return result;

@@ -36,7 +36,7 @@ namespace GenesisVision.Core.Services
                           {
                               Id = Guid.NewGuid(),
                               UserId = request.UserId,
-                              Date = DateTime.Now,
+                              Date = DateTime.UtcNow,
                               Type = ManagerRequestType.FromCabinet,
                               Status = ManagerRequestStatus.Created,
                               BrokerTradeServerId = request.BrokerTradeServerId,
@@ -49,7 +49,7 @@ namespace GenesisVision.Core.Services
                               Logo = request.Logo,
                               Description = request.Description,
                               Title = request.Title,
-                              DateFrom = request.DateFrom ?? DateTime.Now,
+                              DateFrom = request.DateFrom ?? DateTime.UtcNow,
                               DateTo = request.DateTo,
                               Period = request.Period,
                               FeeSuccess = request.FeeSuccess ?? 0,
@@ -68,7 +68,7 @@ namespace GenesisVision.Core.Services
                              Type = WalletTransactionsType.OpenProgram,
                              WalletId = wallet.Id,
                              Amount = request.DepositAmount,
-                             Date = DateTime.Now
+                             Date = DateTime.UtcNow
                          };
 
                 context.Add(req);

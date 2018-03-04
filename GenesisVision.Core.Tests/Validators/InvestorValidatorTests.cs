@@ -40,16 +40,16 @@ namespace GenesisVision.Core.Tests.Validators
             investment = new InvestmentPrograms
                          {
                              Id = Guid.NewGuid(),
-                             DateFrom = DateTime.Now,
-                             DateTo = DateTime.Now.AddMonths(1),
+                             DateFrom = DateTime.UtcNow,
+                             DateTo = DateTime.UtcNow.AddMonths(1),
                              IsEnabled = true,
                              Period = 10
                          };
             var period = new Periods
                          {
                              Id = Guid.NewGuid(),
-                             DateFrom = DateTime.Now,
-                             DateTo = DateTime.Now.AddDays(10),
+                             DateFrom = DateTime.UtcNow,
+                             DateTo = DateTime.UtcNow.AddDays(10),
                              Number = 1,
                              Status = PeriodStatus.InProccess,
                              InvestmentProgramId = investment.Id

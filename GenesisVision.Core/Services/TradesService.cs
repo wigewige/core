@@ -217,7 +217,7 @@ namespace GenesisVision.Core.Services
                         var t = new ManagersAccountsOpenTrades
                                 {
                                     Id = Guid.NewGuid(),
-                                    DateUpdateFromTradePlatform = DateTime.Now,
+                                    DateUpdateFromTradePlatform = DateTime.UtcNow,
                                     ManagerAccountId = openTrades.ManagerAccountId,
 
                                     Ticket = trades.Ticket,
@@ -241,7 +241,7 @@ namespace GenesisVision.Core.Services
             {
                 var query = context.ManagersAccountsOpenTrades
                                    .Where(x => x.ManagerAccountId == filter.ManagerId &&
-                                               x.DateUpdateFromTradePlatform > DateTime.Now.AddMinutes(-10));
+                                               x.DateUpdateFromTradePlatform > DateTime.UtcNow.AddMinutes(-10));
 
                 if (filter.DateFrom.HasValue)
                     query = query.Where(x => x.DateOpenOrder >= filter.DateFrom.Value);

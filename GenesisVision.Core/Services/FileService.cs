@@ -35,7 +35,7 @@ namespace GenesisVision.Core.Services
                 var file = new Files
                            {
                                Id = Guid.NewGuid(),
-                               UploadDate = DateTime.Now,
+                               UploadDate = DateTime.UtcNow,
                                UserId = userId,
                                Path = fileName,
                                FileName = uploadedFile.FileName,

@@ -46,7 +46,7 @@ namespace GenesisVision.Core.Tests.Validators
                          Description = string.Empty,
                          IsEnabled = true,
                          Name = "Broker #1",
-                         RegistrationDate = DateTime.Now
+                         RegistrationDate = DateTime.UtcNow
                      };
             brokerTradeServer = new BrokerTradeServers
                                 {
@@ -54,7 +54,7 @@ namespace GenesisVision.Core.Tests.Validators
                                     Name = "Server #1",
                                     IsEnabled = true,
                                     Host = string.Empty,
-                                    RegistrationDate = DateTime.Now,
+                                    RegistrationDate = DateTime.UtcNow,
                                     Type = BrokerTradeServerType.MetaTrader4,
                                     BrokerId = broker.Id
                                 };
@@ -64,7 +64,7 @@ namespace GenesisVision.Core.Tests.Validators
                                  BrokerTradeServerId = brokerTradeServer.Id,
                                  Currency = Currency.USD,
                                  Login = "111111",
-                                 RegistrationDate = DateTime.Now,
+                                 RegistrationDate = DateTime.UtcNow,
                                  UserId = applicationUser.Id,
                                  IsConfirmed = true
                              };
@@ -123,13 +123,12 @@ namespace GenesisVision.Core.Tests.Validators
                             {
                                 UserId = applicationUser.Id,
                                 Description = "Test_test",
-                                DateFrom = DateTime.Now.AddDays(1),
-                                DateTo = DateTime.Now.AddDays(36),
+                                DateFrom = DateTime.UtcNow.AddDays(1),
+                                DateTo = DateTime.UtcNow.AddDays(36),
                                 InvestMaxAmount = 99999,
                                 InvestMinAmount = 100,
                                 FeeSuccess = 10,
                                 FeeManagement = 20,
-                                FeeEntrance = 30,
                                 Period = 35,
                                 BrokerTradeServerId = brokerTradeServer.Id,
                                 Logo = "logo.jpg",
@@ -158,32 +157,31 @@ namespace GenesisVision.Core.Tests.Validators
                             {
                                 UserId = applicationUser.Id,
                                 Description = "Test_test",
-                                DateFrom = DateTime.Now.AddDays(1),
-                                DateTo = DateTime.Now.AddDays(10),
+                                DateFrom = DateTime.UtcNow.AddDays(1),
+                                DateTo = DateTime.UtcNow.AddDays(10),
                                 InvestMaxAmount = 99999,
                                 InvestMinAmount = 100,
                                 FeeSuccess = 10,
                                 FeeManagement = 20,
-                                FeeEntrance = 30,
                                 Period = 35
                             };
 
-            createInv.DateFrom = createInv.DateTo = DateTime.Now.Date;
+            createInv.DateFrom = createInv.DateTo = DateTime.UtcNow.Date;
             var result1 = managerValidator.ValidateNewInvestmentRequest(applicationUser, createInv);
             Assert.True(result1.Any(x => x == "DateFrom must be greater than today"));
             Assert.True(result1.Any(x => x == "DateTo must be greater DateFrom"));
 
-            createInv.DateFrom = DateTime.Now.AddDays(10);
-            createInv.DateTo = DateTime.Now.Date;
+            createInv.DateFrom = DateTime.UtcNow.AddDays(10);
+            createInv.DateTo = DateTime.UtcNow.Date;
             var result2 = managerValidator.ValidateNewInvestmentRequest(applicationUser, createInv);
             Assert.IsTrue(result2.Any(x => x == "DateTo must be greater DateFrom"));
 
-            createInv.DateFrom = createInv.DateTo = DateTime.Now.AddDays(10);
+            createInv.DateFrom = createInv.DateTo = DateTime.UtcNow.AddDays(10);
             var result3 = managerValidator.ValidateNewInvestmentRequest(applicationUser, createInv);
             Assert.IsTrue(result3.Any(x => x == "DateTo must be greater DateFrom"));
 
-            createInv.DateFrom = DateTime.Now.Date.AddDays(10);
-            createInv.DateTo = DateTime.Now.Date.AddDays(10).AddHours(1);
+            createInv.DateFrom = DateTime.UtcNow.Date.AddDays(10);
+            createInv.DateTo = DateTime.UtcNow.Date.AddDays(10).AddHours(1);
             var result4 = managerValidator.ValidateNewInvestmentRequest(applicationUser, createInv);
             Assert.True(result4.Any(x => x == "Minimum duration is 1 day"));
         }
@@ -207,7 +205,6 @@ namespace GenesisVision.Core.Tests.Validators
                             {
                                 UserId = applicationUser.Id,
                                 Period = 10,
-                                FeeEntrance = -1,
                                 FeeSuccess = -10,
                                 FeeManagement = -20
                             };

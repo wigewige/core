@@ -43,7 +43,7 @@ namespace GenesisVision.Core.Services
                                         .Include(x => x.Periods)
                                         .First(x => x.Id == invProgramId);
 
-                investment.DateTo = DateTime.Now;
+                investment.DateTo = DateTime.UtcNow;
 
                 var plannedPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.Planned);
                 if (plannedPeriod != null)
@@ -67,7 +67,7 @@ namespace GenesisVision.Core.Services
                                          Type = WalletTransactionsType.CancelInvestmentRequest,
                                          WalletId = wallet.Id,
                                          Amount = request.Amount,
-                                         Date = DateTime.Now
+                                         Date = DateTime.UtcNow
                                      };
                             context.Add(tx);
                         }
@@ -92,7 +92,7 @@ namespace GenesisVision.Core.Services
                                   Id = Guid.NewGuid(),
                                   BrokerTradeServerId = managerRequest.BrokerTradeServerId,
                                   UserId = managerRequest.UserId,
-                                  RegistrationDate = DateTime.Now,
+                                  RegistrationDate = DateTime.UtcNow,
                                   Login = request.Login,
                                   Currency = managerRequest.TradePlatformCurrency,
                                   IsConfirmed = false,
@@ -198,7 +198,7 @@ namespace GenesisVision.Core.Services
                              Type = WalletTransactionsType.InvestToProgram,
                              WalletId = wallet.Id,
                              Amount = model.Amount,
-                             Date = DateTime.Now
+                             Date = DateTime.UtcNow
                          };
 
                 var invRequest = new InvestmentRequests
@@ -206,7 +206,7 @@ namespace GenesisVision.Core.Services
                                      Id = Guid.NewGuid(),
                                      UserId = model.UserId,
                                      Amount = model.Amount,
-                                     Date = DateTime.Now,
+                                     Date = DateTime.UtcNow,
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
                                      Type = InvestmentRequestType.Invest,
@@ -242,7 +242,7 @@ namespace GenesisVision.Core.Services
                                      Id = Guid.NewGuid(),
                                      UserId = model.UserId,
                                      Amount = model.Amount,
-                                     Date = DateTime.Now,
+                                     Date = DateTime.UtcNow,
                                      InvestmentProgramtId = model.InvestmentProgramId,
                                      Status = InvestmentRequestStatus.New,
                                      Type = InvestmentRequestType.Withdrawal,
@@ -369,8 +369,8 @@ namespace GenesisVision.Core.Services
                                  .Include(x => x.Periods)
                                  .Where(x => x.ManagerAccount.BrokerTradeServerId == brokerTradeServerId &&
                                              x.IsEnabled &&
-                                             x.DateFrom < DateTime.Now &&
-                                             (x.DateTo == null || x.DateTo > DateTime.Now))
+                                             x.DateFrom < DateTime.UtcNow &&
+                                             (x.DateTo == null || x.DateTo > DateTime.UtcNow))
                                  .Select(x => x.ToBrokerInvestmentProgram())
                                  .ToList();
                 return res;
@@ -391,7 +391,7 @@ namespace GenesisVision.Core.Services
                                CurrentPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod()
                            };
 
-                data.CanCloseCurrentPeriod = data.CurrentPeriod != null && data.CurrentPeriod.DateTo <= DateTime.Now;
+                data.CanCloseCurrentPeriod = data.CurrentPeriod != null && data.CurrentPeriod.DateTo <= DateTime.UtcNow;
                 data.TokenHolders = context.Portfolios
                                            .Where(x => x.ManagerTokenId == investment.ManagerTokensId)
                                            .Select(x => new InvestorAmount
@@ -423,13 +423,13 @@ namespace GenesisVision.Core.Services
                     nextPeriod.Status = PeriodStatus.InProccess;
                 }
 
-                if (!investment.DateTo.HasValue || DateTime.Now < investment.DateTo.Value)
+                if (!investment.DateTo.HasValue || DateTime.UtcNow < investment.DateTo.Value)
                 {
                     var newPeriod = new Periods
                                     {
                                         Id = Guid.NewGuid(),
-                                        DateFrom = DateTime.Now,
-                                        DateTo = DateTime.Now.AddDays(investment.Period),
+                                        DateFrom = DateTime.UtcNow,
+                                        DateTo = DateTime.UtcNow.AddDays(investment.Period),
                                         InvestmentProgramId = investmentProgramId,
                                         Number = investment.Periods.Max(x => x.Number) + 1,
                                         Status = PeriodStatus.Planned
@@ -437,7 +437,7 @@ namespace GenesisVision.Core.Services
                     context.Add(newPeriod);
                 }
 
-                if (investment.DateTo.HasValue && investment.DateTo < DateTime.Now)
+                if (investment.DateTo.HasValue && investment.DateTo < DateTime.UtcNow)
                 {
                     investment.IsEnabled = false;
                 }
@@ -538,7 +538,7 @@ namespace GenesisVision.Core.Services
                                    Id = Guid.NewGuid(),
                                    Type = WalletTransactionsType.ProfitFromProgram,
                                    Amount = -brokerAmount,
-                                   Date = DateTime.Now,
+                                   Date = DateTime.UtcNow,
                                    WalletId = wallet.Id
                                };
 
@@ -567,7 +567,7 @@ namespace GenesisVision.Core.Services
                                          Id = Guid.NewGuid(),
                                          Type = WalletTransactionsType.ProfitFromProgram,
                                          Amount = investorAmount,
-                                         Date = DateTime.Now,
+                                         Date = DateTime.UtcNow,
                                          WalletId = investorWallet.Id
                                      };
 
@@ -609,7 +609,7 @@ namespace GenesisVision.Core.Services
                         Type = WalletTransactionsType.CancelInvestmentRequest,
                         WalletId = wallet.Id,
                         Amount = investmentRequest.Amount,
-                        Date = DateTime.Now
+                        Date = DateTime.UtcNow
                     };
 
                     context.Add(tx);
@@ -690,7 +690,7 @@ namespace GenesisVision.Core.Services
                                 Type = WalletTransactionsType.PartialInvestmentExecutionRefund,
                                 WalletId = wallet.Id,
                                 Amount = request.Amount - gvtAmount,
-                                Date = DateTime.Now
+                                Date = DateTime.UtcNow
                             };
 
                             context.Add(tx);
@@ -743,7 +743,7 @@ namespace GenesisVision.Core.Services
                                              Type = WalletTransactionsType.WithdrawFromProgram,
                                              WalletId = wallet.Id,
                                              Amount = amountInGVT,
-                                             Date = DateTime.Now
+                                             Date = DateTime.UtcNow
                                          };
 
                         context.Add(investorTx);
@@ -786,7 +786,7 @@ namespace GenesisVision.Core.Services
                                             Id = Guid.NewGuid(),
                                             Type = WalletTransactionsType.WithdrawFromProgram,
                                             Amount = amountInGVT,
-                                            Date = DateTime.Now,
+                                            Date = DateTime.UtcNow,
                                             WalletId = wallet.Id
                                         };
 
@@ -907,7 +907,7 @@ namespace GenesisVision.Core.Services
                         Type = WalletTransactionsType.ClosingProgramRefund,
                         WalletId = wallet.Id,
                         Amount = gvtAmount,
-                        Date = DateTime.Now
+                        Date = DateTime.UtcNow
                     };
 
                     context.Add(investorTx);
@@ -933,7 +933,7 @@ namespace GenesisVision.Core.Services
                     Type = WalletTransactionsType.ClosingProgramRefund,
                     WalletId = managerWallet.Id,
                     Amount = managerAmountInGVT,
-                    Date = DateTime.Now
+                    Date = DateTime.UtcNow
                 };
 
                 context.Add(managerTx);
@@ -950,7 +950,7 @@ namespace GenesisVision.Core.Services
                     Type = WalletTransactionsType.ClosingProgramRefund,
                     WalletId = brokerWallet.Id,
                     Amount = managerAmountInGVT,
-                    Date = DateTime.Now
+                    Date = DateTime.UtcNow
                 };
 
                 context.Add(brokerTx);
