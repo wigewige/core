@@ -9,6 +9,7 @@
         WithdrawFromProgram = 4,
         ProfitFromProgram = 5,
         CancelInvestmentRequest = 6,
-        PartialInvestmentExecutionRefund = 7
+        PartialInvestmentExecutionRefund = 7,
+        ClosingProgramRefund = 8
     }
 }

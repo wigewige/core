@@ -207,5 +207,20 @@ namespace GenesisVision.Core.Services.Validators
 
             return result;
         }
+
+        public List<string> ValidateProcessClosingProgram(ApplicationUser user, Guid investmentProgramId)
+        {
+            var result = new List<string>();
+
+            var periodErrors = ValidateClosePeriod(user, investmentProgramId);
+            if (periodErrors.Any())
+                return periodErrors;
+
+            var investmentProgram = context.InvestmentPrograms.First(x => x.Id == investmentProgramId);
+            if (investmentProgram.DateTo == null || investmentProgram.DateTo > DateTime.Now)
+                result.Add("Investment program is still running and can't be closed");
+
+            return result;
+        }
     }
 }

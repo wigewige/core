@@ -29,5 +29,7 @@ namespace GenesisVision.Core.Services.Validators.Interfaces
         List<string> ValidateReevaluateManagerToken(ApplicationUser user, Guid investmentProgramId);
 
         List<string> ValidateUpdateManagerHistoryIpfsHash(ApplicationUser user, ManagerHistoryIpfsHash data);
+
+        List<string> ValidateProcessClosingProgram(ApplicationUser user, Guid investmentProgramId);
     }
 }

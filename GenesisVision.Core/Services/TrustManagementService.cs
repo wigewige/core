@@ -865,5 +865,100 @@ namespace GenesisVision.Core.Services
                     context.SaveChanges();
             });
         }
+
+        public OperationResult ProcessClosingProgram(Guid investmentProgramId, decimal managerBalance)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                decimal brokerBalanceChange = 0;
+
+                var USDGVTRate = rateService.GetRate(Currency.USD, Currency.GVT);
+                if (!USDGVTRate.IsSuccess)
+                    throw new Exception("Error at GetRate: " + string.Join(", ", USDGVTRate.Errors));
+                
+                var investmentProgram = context.InvestmentPrograms
+                      .Include(x => x.Token)
+                      .ThenInclude(x => x.Portfolios)
+                      .Include(x => x.ManagerAccount)
+                      .ThenInclude(x => x.BrokerTradeServer)
+                      .ThenInclude(x => x.Broker)
+                      .ThenInclude(x => x.User)
+                      .ThenInclude(x => x.Wallets)
+                      .First(x => x.Id == investmentProgramId);
+
+                var tokenGVTRate = investmentProgram.Token.InitialPrice * USDGVTRate.Data;
+
+                //Process investors
+                foreach (var holder in investmentProgram.Token.Portfolios)
+                {
+                    var gvtAmount = holder.Amount * tokenGVTRate;
+
+                    var investor = context.InvestorAccounts
+                                         .Include(x => x.User)
+                                         .ThenInclude(x => x.Wallets)
+                                         .First(x => x.UserId == holder.InvestorAccountId);
+
+                    var wallet = investor.User.Wallets.First(x => x.Currency == Currency.GVT);
+                    wallet.Amount += gvtAmount;
+
+                    var investorTx = new WalletTransactions
+                    {
+                        Id = Guid.NewGuid(),
+                        Type = WalletTransactionsType.ClosingProgramRefund,
+                        WalletId = wallet.Id,
+                        Amount = gvtAmount,
+                        Date = DateTime.Now
+                    };
+
+                    context.Add(investorTx);
+
+                    brokerBalanceChange += gvtAmount;
+
+                    holder.Amount = 0;
+                }
+
+                //Process manager
+                var managerAmountInGVT = managerBalance * USDGVTRate.Data;
+
+                var manager = context.Users
+                                      .Include(x => x.Wallets)
+                                      .First(x => x.Id == investmentProgram.ManagerAccountId);
+
+                var managerWallet = manager.Wallets.First(x => x.Currency == Currency.GVT);
+                managerWallet.Amount += managerAmountInGVT;
+
+                var managerTx = new WalletTransactions
+                {
+                    Id = Guid.NewGuid(),
+                    Type = WalletTransactionsType.ClosingProgramRefund,
+                    WalletId = managerWallet.Id,
+                    Amount = managerAmountInGVT,
+                    Date = DateTime.Now
+                };
+
+                context.Add(managerTx);
+
+                brokerBalanceChange += managerAmountInGVT;
+
+                //Process broker
+                var brokerWallet = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Wallets.First(x => x.Currency == Currency.GVT);
+                brokerWallet.Amount -= brokerBalanceChange;
+
+                var brokerTx = new WalletTransactions
+                {
+                    Id = Guid.NewGuid(),
+                    Type = WalletTransactionsType.ClosingProgramRefund,
+                    WalletId = brokerWallet.Id,
+                    Amount = managerAmountInGVT,
+                    Date = DateTime.Now
+                };
+
+                context.Add(brokerTx);
+
+                context.SaveChanges();
+                
+                ClosePeriod(investmentProgramId);
+            });
+        }
     }
 }

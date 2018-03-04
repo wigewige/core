@@ -290,5 +290,26 @@ namespace GenesisVision.Core.Controllers
 
             return Ok();
         }
+
+        /// <summary>
+        /// Close investment program
+        /// </summary>
+        [HttpPost]
+        [Route("broker/period/processClosingProgram")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult ProcessClosingProgram(Guid investmentProgramId, decimal managerBalance)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ErrorResult.GetResult(ModelState));
+
+            var errors = brokerValidator.ValidateProcessClosingProgram(CurrentUser, investmentProgramId);
+            if (errors.Any())
+                return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
+
+            trustManagementService.ProcessClosingProgram(investmentProgramId, managerBalance);
+
+            return Ok();
+        }
     }
 }
