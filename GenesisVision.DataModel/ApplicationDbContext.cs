@@ -25,7 +25,7 @@ namespace GenesisVision.DataModel
         public DbSet<Periods> Periods { get; set; }
         public DbSet<InvestmentRequests> InvestmentRequests { get; set; }
         public DbSet<ManagerTokens> ManagerTokens { get; set; }
-        public DbSet<Portfolios> Portfolios { get; set; }
+        public DbSet<InvestorTokens> InvestorTokens { get; set; }
         public DbSet<Wallets> Wallets { get; set; }
         public DbSet<BlockchainAddresses> BlockchainAddresses { get; set; }
         public DbSet<WalletTransactions> WalletTransactions { get; set; }
@@ -77,12 +77,7 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.User)
                    .WithMany(x => x.Files)
                    .HasForeignKey(x => x.UserId);
-
-            builder.Entity<Portfolios>()
-                   .HasOne(x => x.ManagerToken)
-                   .WithMany(x => x.Portfolios)
-                   .HasForeignKey(x => x.ManagerTokenId);
-
+            
             builder.Entity<BrokerTradeServers>()
                    .HasOne(x => x.Broker)
                    .WithMany(x => x.BrokerTradeServers)
@@ -208,19 +203,21 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.InvestorAccount)
                    .WithOne(x => x.User)
                    .HasForeignKey<InvestorAccounts>(x => x.UserId);
-            
-            //builder.Entity<InvestorAccounts>()
-            //       .HasOne(x => x.Portfolios)
-            //       .WithMany(x => x.InvestorAccount)
-            //       .HasForeignKey<Portfolios>(x => x.InvestorAccountId);
 
-            builder.Entity<Portfolios>()
-                   .HasKey(x => x.InvestorAccountId);
+            builder.Entity<InvestorTokens>()
+                   .HasOne(x => x.InvestorAccount)
+                   .WithMany(x => x.InvestorTokens)
+                   .HasForeignKey(x => x.InvestorAccountId);
+
+            builder.Entity<InvestorTokens>()
+                   .HasOne(x => x.ManagerToken)
+                   .WithMany(x => x.InvestorTokens)
+                   .HasForeignKey(x => x.ManagerTokenId);
 
             builder.Entity<ManagerTokens>()
                    .HasOne(x => x.InvestmentProgram)
                    .WithOne(x => x.Token)
-                   .HasForeignKey<InvestmentPrograms>(x => x.ManagerTokensId);
+                   .HasForeignKey<InvestmentPrograms>(x => x.ManagerTokenId);
             
             builder.Entity<WalletTransactions>()
                    .HasOne(x => x.Wallet)

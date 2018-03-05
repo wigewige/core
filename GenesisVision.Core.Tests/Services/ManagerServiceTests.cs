@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GenesisVision.Common.Models;
 
 namespace GenesisVision.Core.Tests.Services
 {
@@ -38,6 +39,9 @@ namespace GenesisVision.Core.Tests.Services
         [Test]
         public void CreateInvestmentProgramRequest()
         {
+            rateService.Setup(x => x.GetRate(It.IsAny<Currency>(), It.IsAny<Currency>()))
+                       .Returns(() => InvokeOperations.InvokeOperation(() => 1m));
+
             var user = new ApplicationUser
                        {
                            Id = Guid.NewGuid(),
@@ -68,6 +72,7 @@ namespace GenesisVision.Core.Tests.Services
                                    };
             var result = managerService.CreateNewInvestmentRequest(createInvestment);
             Assert.IsTrue(result.IsSuccess);
+            rateService.Verify(x => x.GetRate(It.IsAny<Currency>(), It.IsAny<Currency>()));
 
             var investment = context.ManagerRequests
                                     .FirstOrDefault(x => x.Id == result.Data);

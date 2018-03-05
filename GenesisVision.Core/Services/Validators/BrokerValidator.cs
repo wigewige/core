@@ -130,13 +130,13 @@ namespace GenesisVision.Core.Services.Validators
 
             foreach (var acc in accrual.Accruals)
             {
-                var portfolio = context.Portfolios
-                                       .Include(p => p.ManagerToken)
-                                       .ThenInclude(p => p.InvestmentProgram)
-                                       .Where(p => p.InvestorAccountId == acc.InvestorId)
-                                       .FirstOrDefault(p => p.ManagerToken.InvestmentProgram.Id == accrual.InvestmentProgramId);
+                var investorTokens = context.InvestorTokens
+                                            .Include(p => p.ManagerToken)
+                                            .ThenInclude(p => p.InvestmentProgram)
+                                            .Where(p => p.InvestorAccountId == acc.InvestorId)
+                                            .FirstOrDefault(p => p.ManagerToken.InvestmentProgram.Id == accrual.InvestmentProgramId);
 
-                if (portfolio == null)
+                if (investorTokens == null)
                     result.Add($"Investor {acc.InvestorId} doesn't belong to investment program");
             }
 

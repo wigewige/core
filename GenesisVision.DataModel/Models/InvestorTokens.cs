@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace GenesisVision.DataModel.Models
 {
-    public class Portfolios
+    public class InvestorTokens
     {
+        public Guid Id { get; set; }
+
         public Guid InvestorAccountId { get; set; }
         public InvestorAccounts InvestorAccount { get; set; }
 

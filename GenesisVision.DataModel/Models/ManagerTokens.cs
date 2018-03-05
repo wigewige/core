@@ -14,6 +14,6 @@ namespace GenesisVision.DataModel.Models
 
         public InvestmentPrograms InvestmentProgram { get; set; }
 
-        public ICollection<Portfolios> Portfolios { get; set; }
+        public ICollection<InvestorTokens> InvestorTokens { get; set; }
     }
 }

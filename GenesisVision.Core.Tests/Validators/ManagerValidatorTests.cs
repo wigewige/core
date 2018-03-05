@@ -93,30 +93,6 @@ namespace GenesisVision.Core.Tests.Validators
         }
 
         [Test]
-        public void ValidateNewManagerAccountRequestCheckName()
-        {
-            const string errorMsg = "'Description' is empty";
-
-            var res1 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
-                new NewInvestmentRequest
-                {
-                    BrokerTradeServerId = brokerTradeServer.Id,
-                    UserId = applicationUser.Id,
-                    Description = "Manager #1"
-                });
-            Assert.IsTrue(res1.All(x => x != errorMsg));
-
-            var res2 = managerValidator.ValidateNewInvestmentRequest(applicationUser,
-                new NewInvestmentRequest
-                {
-                    BrokerTradeServerId = brokerTradeServer.Id,
-                    UserId = applicationUser.Id,
-                    Description = ""
-                });
-            Assert.IsTrue(res2.Any(x => x == errorMsg));
-        }
-
-        [Test]
         public void ValidateInvestSuccess()
         {
             var createInv = new NewInvestmentRequest
@@ -206,10 +182,10 @@ namespace GenesisVision.Core.Tests.Validators
                                 UserId = applicationUser.Id,
                                 Period = 10,
                                 FeeSuccess = -10,
-                                FeeManagement = -20
+                                FeeManagement = -20,
+                                BrokerTradeServerId = brokerTradeServer.Id
                             };
             var result = managerValidator.ValidateNewInvestmentRequest(applicationUser, createInv);
-            Assert.IsTrue(result.Any(x => x.Contains("FeeEntrance must be greater or equal zero")));
             Assert.IsTrue(result.Any(x => x.Contains("FeeSuccess must be greater or equal zero")));
             Assert.IsTrue(result.Any(x => x.Contains("FeeManagement must be greater or equal zero")));
         }

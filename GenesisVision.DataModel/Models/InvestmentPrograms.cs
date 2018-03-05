@@ -26,7 +26,7 @@ namespace GenesisVision.DataModel.Models
         public Guid ManagerAccountId { get; set; }
 
         public ManagerTokens Token { get; set; }
-        public Guid ManagerTokensId { get; set; }
+        public Guid ManagerTokenId { get; set; }
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 

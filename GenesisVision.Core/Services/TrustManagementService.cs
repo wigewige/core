@@ -122,7 +122,7 @@ namespace GenesisVision.Core.Services
                               IsEnabled = true,
                               ManagerAccountId = manager.Id,
                               Period = managerRequest.Period,
-                              ManagerTokensId = token.Id,
+                              ManagerTokenId = token.Id,
                               Logo = managerRequest.Logo,
                               Rating = 0,
                           };
@@ -381,19 +381,19 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var investment = context.InvestmentPrograms
-                                        .Include(x => x.Periods)
-                                        .ThenInclude(x => x.InvestmentRequests)
-                                        .First(x => x.Id == investmentProgramId);
+                var program = context.InvestmentPrograms
+                                     .Include(x => x.Periods)
+                                     .ThenInclude(x => x.InvestmentRequests)
+                                     .First(x => x.Id == investmentProgramId);
 
                 var data = new ClosePeriodData
                            {
-                               CurrentPeriod = investment.Periods.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod()
+                               CurrentPeriod = program.Periods.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ToPeriod()
                            };
 
                 data.CanCloseCurrentPeriod = data.CurrentPeriod != null && data.CurrentPeriod.DateTo <= DateTime.UtcNow;
-                data.TokenHolders = context.Portfolios
-                                           .Where(x => x.ManagerTokenId == investment.ManagerTokensId)
+                data.TokenHolders = context.InvestorTokens
+                                           .Where(x => x.ManagerTokenId == program.ManagerTokenId)
                                            .Select(x => new InvestorAmount
                                                         {
                                                             InvestorId = x.InvestorAccountId,
@@ -640,28 +640,31 @@ namespace GenesisVision.Core.Services
                                         .First(x => x.InvestmentProgramId == investmentProgramId && x.Status == PeriodStatus.Planned);
 
                 var investmentProgram = context.InvestmentPrograms
-                      .Include(x => x.Token)
-                      .Include(x => x.ManagerAccount)
-                      .ThenInclude(x => x.BrokerTradeServer)
-                      .ThenInclude(x => x.Broker)
-                      .ThenInclude(x => x.User)
-                      .ThenInclude(x => x.Wallets)                      
-                      .First(x => x.Id == investmentProgramId);
+                                               .Include(x => x.Token)
+                                               .Include(x => x.ManagerAccount)
+                                               .ThenInclude(x => x.BrokerTradeServer)
+                                               .ThenInclude(x => x.Broker)
+                                               .ThenInclude(x => x.User)
+                                               .ThenInclude(x => x.Wallets)
+                                               .First(x => x.Id == investmentProgramId);
 
                 var brokerWalletId = investmentProgram.ManagerAccount.BrokerTradeServer.Broker.User.Id;
                 var GVTToManagerTokenRate = GVTUSDRate.Data / investmentProgram.Token.InitialPrice;
                 
-                foreach (var request in nextPeriod.InvestmentRequests.OrderByDescending(x => x.Type).ThenBy(x => x.Date).Where(i => i.Status == InvestmentRequestStatus.New && i.UserId != investmentProgram.ManagerAccountId))
+                foreach (var request in nextPeriod.InvestmentRequests
+                                                  .OrderByDescending(x => x.Type)
+                                                  .ThenBy(x => x.Date)
+                                                  .Where(x => x.Status == InvestmentRequestStatus.New && x.UserId != investmentProgram.ManagerAccount.UserId))
                 {
                     request.Status = InvestmentRequestStatus.Executed;
 
                     var investor = context.InvestorAccounts
-                                          .Include(x => x.Portfolios)
+                                          .Include(x => x.InvestorTokens)
                                           .Include(x => x.User)
                                           .ThenInclude(x => x.Wallets)
                                           .First(x => x.UserId == request.UserId);
 
-                    var portfolio = investor.Portfolios.FirstOrDefault(x => x.ManagerTokenId == investmentProgram.Token.Id);
+                    var investorTokens = investor.InvestorTokens.FirstOrDefault(x => x.ManagerTokenId == investmentProgram.Token.Id);
 
                     if (request.Type == InvestmentRequestType.Invest)
                     {
@@ -699,30 +702,30 @@ namespace GenesisVision.Core.Services
                         brokerBalanceChange += gvtAmount;
                         result.AccountBalanceChange += gvtAmount * GVTUSDRate.Data;
 
-                        if (portfolio == null)
+                        if (investorTokens == null)
                         {
-                            var newPortfolio = new Portfolios
-                            {
-                                InvestorAccountId = request.UserId,
-                                ManagerTokenId = investmentProgram.Token.Id,
-                                Amount = tokensAmount
-                            };
-
+                            var newPortfolio = new InvestorTokens
+                                               {
+                                                   Id = Guid.NewGuid(),
+                                                   InvestorAccountId = request.UserId,
+                                                   ManagerTokenId = investmentProgram.Token.Id,
+                                                   Amount = tokensAmount
+                                               };
                             context.Add(newPortfolio);
                         }
                         else
                         {
-                            portfolio.Amount += tokensAmount;
+                            investorTokens.Amount += tokensAmount;
                         }
 
                         investmentProgram.Token.FreeTokens -= tokensAmount;
                     }
                     else
                     {
-                        var portfolioValue = portfolio.Amount * investmentProgram.Token.InitialPrice;
+                        var investorTokensValue = investorTokens.Amount * investmentProgram.Token.InitialPrice;
 
                         //ToDo: Actual amount to request
-                        var amount = portfolioValue > request.Amount ? request.Amount : portfolioValue;
+                        var amount = investorTokensValue > request.Amount ? request.Amount : investorTokensValue;
 
                         var amountInGVT = amount / GVTUSDRate.Data;
 
@@ -730,7 +733,7 @@ namespace GenesisVision.Core.Services
                         result.AccountBalanceChange -= amount;
 
                         var tokensAmount = amount / investmentProgram.Token.InitialPrice;
-                        portfolio.Amount -= tokensAmount;
+                        investorTokens.Amount -= tokensAmount;
                         investmentProgram.Token.FreeTokens += tokensAmount;
 
 
@@ -750,7 +753,8 @@ namespace GenesisVision.Core.Services
                     }
                 }
 
-                foreach (var request in nextPeriod.InvestmentRequests.Where(i => i.Status == InvestmentRequestStatus.New && i.UserId == investmentProgram.ManagerAccountId))
+                foreach (var request in nextPeriod.InvestmentRequests
+                                                  .Where(i => i.Status == InvestmentRequestStatus.New && i.UserId == investmentProgram.ManagerAccount.UserId))
                 {
                     request.Status = InvestmentRequestStatus.Executed;
 
@@ -775,8 +779,8 @@ namespace GenesisVision.Core.Services
                         result.ManagerBalanceChange -= amount;
 
                         var manager = context.Users
-                                      .Include(x => x.Wallets)
-                                      .First(x => x.Id == investmentProgram.ManagerAccountId);
+                                             .Include(x => x.Wallets)
+                                             .First(x => x.Id == investmentProgram.ManagerAccount.UserId);
 
                         var wallet = manager.Wallets.First(x => x.Currency == Currency.GVT);
                         wallet.Amount += amountInGVT;
@@ -875,28 +879,28 @@ namespace GenesisVision.Core.Services
                 var USDGVTRate = rateService.GetRate(Currency.USD, Currency.GVT);
                 if (!USDGVTRate.IsSuccess)
                     throw new Exception("Error at GetRate: " + string.Join(", ", USDGVTRate.Errors));
-                
+
                 var investmentProgram = context.InvestmentPrograms
-                      .Include(x => x.Token)
-                      .ThenInclude(x => x.Portfolios)
-                      .Include(x => x.ManagerAccount)
-                      .ThenInclude(x => x.BrokerTradeServer)
-                      .ThenInclude(x => x.Broker)
-                      .ThenInclude(x => x.User)
-                      .ThenInclude(x => x.Wallets)
-                      .First(x => x.Id == investmentProgramId);
+                                               .Include(x => x.Token)
+                                               .ThenInclude(x => x.InvestorTokens)
+                                               .Include(x => x.ManagerAccount)
+                                               .ThenInclude(x => x.BrokerTradeServer)
+                                               .ThenInclude(x => x.Broker)
+                                               .ThenInclude(x => x.User)
+                                               .ThenInclude(x => x.Wallets)
+                                               .First(x => x.Id == investmentProgramId);
 
                 var tokenGVTRate = investmentProgram.Token.InitialPrice * USDGVTRate.Data;
 
                 //Process investors
-                foreach (var holder in investmentProgram.Token.Portfolios)
+                foreach (var holder in investmentProgram.Token.InvestorTokens)
                 {
                     var gvtAmount = holder.Amount * tokenGVTRate;
 
                     var investor = context.InvestorAccounts
-                                         .Include(x => x.User)
-                                         .ThenInclude(x => x.Wallets)
-                                         .First(x => x.UserId == holder.InvestorAccountId);
+                                          .Include(x => x.User)
+                                          .ThenInclude(x => x.Wallets)
+                                          .First(x => x.UserId == holder.InvestorAccountId);
 
                     var wallet = investor.User.Wallets.First(x => x.Currency == Currency.GVT);
                     wallet.Amount += gvtAmount;
@@ -921,8 +925,8 @@ namespace GenesisVision.Core.Services
                 var managerAmountInGVT = managerBalance * USDGVTRate.Data;
 
                 var manager = context.Users
-                                      .Include(x => x.Wallets)
-                                      .First(x => x.Id == investmentProgram.ManagerAccountId);
+                                     .Include(x => x.Wallets)
+                                     .First(x => x.Id == investmentProgram.ManagerAccountId);
 
                 var managerWallet = manager.Wallets.First(x => x.Currency == Currency.GVT);
                 managerWallet.Amount += managerAmountInGVT;

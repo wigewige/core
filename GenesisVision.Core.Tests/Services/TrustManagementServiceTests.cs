@@ -483,9 +483,9 @@ namespace GenesisVision.Core.Tests.Services
             Assert.AreEqual(inv1.Description, result.Data.First(x => x.Id == inv1.Id).Description);
             Assert.AreEqual(inv1.DateFrom, result.Data.First(x => x.Id == inv1.Id).DateFrom);
             Assert.IsNotNull(result.Data.First(x => x.Id == inv1.Id).LastPeriod);
-            Assert.AreEqual(period2.Id, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Id);
-            Assert.AreEqual(period2.Number, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Number);
-            Assert.AreEqual(period2.Status, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Status);
+            Assert.AreEqual(period1.Id, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Id);
+            Assert.AreEqual(period1.Number, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Number);
+            Assert.AreEqual(period1.Status, result.Data.First(x => x.Id == inv1.Id).LastPeriod.Status);
             Assert.AreEqual(inv2.Period, result.Data.First(x => x.Id == inv2.Id).Period);
             Assert.AreEqual(inv2.DateTo, result.Data.First(x => x.Id == inv2.Id).DateTo);
             Assert.AreEqual(inv2.ManagerAccount.Login, result.Data.First(x => x.Id == inv2.Id).Login);
