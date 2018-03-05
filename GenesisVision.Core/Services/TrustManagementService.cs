@@ -1,5 +1,6 @@
 ﻿using GenesisVision.Common.Models;
 using GenesisVision.Common.Services.Interfaces;
+using GenesisVision.Core.Helpers;
 using GenesisVision.Core.Helpers.Convertors;
 using GenesisVision.Core.Services.Interfaces;
 using GenesisVision.Core.ViewModels.Broker;
@@ -130,21 +131,25 @@ namespace GenesisVision.Core.Services
                                   {
                                       Id = Guid.NewGuid(),
                                       DateFrom = inv.DateFrom,
-                                      DateTo = inv.DateFrom.AddDays(inv.Period),
+                                      DateTo = Constants.IsPeriodInMinutes
+                                          ? inv.DateFrom.AddMinutes(inv.Period)
+                                          : inv.DateFrom.AddDays(inv.Period),
                                       Status = PeriodStatus.InProccess,
                                       InvestmentProgramId = inv.Id,
                                       Number = 1,
                                       StartBalance = managerRequest.DepositInUsd,
                                       ManagerStartBalance = managerRequest.DepositInUsd,
                                       ManagerStartShare = 1
-                };
+                                  };
                 if (!inv.DateTo.HasValue || inv.DateTo > inv.DateFrom.AddDays(inv.Period))
                 {
                     var plannedPeriod = new Periods
                                         {
                                             Id = Guid.NewGuid(),
                                             DateFrom = firstPeriod.DateTo,
-                                            DateTo = firstPeriod.DateTo.AddDays(inv.Period),
+                                            DateTo = Constants.IsPeriodInMinutes
+                                                ? firstPeriod.DateTo.AddMinutes(inv.Period)
+                                                : firstPeriod.DateTo.AddDays(inv.Period),
                                             Status = PeriodStatus.Planned,
                                             InvestmentProgramId = inv.Id,
                                             Number = 2
@@ -435,7 +440,9 @@ namespace GenesisVision.Core.Services
                                     {
                                         Id = Guid.NewGuid(),
                                         DateFrom = DateTime.UtcNow,
-                                        DateTo = DateTime.UtcNow.AddDays(investment.Period),
+                                        DateTo = Constants.IsPeriodInMinutes
+                                            ? DateTime.UtcNow.AddMinutes(investment.Period)
+                                            : DateTime.UtcNow.AddDays(investment.Period),
                                         InvestmentProgramId = investmentProgramId,
                                         Number = investment.Periods.Max(x => x.Number) + 1,
                                         Status = PeriodStatus.Planned

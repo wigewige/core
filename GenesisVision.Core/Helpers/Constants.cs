@@ -4,7 +4,16 @@
     {
         #region Platform
 
-        public static bool IsDevelopment = false;
+        /// <summary>
+        /// Is development flag:
+        /// autoapprove email;
+        /// </summary>
+        public static bool IsDevelopment { get; set; } = false;
+
+        /// <summary>
+        /// Set investment program period in minutes instead of days
+        /// </summary>
+        public static bool IsPeriodInMinutes { get; set; } = false;
 
         public static string UploadPath { get; set; }
 
