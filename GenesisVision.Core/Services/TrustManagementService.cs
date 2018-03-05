@@ -254,7 +254,7 @@ namespace GenesisVision.Core.Services
             });
         }
 
-        public OperationResult<(List<InvestmentProgram>, int)> GetInvestmentPrograms(InvestmentProgramsFilter filter, Guid? userId)
+        public OperationResult<(List<InvestmentProgram>, int)> GetInvestmentPrograms(InvestmentProgramsFilter filter, Guid? userId, UserType? userType)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
@@ -312,17 +312,20 @@ namespace GenesisVision.Core.Services
                 if (filter.Take.HasValue)
                     query = query.Take(filter.Take.Value);
                 
-                var programs = query.Select(x => x.ToInvestmentProgram(userId)).ToList();
+                var programs = query.Select(x => x.ToInvestmentProgram(userId, userType)).ToList();
 
                 return (programs, count);
             });
         }
 
-        public OperationResult<InvestmentProgramDetails> GetInvestmentProgram(Guid investmentId, Guid? userId)
+        public OperationResult<InvestmentProgramDetails> GetInvestmentProgram(Guid investmentId, Guid? userId, UserType? userType)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
                 var program = context.InvestmentPrograms
+                                     .Include(x => x.Token)
+                                     .ThenInclude(x => x.InvestorTokens)
+                                     .ThenInclude(x => x.InvestorAccount)
                                      .Include(x => x.ManagerAccount)
                                      .ThenInclude(x => x.ManagersAccountsTrades)
                                      .Include(x => x.ManagerAccount)
@@ -332,11 +335,11 @@ namespace GenesisVision.Core.Services
                                      .Include(x => x.Periods)
                                      .First(x => x.Id == investmentId);
                 
-                return program.ToInvestmentProgramDetails(userId);
+                return program.ToInvestmentProgramDetails(userId, userType);
             });
         }
 
-        public OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId, Guid? userId)
+        public OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId, Guid? userId, UserType? userType)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
@@ -349,9 +352,12 @@ namespace GenesisVision.Core.Services
                                       .ThenInclude(x => x.User)
                                       .ThenInclude(x => x.Profile)
                                       .Include(x => x.InvestmentProgram.Periods)
+                                      .Include(x => x.InvestmentProgram.Token)
+                                      .ThenInclude(x => x.InvestorTokens)
+                                      .ThenInclude(x => x.InvestorAccount)
                                       .Where(x => x.InvestorAccount.UserId == investorUserId)
                                       .ToList()
-                                      .GroupBy(x => x.InvestmentProgram, (program, reqs) => program.ToInvestmentProgramDashboard(userId))
+                                      .GroupBy(x => x.InvestmentProgram, (program, reqs) => program.ToInvestmentProgramDashboard(userId, userType))
                                       .ToList();
 
                 var result = new InvestorDashboard {InvestmentPrograms = requests};
@@ -501,7 +507,7 @@ namespace GenesisVision.Core.Services
                                            .Include(x => x.InvestmentRequests)
                                            .First(x => x.Id == investmentId);
 
-            var json = JsonConvert.SerializeObject(investmentProgram.ToInvestmentProgram(null));
+            var json = JsonConvert.SerializeObject(investmentProgram.ToInvestmentProgram(null, null));
 
             return ipfsService.WriteIpfsText(json);
         }

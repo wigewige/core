@@ -37,5 +37,6 @@ namespace GenesisVision.Core.ViewModels.Investment
         public bool IsHistoryEnable { get; set; }
         public bool IsInvestEnable { get; set; }
         public bool IsWithdrawEnable { get; set; }
+        public bool CanCloseProgram { get; set; }
     }
 }

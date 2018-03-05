@@ -36,7 +36,7 @@ namespace GenesisVision.Core.Helpers.Convertors
             return result;
         }
 
-        public static InvestmentProgram ToInvestmentProgram(this InvestmentPrograms program, Guid? userId)
+        public static InvestmentProgram ToInvestmentProgram(this InvestmentPrograms program, Guid? userId, UserType? userType)
         {
             var result = new InvestmentProgram
                          {
@@ -55,12 +55,12 @@ namespace GenesisVision.Core.Helpers.Convertors
                              AvailableInvestment = 0m,
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
-                             HasNewRequests = GetHasNewRequests(program, userId),
+                             HasNewRequests = GetHasNewRequests(program, userType, userId),
                          };
             return result;
         }
 
-        public static InvestmentProgramDetails ToInvestmentProgramDetails(this InvestmentPrograms program, Guid? userId)
+        public static InvestmentProgramDetails ToInvestmentProgramDetails(this InvestmentPrograms program, Guid? userId, UserType? userType)
         {
             var result = new InvestmentProgramDetails
                          {
@@ -86,15 +86,16 @@ namespace GenesisVision.Core.Helpers.Convertors
                              IpfsHash = program.ManagerAccount.IpfsHash,
                              TradeIpfsHash = program.ManagerAccount.TradeIpfsHash,
                              Manager = program.ManagerAccount.User.ToProfilePublic(),
-                             HasNewRequests = GetHasNewRequests(program, userId),
-                             IsHistoryEnable = GetIsHistoryEnable(program, userId),
-                             IsInvestEnable = GetIsInvestEnable(program, userId),
-                             IsWithdrawEnable = GetIsWithdrawEnable(program, userId),
+                             HasNewRequests = GetHasNewRequests(program, userType, userId),
+                             IsHistoryEnable = GetIsHistoryEnable(program, userType, userId),
+                             IsInvestEnable = GetIsInvestEnable(program, userType, userId),
+                             IsWithdrawEnable = GetIsWithdrawEnable(program, userType, userId),
+                             CanCloseProgram = GetCanCloseProgram(program, userType, userId)
                          };
             return result;
         }
 
-        public static InvestmentProgramDashboard ToInvestmentProgramDashboard(this InvestmentPrograms program, Guid? userId)
+        public static InvestmentProgramDashboard ToInvestmentProgramDashboard(this InvestmentPrograms program, Guid? userId, UserType? userType)
         {
             var result = new InvestmentProgramDashboard
                          {
@@ -115,10 +116,11 @@ namespace GenesisVision.Core.Helpers.Convertors
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
                              Manager = program.ManagerAccount.User.ToProfilePublic(),
-                             HasNewRequests = GetHasNewRequests(program, userId),
-                             IsHistoryEnable = GetIsHistoryEnable(program, userId),
-                             IsInvestEnable = GetIsInvestEnable(program, userId),
-                             IsWithdrawEnable = GetIsWithdrawEnable(program, userId),
+                             HasNewRequests = GetHasNewRequests(program, userType, userId),
+                             IsHistoryEnable = GetIsHistoryEnable(program, userType, userId),
+                             IsInvestEnable = GetIsInvestEnable(program, userType, userId),
+                             IsWithdrawEnable = GetIsWithdrawEnable(program, userType, userId),
+                             CanCloseProgram = GetCanCloseProgram(program, userType, userId)
                          };
             return result;
         }
@@ -176,7 +178,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                           .Count();
         }
 
-        private static bool GetHasNewRequests(InvestmentPrograms program, Guid? userId)
+        private static bool GetHasNewRequests(InvestmentPrograms program, UserType? userType, Guid? userId)
         {
             if (!userId.HasValue)
                 return false;
@@ -184,7 +186,7 @@ namespace GenesisVision.Core.Helpers.Convertors
             return program.InvestmentRequests.Any(x => x.UserId == userId && x.Status == InvestmentRequestStatus.New);
         }
 
-        private static bool GetIsHistoryEnable(InvestmentPrograms program, Guid? userId)
+        private static bool GetIsHistoryEnable(InvestmentPrograms program, UserType? userType, Guid? userId)
         {
             if (!userId.HasValue)
                 return false;
@@ -192,9 +194,9 @@ namespace GenesisVision.Core.Helpers.Convertors
             return program.InvestmentRequests.Any(x => x.UserId == userId);
         }
 
-        private static bool GetIsInvestEnable(InvestmentPrograms program, Guid? userId)
+        private static bool GetIsInvestEnable(InvestmentPrograms program, UserType? userType, Guid? userId)
         {
-            if (!userId.HasValue)
+            if (!userId.HasValue || userType != UserType.Investor)
                 return false;
 
             return !program.InvestmentRequests.Any(x => x.UserId == userId &&
@@ -202,16 +204,25 @@ namespace GenesisVision.Core.Helpers.Convertors
                                                         x.Status == InvestmentRequestStatus.New);
         }
 
-        private static bool GetIsWithdrawEnable(InvestmentPrograms program, Guid? userId)
+        private static bool GetIsWithdrawEnable(InvestmentPrograms program, UserType? userType, Guid? userId)
         {
-            if (!userId.HasValue)
+            if (!userId.HasValue || userType != UserType.Investor)
                 return false;
 
-            // todo: has tokens
+            if (program.Token.InvestorTokens.FirstOrDefault(x => x.InvestorAccount.UserId == userId)?.Amount <= 0)
+                return false;
 
             return !program.InvestmentRequests.Any(x => x.UserId == userId &&
                                                         x.Type == InvestmentRequestType.Invest &&
                                                         x.Status == InvestmentRequestStatus.New);
+        }
+
+        private static bool GetCanCloseProgram(InvestmentPrograms program, UserType? userType, Guid? userId)
+        {
+            if (!userId.HasValue || userType != UserType.Manager)
+                return false;
+
+            return program.ManagerAccount.UserId == userId;
         }
     }
 }
