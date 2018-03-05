@@ -45,7 +45,7 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                if (context.Profiles.Any(x => x.UserName == profile.UserName))
+                if (context.Profiles.Any(x => x.UserName == profile.UserName && x.UserId != userId))
                     throw new Exception("Username already exists");
 
                 var user = context.Profiles.First(x => x.UserId == userId);

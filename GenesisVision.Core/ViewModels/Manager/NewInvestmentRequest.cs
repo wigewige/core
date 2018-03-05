@@ -10,7 +10,7 @@ namespace GenesisVision.Core.ViewModels.Manager
         public Guid BrokerTradeServerId { get; set; }
 
         [Required]
-        [RegularExpression(@"^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]{8,}$", ErrorMessage = "Wrong password. Minimum 8 digits, symbols and numbers.")]
+        [RegularExpression(@"^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]{8,15}$", ErrorMessage = "Wrong password. 8-15 digits, symbols and numbers.")]
         public string TradePlatformPassword { get; set; }
         [Required]
         public decimal DepositAmount { get; set; }
