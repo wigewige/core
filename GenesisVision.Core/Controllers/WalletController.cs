@@ -67,6 +67,23 @@ namespace GenesisVision.Core.Controllers
         }
 
         /// <summary>
+        /// Get user investment programs with tx
+        /// </summary>
+        [HttpGet]
+        [Route("investor/wallet/transactions/investmentProgramsList")]
+        [Route("manager/wallet/transactions/investmentProgramsList")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(WalletInvestmentPrograms))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetInvestmentProgramsWithTx(string mask)
+        {
+            var data = walletService.GetInvestmentProgramsWithTx(mask, CurrentUser.Id);
+            if (!data.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(data));
+
+            return Ok(data.Data);
+        }
+
+        /// <summary>
         /// Get eth address for GVT depositing
         /// </summary>
         [HttpGet]

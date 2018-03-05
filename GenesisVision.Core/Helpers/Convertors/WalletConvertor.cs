@@ -14,7 +14,27 @@ namespace GenesisVision.Core.Helpers.Convertors
                        Date = tx.Date,
                        Amount = tx.Amount,
                        WalletId = tx.Wallet.Id,
-                       Currency = tx.Wallet.Currency
+                       Currency = tx.Wallet.Currency,
+                       InvestmentProgramRequest = tx.InvestmentRequest == null
+                           ? null
+                           : new InvestmentProgramRequestTxInfo
+                             {
+                                 Status = tx.InvestmentRequest.Status,
+                                 Type = tx.InvestmentRequest.Type,
+                                 InvestmentProgram = new InvestmentProgramTxInfo
+                                                     {
+                                                         Id = tx.InvestmentRequest.InvestmentProgramtId,
+                                                         Title = tx.InvestmentRequest.InvestmentProgram.Title
+                                                     }
+                             },
+                       PaymentTx = tx.PaymentTransaction == null
+                           ? null
+                           : new PaymentTxInfo
+                             {
+                                 Id = tx.PaymentTransaction.Id,
+                                 Hash = tx.PaymentTransaction.Hash,
+                                 Address = tx.PaymentTransaction.BlockchainAddress.Address
+                             }
                    };
         }
     }

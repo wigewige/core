@@ -14,5 +14,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult WithdrawRequest(WalletWithdrawRequestModel request, Guid userId);
 
         OperationResult<WalletsViewModel> GetUserWallets(Guid userId);
+
+        OperationResult<WalletInvestmentPrograms> GetInvestmentProgramsWithTx(string mask, Guid userId);
     }
 }
