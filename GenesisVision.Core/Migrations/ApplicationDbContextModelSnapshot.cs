@@ -222,7 +222,7 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<Guid>("ManagerAccountId");
 
-                    b.Property<Guid>("ManagerTokensId");
+                    b.Property<Guid>("ManagerTokenId");
 
                     b.Property<int>("OrdersCount");
 
@@ -239,7 +239,7 @@ namespace GenesisVision.Core.Migrations
                     b.HasIndex("ManagerAccountId")
                         .IsUnique();
 
-                    b.HasIndex("ManagerTokensId")
+                    b.HasIndex("ManagerTokenId")
                         .IsUnique();
 
                     b.HasIndex("Title")
@@ -290,6 +290,26 @@ namespace GenesisVision.Core.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("InvestorAccounts");
+                });
+
+            modelBuilder.Entity("GenesisVision.DataModel.Models.InvestorTokens", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("Amount");
+
+                    b.Property<Guid>("InvestorAccountId");
+
+                    b.Property<Guid>("ManagerTokenId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvestorAccountId");
+
+                    b.HasIndex("ManagerTokenId");
+
+                    b.ToTable("InvestorTokens");
                 });
 
             modelBuilder.Entity("GenesisVision.DataModel.Models.ManagerAccounts", b =>
@@ -590,26 +610,6 @@ namespace GenesisVision.Core.Migrations
                     b.ToTable("Periods");
                 });
 
-            modelBuilder.Entity("GenesisVision.DataModel.Models.Portfolios", b =>
-                {
-                    b.Property<Guid>("InvestorAccountId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<decimal>("Amount");
-
-                    b.Property<Guid?>("InvestorAccountUserId");
-
-                    b.Property<Guid>("ManagerTokenId");
-
-                    b.HasKey("InvestorAccountId");
-
-                    b.HasIndex("InvestorAccountUserId");
-
-                    b.HasIndex("ManagerTokenId");
-
-                    b.ToTable("Portfolios");
-                });
-
             modelBuilder.Entity("GenesisVision.DataModel.Models.Profiles", b =>
                 {
                     b.Property<Guid>("UserId");
@@ -830,7 +830,7 @@ namespace GenesisVision.Core.Migrations
 
                     b.HasOne("GenesisVision.DataModel.Models.ManagerTokens", "Token")
                         .WithOne("InvestmentProgram")
-                        .HasForeignKey("GenesisVision.DataModel.Models.InvestmentPrograms", "ManagerTokensId")
+                        .HasForeignKey("GenesisVision.DataModel.Models.InvestmentPrograms", "ManagerTokenId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -866,6 +866,19 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
                         .WithOne("InvestorAccount")
                         .HasForeignKey("GenesisVision.DataModel.Models.InvestorAccounts", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GenesisVision.DataModel.Models.InvestorTokens", b =>
+                {
+                    b.HasOne("GenesisVision.DataModel.Models.InvestorAccounts", "InvestorAccount")
+                        .WithMany("InvestorTokens")
+                        .HasForeignKey("InvestorAccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GenesisVision.DataModel.Models.ManagerTokens", "ManagerToken")
+                        .WithMany("InvestorTokens")
+                        .HasForeignKey("ManagerTokenId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -952,18 +965,6 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.DataModel.Models.InvestmentPrograms", "InvestmentProgram")
                         .WithMany("Periods")
                         .HasForeignKey("InvestmentProgramId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("GenesisVision.DataModel.Models.Portfolios", b =>
-                {
-                    b.HasOne("GenesisVision.DataModel.Models.InvestorAccounts", "InvestorAccount")
-                        .WithMany("Portfolios")
-                        .HasForeignKey("InvestorAccountUserId");
-
-                    b.HasOne("GenesisVision.DataModel.Models.ManagerTokens", "ManagerToken")
-                        .WithMany("Portfolios")
-                        .HasForeignKey("ManagerTokenId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
