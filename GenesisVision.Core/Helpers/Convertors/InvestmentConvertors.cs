@@ -80,7 +80,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              ProfitAvg = 0m,
                              ProfitTotal = 0m,
                              AvailableInvestment = 0m,
-                             InvestedTokens = 0,
+                             InvestedTokens = GetInvestedTokens(program, userType, userId),
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
                              IpfsHash = program.ManagerAccount.IpfsHash,
@@ -112,7 +112,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              ProfitAvg = 0m,
                              ProfitTotal = 0m,
                              AvailableInvestment = 0m,
-                             InvestedTokens = 0,
+                             InvestedTokens = GetInvestedTokens(program, userType, userId),
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
                              Manager = program.ManagerAccount.User.ToProfilePublic(),
@@ -223,6 +223,14 @@ namespace GenesisVision.Core.Helpers.Convertors
                 return false;
 
             return program.ManagerAccount.UserId == userId;
+        }
+
+        private static decimal GetInvestedTokens(InvestmentPrograms program, UserType? userType, Guid? userId)
+        {
+            if (!userId.HasValue || userType != UserType.Investor)
+                return 0;
+
+            return program.Token.InvestorTokens.FirstOrDefault(x => x.InvestorAccount.UserId == userId.Value)?.Amount ?? 0;
         }
     }
 }

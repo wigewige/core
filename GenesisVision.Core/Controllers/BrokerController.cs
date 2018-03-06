@@ -274,7 +274,7 @@ namespace GenesisVision.Core.Controllers
         /// Update manager token initial price/total supply after loss
         /// </summary>
         [HttpPost]
-        [Route("broker/trades/reevaluateManagerToken")]
+        [Route("broker/period/reevaluateManagerToken")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult ReevaluateManagerToken(Guid investmentProgramId, decimal investorLossShare)

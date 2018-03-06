@@ -15,7 +15,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal Balance { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Currency Currency { get; set; }
-        public int InvestedTokens { get; set; }
+        public decimal InvestedTokens { get; set; }
         public int TradesCount { get; set; }
         public int InvestorsCount { get; set; }
         public int PeriodDuration { get; set; }
