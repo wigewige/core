@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GV.Payment.DataModel\GV.Payment.DataModel.csproj" />
     <ProjectReference Include="..\src\GV.Payment.DataModel\GV.Payment.DataModel.csproj" />
   </ItemGroup>
 

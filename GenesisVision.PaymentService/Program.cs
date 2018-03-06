@@ -26,7 +26,8 @@ namespace GenesisVision.PaymentService
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                   .UseIISIntegration()
+				   .UseKestrel()
+				   .UseIISIntegration()
                    .UseStartup<Startup>()
                    .UseNLog()
                    .Build();
