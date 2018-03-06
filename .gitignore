@@ -25,3 +25,4 @@ uploads
 
 
 GenesisVision.Core/appsettings.json
+/GenesisVision.PaymentService/Properties/PublishProfiles/CustomProfile.pubxml
