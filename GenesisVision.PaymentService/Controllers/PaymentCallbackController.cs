@@ -3,26 +3,39 @@ using GenesisVision.PaymentService.Models;
 using GenesisVision.PaymentService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GenesisVision.PaymentService.Controllers
 {
-    public class PaymentCallbackController : Controller
+	[Route("PaymentCallback")]
+	public class PaymentCallbackController : Controller
     {
         private ILogger<PaymentCallbackController> logger;
         private IPaymentTransactionService paymentService;
+		private readonly GvPaymentGatewayConfig config;
 
-        public PaymentCallbackController(ILogger<PaymentCallbackController> logger, IPaymentTransactionService paymentsService)
+		public PaymentCallbackController(ILogger<PaymentCallbackController> logger, IPaymentTransactionService paymentsService, GvPaymentGatewayConfig config)
         {
             this.logger = logger;
             this.paymentService = paymentsService;
-        }
+			this.config = config;
+		}
 
-        [Route("notify")]
+		[Route("index")]
+		[HttpGet]
+		public ActionResult Index()
+		{
+			return Ok(nameof(PaymentCallbackController));
+		}
+
+		[Route("notify")]
         [HttpPost]
         public async Task<ActionResult> Notify([FromQuery]string customKey, [FromForm]PaymentNotifyRequest model)
         {
@@ -32,7 +45,11 @@ namespace GenesisVision.PaymentService.Controllers
 
 				if (ModelState.IsValid)
                 {
-                    var request = new ProcessPaymentTransaction()
+					var requestContent = string.Join("&", Request.Form.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
+
+					var isValidSign = HMACSHA512Hex(requestContent);
+
+					var request = new ProcessPaymentTransaction()
                     {
                         TransactionHash = model.Tx_hash,
                         Address = model.Address,
@@ -66,5 +83,15 @@ namespace GenesisVision.PaymentService.Controllers
 
             return Content("OK");
         }
-    }
+
+		private string HMACSHA512Hex(string input)
+		{
+			var key = Encoding.UTF8.GetBytes(config.ApiSecret);
+			using (var hm = new HMACSHA512(key))
+			{
+				var signed = hm.ComputeHash(Encoding.UTF8.GetBytes(input));
+				return BitConverter.ToString(signed).Replace("-", string.Empty);
+			}
+		}
+	}
 }
