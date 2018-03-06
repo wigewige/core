@@ -704,6 +704,8 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<DateTime>("Date");
 
+                    b.Property<Guid?>("InvestmentProgramtId");
+
                     b.Property<int>("Type");
 
                     b.Property<Guid>("WalletId");
@@ -711,6 +713,8 @@ namespace GenesisVision.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("InvestmentProgramtId");
 
                     b.HasIndex("WalletId");
 
@@ -1000,6 +1004,10 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.DataModel.Models.ApplicationUser")
                         .WithMany("WalletTransactions")
                         .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("GenesisVision.DataModel.Models.InvestmentPrograms", "InvestmentProgram")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("InvestmentProgramtId");
 
                     b.HasOne("GenesisVision.DataModel.Models.Wallets", "Wallet")
                         .WithMany("WalletTransactions")

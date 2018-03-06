@@ -48,6 +48,7 @@ namespace GenesisVision.Core.Services
             {
                 var query = context.WalletTransactions
                                    .Include(x => x.Wallet)
+                                   .Include(x => x.InvestmentProgram)
                                    .Include(x => x.PaymentTransaction)
                                    .ThenInclude(x => x.BlockchainAddress)
                                    .Include(x => x.InvestmentRequest)
@@ -62,8 +63,9 @@ namespace GenesisVision.Core.Services
                 if (filter.Take.HasValue)
                     query = query.Take(filter.Take.Value);
                 if (filter.InvestmentProgramId.HasValue)
-                    query = query.Where(x => x.InvestmentRequest != null &&
-                                             x.InvestmentRequest.InvestmentProgramtId == filter.InvestmentProgramId.Value);
+                    query = query.Where(x => (x.InvestmentRequest != null &&
+                                              x.InvestmentRequest.InvestmentProgramtId == filter.InvestmentProgramId.Value) ||
+                                             x.InvestmentProgramtId == filter.InvestmentProgramId.Value);
                 if (filter.Type.HasValue)
                 {
                     switch (filter.Type.Value)

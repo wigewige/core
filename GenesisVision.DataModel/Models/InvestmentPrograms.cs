@@ -28,6 +28,8 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 
+        public ICollection<WalletTransactions> WalletTransactions { get; set; }
+
         public ICollection<Periods> Periods { get; set; }
     }
 }

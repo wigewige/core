@@ -68,7 +68,8 @@ namespace GenesisVision.Core.Services
                                          Type = WalletTransactionsType.CancelInvestmentRequest,
                                          WalletId = wallet.Id,
                                          Amount = request.Amount,
-                                         Date = DateTime.UtcNow
+                                         Date = DateTime.UtcNow,
+                                         InvestmentProgramtId = invProgramId
                                      };
                             context.Add(tx);
                         }
@@ -203,7 +204,8 @@ namespace GenesisVision.Core.Services
                              Type = WalletTransactionsType.InvestToProgram,
                              WalletId = wallet.Id,
                              Amount = model.Amount,
-                             Date = DateTime.UtcNow
+                             Date = DateTime.UtcNow,
+                             InvestmentProgramtId = model.InvestmentProgramId
                          };
 
                 var invRequest = new InvestmentRequests
@@ -558,7 +560,8 @@ namespace GenesisVision.Core.Services
                                    Type = WalletTransactionsType.ProfitFromProgram,
                                    Amount = -brokerAmount,
                                    Date = DateTime.UtcNow,
-                                   WalletId = wallet.Id
+                                   WalletId = wallet.Id,
+                                   InvestmentProgramtId = accrual.InvestmentProgramId
                                };
 
                 var brokerProfitDistribution = new ProfitDistributionTransactions
@@ -587,7 +590,8 @@ namespace GenesisVision.Core.Services
                                          Type = WalletTransactionsType.ProfitFromProgram,
                                          Amount = investorAmount,
                                          Date = DateTime.UtcNow,
-                                         WalletId = investorWallet.Id
+                                         WalletId = investorWallet.Id,
+                                         InvestmentProgramtId = accrual.InvestmentProgramId
                                      };
 
                     var investorProfitDistribution = new ProfitDistributionTransactions
@@ -623,13 +627,14 @@ namespace GenesisVision.Core.Services
                     var wallet = investor.Wallets.First(x => x.Currency == Currency.GVT);
 
                     var tx = new WalletTransactions
-                    {
-                        Id = Guid.NewGuid(),
-                        Type = WalletTransactionsType.CancelInvestmentRequest,
-                        WalletId = wallet.Id,
-                        Amount = investmentRequest.Amount,
-                        Date = DateTime.UtcNow
-                    };
+                             {
+                                 Id = Guid.NewGuid(),
+                                 Type = WalletTransactionsType.CancelInvestmentRequest,
+                                 WalletId = wallet.Id,
+                                 Amount = investmentRequest.Amount,
+                                 Date = DateTime.UtcNow,
+                                 InvestmentProgramtId = investmentRequest.InvestmentProgramtId
+                             };
 
                     context.Add(tx);
 
@@ -712,7 +717,8 @@ namespace GenesisVision.Core.Services
                                 Type = WalletTransactionsType.PartialInvestmentExecutionRefund,
                                 WalletId = wallet.Id,
                                 Amount = request.Amount - gvtAmount,
-                                Date = DateTime.UtcNow
+                                Date = DateTime.UtcNow,
+                                InvestmentProgramtId = investmentProgramId
                             };
 
                             context.Add(tx);
@@ -765,7 +771,8 @@ namespace GenesisVision.Core.Services
                                              Type = WalletTransactionsType.WithdrawFromProgram,
                                              WalletId = wallet.Id,
                                              Amount = amountInGVT,
-                                             Date = DateTime.UtcNow
+                                             Date = DateTime.UtcNow,
+                                             InvestmentProgramtId = investmentProgramId
                                          };
 
                         context.Add(investorTx);
@@ -810,7 +817,8 @@ namespace GenesisVision.Core.Services
                                             Type = WalletTransactionsType.WithdrawFromProgram,
                                             Amount = amountInGVT,
                                             Date = DateTime.UtcNow,
-                                            WalletId = wallet.Id
+                                            WalletId = wallet.Id,
+                                            InvestmentProgramtId = investmentProgramId
                                         };
 
                         context.Add(managerTx);
@@ -930,7 +938,8 @@ namespace GenesisVision.Core.Services
                         Type = WalletTransactionsType.ClosingProgramRefund,
                         WalletId = wallet.Id,
                         Amount = gvtAmount,
-                        Date = DateTime.UtcNow
+                        Date = DateTime.UtcNow,
+                        InvestmentProgramtId = investmentProgramId
                     };
 
                     context.Add(investorTx);
@@ -956,7 +965,8 @@ namespace GenesisVision.Core.Services
                     Type = WalletTransactionsType.ClosingProgramRefund,
                     WalletId = managerWallet.Id,
                     Amount = managerAmountInGVT,
-                    Date = DateTime.UtcNow
+                    Date = DateTime.UtcNow,
+                    InvestmentProgramtId = investmentProgramId
                 };
 
                 context.Add(managerTx);
@@ -973,7 +983,8 @@ namespace GenesisVision.Core.Services
                     Type = WalletTransactionsType.ClosingProgramRefund,
                     WalletId = brokerWallet.Id,
                     Amount = managerAmountInGVT,
-                    Date = DateTime.UtcNow
+                    Date = DateTime.UtcNow,
+                    InvestmentProgramtId = investmentProgramId
                 };
 
                 context.Add(brokerTx);

@@ -20,7 +20,8 @@ namespace GenesisVision.Core.ViewModels.Wallet
 
         [JsonConverter(typeof(StringEnumConverter))]
         public Currency Currency { get; set; }
-
+        
+        public InvestmentProgramTxInfo InvestmentProgram { get; set; }
         public InvestmentProgramRequestTxInfo InvestmentProgramRequest { get; set; }
         public PaymentTxInfo PaymentTx { get; set; }
     }
@@ -31,8 +32,6 @@ namespace GenesisVision.Core.ViewModels.Wallet
         public InvestmentRequestType Type { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public InvestmentRequestStatus Status { get; set; }
-
-        public InvestmentProgramTxInfo InvestmentProgram { get; set; }
     }
 
     public class InvestmentProgramTxInfo

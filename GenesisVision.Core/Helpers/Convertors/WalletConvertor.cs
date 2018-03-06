@@ -20,12 +20,14 @@ namespace GenesisVision.Core.Helpers.Convertors
                            : new InvestmentProgramRequestTxInfo
                              {
                                  Status = tx.InvestmentRequest.Status,
-                                 Type = tx.InvestmentRequest.Type,
-                                 InvestmentProgram = new InvestmentProgramTxInfo
-                                                     {
-                                                         Id = tx.InvestmentRequest.InvestmentProgramtId,
-                                                         Title = tx.InvestmentRequest.InvestmentProgram.Title
-                                                     }
+                                 Type = tx.InvestmentRequest.Type
+                             },
+                       InvestmentProgram = tx.InvestmentProgram == null
+                           ? null
+                           : new InvestmentProgramTxInfo
+                             {
+                                 Id = tx.InvestmentProgram.Id,
+                                 Title = tx.InvestmentProgram.Title
                              },
                        PaymentTx = tx.PaymentTransaction == null
                            ? null

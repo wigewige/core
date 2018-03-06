@@ -228,6 +228,11 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.ProfitDistributionTransaction)
                    .WithOne(x => x.WalletTransaction)
                    .HasForeignKey<ProfitDistributionTransactions>(x => x.WalletTransactionId);
+
+            builder.Entity<WalletTransactions>()
+                   .HasOne(x => x.InvestmentProgram)
+                   .WithMany(x => x.WalletTransactions)
+                   .HasForeignKey(x => x.InvestmentProgramtId);
         }
     }
 }
