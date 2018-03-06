@@ -155,6 +155,8 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<string>("Host");
 
+                    b.Property<int>("HoursOffset");
+
                     b.Property<bool>("IsEnabled");
 
                     b.Property<string>("Name");

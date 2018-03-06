@@ -48,14 +48,17 @@ namespace GenesisVision.Core.Services
 
                 var query = context.ManagersAccountsTrades
                                    .Where(x => x.ManagerAccountId == period.InvestmentProgram.ManagerAccountId);
+                var offset = period.InvestmentProgram.ManagerAccount.BrokerTradeServer.HoursOffset;
 
                 switch (period.InvestmentProgram.ManagerAccount.BrokerTradeServer.Type)
                 {
                     case BrokerTradeServerType.MetaTrader4:
-                        query = query.Where(x => x.DateClose >= period.DateFrom && x.DateClose < period.DateTo.AddSeconds(5));
+                        query = query.Where(x => x.DateClose >= period.DateFrom.AddHours(offset) &&
+                                                 x.DateClose < period.DateTo.AddHours(offset).AddSeconds(5));
                         break;
                     case BrokerTradeServerType.MetaTrader5:
-                        query = query.Where(x => x.Date >= period.DateFrom && x.Date < period.DateTo.AddSeconds(5));
+                        query = query.Where(x => x.Date >= period.DateFrom.AddHours(offset) &&
+                                                 x.Date < period.DateTo.AddHours(offset).AddSeconds(5));
                         break;
                     default:
                         throw new NotSupportedException();
@@ -80,19 +83,20 @@ namespace GenesisVision.Core.Services
                                        .Where(x => x.ManagerAccountId == period.InvestmentProgram.ManagerAccountId)
                                        .OrderByDescending(x => x.Date)
                                        .ToList();
-
-                context.Add(new ManagersAccountsStatistics
-                            {
-                                Id = Guid.NewGuid(),
-                                ManagerAccountId = period.InvestmentProgram.ManagerAccountId,
-                                Date = DateTime.UtcNow,
-                                PeriodId = periodId,
-                                Profit = totalProfit,
-                                Loss = totalLoss,
-                                Volume = totalVolume,
-                                Fund = period.ManagerStartBalance,
-                                TotalProfit = (totalProfit + totalLoss) + (statistic.FirstOrDefault()?.TotalProfit ?? 0m)
-                            });
+                var newRecord = new ManagersAccountsStatistics
+                                {
+                                    Id = Guid.NewGuid(),
+                                    ManagerAccountId = period.InvestmentProgram.ManagerAccountId,
+                                    Date = DateTime.UtcNow,
+                                    PeriodId = periodId,
+                                    Profit = totalProfit,
+                                    Loss = totalLoss,
+                                    Volume = totalVolume,
+                                    Fund = period.ManagerStartBalance,
+                                    TotalProfit = (totalProfit + totalLoss) + (statistic.FirstOrDefault()?.TotalProfit ?? 0m)
+                                };
+                context.Add(newRecord);
+                statistic.Add(newRecord);
 
                 period.InvestmentProgram.ManagerAccount.ProfitTotal = statistic.Sum(x => x.Profit + x.Loss);
                 period.InvestmentProgram.ManagerAccount.ProfitAvg = statistic.Any() ? (statistic.Sum(x => x.Profit + x.Loss) / statistic.Count) : 0m;

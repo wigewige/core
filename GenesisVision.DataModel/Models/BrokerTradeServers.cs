@@ -12,6 +12,7 @@ namespace GenesisVision.DataModel.Models
         public BrokerTradeServerType Type { get; set; }
         public DateTime RegistrationDate { get; set; }
         public bool IsEnabled { get; set; }
+        public int HoursOffset { get; set; }
 
         public Guid BrokerId { get; set; }
         public BrokersAccounts Broker { get; set; }
