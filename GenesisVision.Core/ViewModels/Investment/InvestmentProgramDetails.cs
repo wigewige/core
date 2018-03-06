@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Enums;
 using Newtonsoft.Json;
@@ -30,6 +31,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal FeeManagement { get; set; }
         public string IpfsHash { get; set; }
         public string TradeIpfsHash { get; set; }
+        public List<Chart> Chart { get; set; }
 
         public ProfilePublicViewModel Manager { get; set; }
 

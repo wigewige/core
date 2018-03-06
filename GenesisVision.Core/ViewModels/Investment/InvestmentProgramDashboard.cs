@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Enums;
 using Newtonsoft.Json;
@@ -25,6 +26,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal AvailableInvestment { get; set; }
         public decimal FeeSuccess { get; set; }
         public decimal FeeManagement { get; set; }
+        public List<Chart> Chart { get; set; }
 
         public ProfilePublicViewModel Manager { get; set; }
 

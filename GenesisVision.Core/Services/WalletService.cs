@@ -35,7 +35,7 @@ namespace GenesisVision.Core.Services
             internalTxType = new List<WalletTransactionsType>();
             foreach (WalletTransactionsType x in Enum.GetValues(typeof(WalletTransactionsType)))
             {
-                if (!externalTxType.Contains(x))
+                if (externalTxType.Contains(x))
                     continue;
 
                 internalTxType.Add(x);

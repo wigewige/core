@@ -44,18 +44,19 @@ namespace GenesisVision.Core.Helpers.Convertors
                              Title = program.Title,
                              Level = 1,
                              Logo = program.Logo,
-                             Balance = 0m,
+                             Balance = program.ManagerAccount.Balance,
                              Currency = program.ManagerAccount.Currency,
-                             TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
+                             TradesCount = program.ManagerAccount.OrdersCount,
                              InvestorsCount = GetInvestorsCount(program),
                              PeriodDuration = program.Period,
                              EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
-                             ProfitAvg = 0m,
-                             ProfitTotal = 0m,
-                             AvailableInvestment = 0m,
+                             ProfitAvg = program.ManagerAccount.ProfitAvg,
+                             ProfitTotal = program.ManagerAccount.ProfitTotal,
+                             AvailableInvestment = program.Token.FreeTokens,
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
                              HasNewRequests = GetHasNewRequests(program, userType, userId),
+                             Chart = GetChart(program)
                          };
             return result;
         }
@@ -70,16 +71,16 @@ namespace GenesisVision.Core.Helpers.Convertors
                              Level = 1,
                              Login = program.ManagerAccount.Login,
                              Logo = program.Logo,
-                             Balance = 0m,
-                             OwnBalance = 0m,
+                             Balance = program.ManagerAccount.Balance,
+                             OwnBalance = program.Periods.FirstOrDefault(x => x.Status == PeriodStatus.InProccess)?.ManagerStartBalance ?? 0m,
                              Currency = program.ManagerAccount.Currency,
-                             TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
+                             TradesCount = program.ManagerAccount.OrdersCount,
                              InvestorsCount = GetInvestorsCount(program),
                              PeriodDuration = program.Period,
                              EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
-                             ProfitAvg = 0m,
-                             ProfitTotal = 0m,
-                             AvailableInvestment = 0m,
+                             ProfitAvg = program.ManagerAccount.ProfitAvg,
+                             ProfitTotal = program.ManagerAccount.ProfitTotal,
+                             AvailableInvestment = program.Token.FreeTokens,
                              InvestedTokens = GetInvestedTokens(program, userType, userId),
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
@@ -90,7 +91,8 @@ namespace GenesisVision.Core.Helpers.Convertors
                              IsHistoryEnable = GetIsHistoryEnable(program, userType, userId),
                              IsInvestEnable = GetIsInvestEnable(program, userType, userId),
                              IsWithdrawEnable = GetIsWithdrawEnable(program, userType, userId),
-                             CanCloseProgram = GetCanCloseProgram(program, userType, userId)
+                             CanCloseProgram = GetCanCloseProgram(program, userType, userId),
+                             Chart = GetChart(program)
                          };
             return result;
         }
@@ -103,15 +105,15 @@ namespace GenesisVision.Core.Helpers.Convertors
                              Title = program.Title,
                              Level = 1,
                              Logo = program.Logo,
-                             Balance = 0m,
+                             Balance = program.ManagerAccount.Balance,
                              Currency = program.ManagerAccount.Currency,
-                             TradesCount = program.ManagerAccount.ManagersAccountsTrades.Count,
+                             TradesCount = program.ManagerAccount.OrdersCount,
                              InvestorsCount = GetInvestorsCount(program),
                              PeriodDuration = program.Period,
                              EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
-                             ProfitAvg = 0m,
-                             ProfitTotal = 0m,
-                             AvailableInvestment = 0m,
+                             ProfitAvg = program.ManagerAccount.ProfitAvg,
+                             ProfitTotal = program.ManagerAccount.ProfitTotal,
+                             AvailableInvestment = program.Token.FreeTokens,
                              InvestedTokens = GetInvestedTokens(program, userType, userId),
                              FeeSuccess = program.FeeSuccess,
                              FeeManagement = program.FeeManagement,
@@ -120,7 +122,8 @@ namespace GenesisVision.Core.Helpers.Convertors
                              IsHistoryEnable = GetIsHistoryEnable(program, userType, userId),
                              IsInvestEnable = GetIsInvestEnable(program, userType, userId),
                              IsWithdrawEnable = GetIsWithdrawEnable(program, userType, userId),
-                             CanCloseProgram = GetCanCloseProgram(program, userType, userId)
+                             CanCloseProgram = GetCanCloseProgram(program, userType, userId),
+                             Chart = GetChart(program)
                          };
             return result;
         }
@@ -231,6 +234,22 @@ namespace GenesisVision.Core.Helpers.Convertors
                 return 0;
 
             return program.Token.InvestorTokens.FirstOrDefault(x => x.InvestorAccount.UserId == userId.Value)?.Amount ?? 0;
+        }
+
+        private static List<Chart> GetChart(InvestmentPrograms program)
+        {
+            var charts = program.ManagerAccount.ManagersAccountsStatistics
+                                .OrderBy(x => x.Date)
+                                .Select(x => new Chart
+                                             {
+                                                 Date = x.Date,
+                                                 Profit = x.Profit,
+                                                 Loss = x.Loss,
+                                                 TotalProfit = x.TotalProfit,
+                                                 Fund = x.Fund
+                                             })
+                                .ToList();
+            return charts;
         }
     }
 }

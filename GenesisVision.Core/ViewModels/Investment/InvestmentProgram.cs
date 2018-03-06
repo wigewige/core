@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GenesisVision.DataModel.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -23,6 +24,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal AvailableInvestment { get; set; }
         public decimal FeeSuccess { get; set; }
         public decimal FeeManagement { get; set; }
+        public List<Chart> Chart { get; set; }
 
         public bool HasNewRequests { get; set; }
     }

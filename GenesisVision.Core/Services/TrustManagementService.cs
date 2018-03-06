@@ -266,6 +266,8 @@ namespace GenesisVision.Core.Services
                 var query = context.InvestmentPrograms
                                    .Include(x => x.ManagerAccount)
                                    .ThenInclude(x => x.ManagersAccountsTrades)
+                                   .Include(x => x.ManagerAccount.ManagersAccountsStatistics)
+                                   .Include(x => x.Token)
                                    .Include(x => x.InvestmentRequests)
                                    .Include(x => x.Periods)
                                    .AsQueryable();
@@ -292,16 +294,16 @@ namespace GenesisVision.Core.Services
                             query = query.OrderByDescending(x => x.Rating);
                             break;
                         case Sorting.ByOrdersAsc:
-                            query = query.OrderBy(x => x.OrdersCount);
+                            query = query.OrderBy(x => x.ManagerAccount.OrdersCount);
                             break;
                         case Sorting.ByOrdersDesc:
-                            query = query.OrderByDescending(x => x.OrdersCount);
+                            query = query.OrderByDescending(x => x.ManagerAccount.OrdersCount);
                             break;
                         case Sorting.ByProfitAsc:
-                            query = query.OrderBy(x => x.TotalProfit);
+                            query = query.OrderBy(x => x.ManagerAccount.ProfitTotal);
                             break;
                         case Sorting.ByProfitDesc:
-                            query = query.OrderByDescending(x => x.TotalProfit);
+                            query = query.OrderByDescending(x => x.ManagerAccount.ProfitTotal);
                             break;
                     }
                 }
@@ -333,6 +335,7 @@ namespace GenesisVision.Core.Services
                                      .ThenInclude(x => x.InvestorAccount)
                                      .Include(x => x.ManagerAccount)
                                      .ThenInclude(x => x.ManagersAccountsTrades)
+                                     .Include(x => x.ManagerAccount.ManagersAccountsStatistics)
                                      .Include(x => x.ManagerAccount)
                                      .ThenInclude(x => x.User)
                                      .ThenInclude(x => x.Profile)
@@ -356,6 +359,8 @@ namespace GenesisVision.Core.Services
                                       .ThenInclude(x => x.ManagerAccount)
                                       .ThenInclude(x => x.User)
                                       .ThenInclude(x => x.Profile)
+                                      .Include(x => x.InvestmentProgram.Token)
+                                      .Include(x => x.InvestmentProgram.ManagerAccount.ManagersAccountsStatistics)
                                       .Include(x => x.InvestmentProgram.Periods)
                                       .Include(x => x.InvestmentProgram.Token)
                                       .ThenInclude(x => x.InvestorTokens)
@@ -509,6 +514,7 @@ namespace GenesisVision.Core.Services
             var investmentProgram = context.InvestmentPrograms
                                            .Include(x => x.ManagerAccount)
                                            .ThenInclude(x => x.ManagersAccountsTrades)
+                                           .Include(x => x.ManagerAccount.ManagersAccountsStatistics)
                                            .Include(x => x.Token)
                                            .Include(x => x.Periods)
                                            .Include(x => x.InvestmentRequests)

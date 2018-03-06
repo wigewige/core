@@ -13,6 +13,12 @@ namespace GenesisVision.DataModel.Models
         public string IpfsHash { get; set; }
         public string TradeIpfsHash { get; set; }
         public bool IsConfirmed { get; set; }
+        public int OrdersCount { get; set; }
+        public decimal Balance { get; set; }
+        public decimal ProfitTotal { get; set; }
+        public decimal ProfitAvg { get; set; }
+        public decimal VolumeTotal { get; set; }
+        public decimal VolumeAvg { get; set; }
 
         public ApplicationUser User { get; set; }
         public Guid UserId { get; set; }
