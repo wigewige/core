@@ -7,11 +7,10 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GenesisVision.Common.Helpers;
 
 namespace GenesisVision.PaymentService.Services
 {
-    public class PaymentTransactionService : IPaymentTransactionService
+	public class PaymentTransactionService : IPaymentTransactionService
     {
         private readonly ILogger<IPaymentTransactionService> logger;
         private readonly ApplicationDbContext context;
