@@ -245,6 +245,7 @@ namespace GenesisVision.Core.Controllers
                 return BadRequest(ErrorResult.GetResult(errors, ErrorCodes.ValidationError));
 
             tradesService.SaveNewTrade(tradeEvent);
+            trustManagementService.UpdateManagerBalance(tradeEvent);
 
             return Ok();
         }
