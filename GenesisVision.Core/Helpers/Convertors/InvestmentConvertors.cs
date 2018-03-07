@@ -49,7 +49,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              TradesCount = program.ManagerAccount.OrdersCount,
                              InvestorsCount = GetInvestorsCount(program),
                              PeriodDuration = program.Period,
-                             EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
+                             EndOfPeriod = GetEndOfPeriod(program),
                              ProfitAvg = program.ManagerAccount.ProfitAvg,
                              ProfitTotal = program.ManagerAccount.ProfitTotal,
                              AvailableInvestment = program.Token.FreeTokens,
@@ -77,7 +77,8 @@ namespace GenesisVision.Core.Helpers.Convertors
                              TradesCount = program.ManagerAccount.OrdersCount,
                              InvestorsCount = GetInvestorsCount(program),
                              PeriodDuration = program.Period,
-                             EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
+                             IsEnabled = program.IsEnabled,
+                             EndOfPeriod = GetEndOfPeriod(program),
                              ProfitAvg = program.ManagerAccount.ProfitAvg,
                              ProfitTotal = program.ManagerAccount.ProfitTotal,
                              AvailableInvestment = program.Token.FreeTokens,
@@ -91,7 +92,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              IsHistoryEnable = GetIsHistoryEnable(program, userType, userId),
                              IsInvestEnable = GetIsInvestEnable(program, userType, userId),
                              IsWithdrawEnable = GetIsWithdrawEnable(program, userType, userId),
-                             CanCloseProgram = GetCanCloseProgram(program, userType, userId),
+                             IsOwnProgram = GetIsOwnProgram(program, userType, userId),
                              Chart = GetChart(program)
                          };
             return result;
@@ -110,7 +111,8 @@ namespace GenesisVision.Core.Helpers.Convertors
                              TradesCount = program.ManagerAccount.OrdersCount,
                              InvestorsCount = GetInvestorsCount(program),
                              PeriodDuration = program.Period,
-                             EndOfPeriod = program.Periods.OrderByDescending(p => p.Number).First().DateFrom,
+                             IsEnabled = program.IsEnabled,
+                             EndOfPeriod = GetEndOfPeriod(program),
                              ProfitAvg = program.ManagerAccount.ProfitAvg,
                              ProfitTotal = program.ManagerAccount.ProfitTotal,
                              AvailableInvestment = program.Token.FreeTokens,
@@ -122,7 +124,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                              IsHistoryEnable = GetIsHistoryEnable(program, userType, userId),
                              IsInvestEnable = GetIsInvestEnable(program, userType, userId),
                              IsWithdrawEnable = GetIsWithdrawEnable(program, userType, userId),
-                             CanCloseProgram = GetCanCloseProgram(program, userType, userId),
+                             IsOwnProgram = GetIsOwnProgram(program, userType, userId),
                              Chart = GetChart(program)
                          };
             return result;
@@ -220,7 +222,7 @@ namespace GenesisVision.Core.Helpers.Convertors
                                                         x.Status == InvestmentRequestStatus.New);
         }
 
-        private static bool GetCanCloseProgram(InvestmentPrograms program, UserType? userType, Guid? userId)
+        private static bool GetIsOwnProgram(InvestmentPrograms program, UserType? userType, Guid? userId)
         {
             if (!userId.HasValue || userType != UserType.Manager)
                 return false;
@@ -250,6 +252,12 @@ namespace GenesisVision.Core.Helpers.Convertors
                                              })
                                 .ToList();
             return charts;
+        }
+
+        private static DateTime GetEndOfPeriod(InvestmentPrograms program)
+        {
+            var period = program.Periods.OrderByDescending(p => p.Number).FirstOrDefault();
+            return period?.DateFrom ?? default(DateTime);
         }
     }
 }

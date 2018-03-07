@@ -31,6 +31,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal FeeManagement { get; set; }
         public string IpfsHash { get; set; }
         public string TradeIpfsHash { get; set; }
+        public bool IsEnabled { get; set; }
         public List<Chart> Chart { get; set; }
 
         public ProfilePublicViewModel Manager { get; set; }
@@ -39,6 +40,6 @@ namespace GenesisVision.Core.ViewModels.Investment
         public bool IsHistoryEnable { get; set; }
         public bool IsInvestEnable { get; set; }
         public bool IsWithdrawEnable { get; set; }
-        public bool CanCloseProgram { get; set; }
+        public bool IsOwnProgram { get; set; }
     }
 }
