@@ -11,5 +11,8 @@ namespace GenesisVision.Core.ViewModels.Trades
 
         [Required]
         public IEnumerable<OrderModel> Trades { get; set; }
+
+        [Required]
+        public decimal Balance { get; set; }
     }
 }

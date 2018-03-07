@@ -201,7 +201,7 @@ namespace GenesisVision.Core.Helpers.Convertors
 
         private static bool GetIsInvestEnable(InvestmentPrograms program, UserType? userType, Guid? userId)
         {
-            if (!userId.HasValue || userType != UserType.Investor)
+            if (!userId.HasValue || userType != UserType.Investor || !program.IsEnabled)
                 return false;
 
             return !program.InvestmentRequests.Any(x => x.UserId == userId &&
@@ -211,10 +211,11 @@ namespace GenesisVision.Core.Helpers.Convertors
 
         private static bool GetIsWithdrawEnable(InvestmentPrograms program, UserType? userType, Guid? userId)
         {
-            if (!userId.HasValue || userType != UserType.Investor)
+            if (!userId.HasValue || userType != UserType.Investor || !program.IsEnabled)
                 return false;
 
-            if (program.Token.InvestorTokens.FirstOrDefault(x => x.InvestorAccount.UserId == userId)?.Amount <= 0)
+            var investorTokens = program.Token.InvestorTokens.FirstOrDefault(x => x.InvestorAccount.UserId == userId);
+            if (investorTokens == null || investorTokens.Amount <= 0)
                 return false;
 
             return !program.InvestmentRequests.Any(x => x.UserId == userId &&

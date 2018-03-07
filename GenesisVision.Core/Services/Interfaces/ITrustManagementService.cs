@@ -1,6 +1,7 @@
 ﻿using GenesisVision.Common.Models;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.Core.ViewModels.Trades;
 using GenesisVision.DataModel.Enums;
 using System;
 using System.Collections.Generic;
@@ -46,5 +47,7 @@ namespace GenesisVision.Core.Services.Interfaces
         OperationResult UpdateManagerHistoryIpfsHash(ManagerHistoryIpfsHash data);
 
         OperationResult ProcessClosingProgram(Guid investmentProgramId, decimal managerBalance);
+
+        OperationResult UpdateManagerBalance(NewTradeEvent tradeEvent);
     }
 }
