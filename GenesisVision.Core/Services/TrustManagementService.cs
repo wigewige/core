@@ -42,6 +42,7 @@ namespace GenesisVision.Core.Services
             {
                 var investment = context.InvestmentPrograms
                                         .Include(x => x.Periods)
+                                        .ThenInclude(x => x.InvestmentRequests)
                                         .First(x => x.Id == invProgramId);
 
                 investment.DateTo = DateTime.UtcNow;
@@ -446,13 +447,13 @@ namespace GenesisVision.Core.Services
                     var newPeriod = new Periods
                                     {
                                         Id = Guid.NewGuid(),
-                                        DateFrom = DateTime.UtcNow,
+                                        DateFrom = nextPeriod?.DateTo ?? DateTime.UtcNow,
                                         DateTo = Constants.IsPeriodInMinutes
-                                            ? DateTime.UtcNow.AddMinutes(investment.Period)
-                                            : DateTime.UtcNow.AddDays(investment.Period),
+                                            ? (nextPeriod?.DateTo ?? DateTime.UtcNow).AddMinutes(investment.Period)
+                                            : (nextPeriod?.DateTo ?? DateTime.UtcNow).AddDays(investment.Period),
                                         InvestmentProgramId = investmentProgramId,
                                         Number = investment.Periods.Max(x => x.Number) + 1,
-                                        Status = PeriodStatus.Planned
+                                        Status = nextPeriod == null ? PeriodStatus.InProccess : PeriodStatus.Planned
                                     };
                     context.Add(newPeriod);
                 }
