@@ -42,7 +42,7 @@ namespace GenesisVision.PaymentService.Services
 
             using (var transaction = await context.Database.BeginTransactionAsync())
             {
-                var paymentTransaction = context.PaymentTransactions
+				var paymentTransaction = context.PaymentTransactions
                                                 .FirstOrDefault(t => t.Hash == request.TransactionHash &&
                                                                      t.BlockchainAddressId == blockchainAddress.Id);
 
@@ -82,11 +82,22 @@ namespace GenesisVision.PaymentService.Services
 
                     if (paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
                     {
-                        var wallet = context.Wallets.First(w => w.UserId == blockchainAddress.UserId &&
-                                                                w.Currency == blockchainAddress.Currency);
+                        var wallet = context.Wallets.First(w => w.UserId == blockchainAddress.UserId && w.Currency == blockchainAddress.Currency);
                         wallet.Amount += paymentTransaction.Amount;
-                        await context.SaveChangesAsync();
-                    }
+
+						await context.SaveChangesAsync();
+
+						context.WalletTransactions.Add(new WalletTransactions()
+						{
+							WalletId = wallet.Id,
+							PaymentTransaction = paymentTransaction,
+							Type = WalletTransactionsType.Deposit,
+							Date = DateTime.UtcNow,
+							Amount = paymentTransaction.Amount,
+						});
+
+						await context.SaveChangesAsync();
+					}
                 }
 
                 transaction.Commit();
