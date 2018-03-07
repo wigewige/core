@@ -7,104 +7,118 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GenesisVision.Common.Helpers;
 
 namespace GenesisVision.PaymentService.Services
 {
-    public class PaymentTransactionService : IPaymentTransactionService
-    {
-        private readonly ILogger<IPaymentTransactionService> logger;
-        private readonly ApplicationDbContext context;
+	public class PaymentTransactionService : IPaymentTransactionService
+	{
+		private readonly ILogger<IPaymentTransactionService> logger;
+		private readonly ApplicationDbContext context;
 
-        public PaymentTransactionService(ILogger<IPaymentTransactionService> logger, ApplicationDbContext context)
-        {
-            this.logger = logger;
-            this.context = context;
-        }
+		public PaymentTransactionService(ILogger<IPaymentTransactionService> logger, ApplicationDbContext context)
+		{
+			this.logger = logger;
+			this.context = context;
+		}
 
-        public async Task<PaymentTransactionInfo> ProcessCallback(ProcessPaymentTransaction request)
-        {
-            var blockchainAddress = context.BlockchainAddresses.FirstOrDefault(addr => addr.Address == request.Address);
-            if (blockchainAddress == null)
-            {
-                var msg = $"Eth address not found - {request.Address}";
-                logger.LogError(msg);
-                throw new ApplicationException(msg);
-            }
+		public async Task<PaymentTransactionInfo> ProcessCallback(ProcessPaymentTransaction request)
+		{
+			var blockchainAddress = context.BlockchainAddresses.FirstOrDefault(addr => addr.Address == request.Address);
+			if (blockchainAddress == null)
+			{
+				var msg = $"Eth address not found - {request.Address}";
+				logger.LogError(msg);
+				throw new ApplicationException(msg);
+			}
 
-            if (request.Currency != blockchainAddress.Currency)
-            {
-                var msg = $"Wallet and Transaction currency should be the same {blockchainAddress.Id}";
-                logger.LogError(msg);
-                throw new ApplicationException(msg);
-            }
+			if (request.Currency != blockchainAddress.Currency)
+			{
+				var msg = $"Wallet and Transaction currency should be the same {blockchainAddress.Id}";
+				logger.LogError(msg);
+				throw new ApplicationException(msg);
+			}
 
-            PaymentTransactionInfo paymentTransactionInfo;
+			var wallet = context.Wallets.First(w => w.UserId == blockchainAddress.UserId && w.Currency == blockchainAddress.Currency);
 
-            using (var transaction = await context.Database.BeginTransactionAsync())
-            {
-                var paymentTransaction = context.PaymentTransactions
-                                                .FirstOrDefault(t => t.Hash == request.TransactionHash &&
-                                                                     t.BlockchainAddressId == blockchainAddress.Id);
+			PaymentTransactionInfo paymentTransactionInfo;
 
-                if (paymentTransaction != null)
-                {
-                    if (paymentTransaction.Status == PaymentTransactionStatus.Pending ||
-                        paymentTransaction.Status == PaymentTransactionStatus.New)
-                    {
-                        paymentTransaction.Status = request.Status;
-                        paymentTransaction.LastUpdated = DateTime.UtcNow;
-                        context.Update(paymentTransaction);
-                        await context.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        logger.LogError($"Can not override status from {paymentTransaction.Status} to {request.Status}");
-                    }
-                }
-                else
-                {
-                    paymentTransaction = new PaymentTransactions
-                                         {
-                                             Id = Guid.NewGuid(),
-                                             Hash = request.TransactionHash,
-                                             Type = PaymentTransactionType.Deposit,
-                                             BlockchainAddressId = blockchainAddress.Id,
-                                             Amount = request.Amount,
-                                             Fee = request.Fee,
-                                             DateCreated = DateTime.UtcNow,
-                                             Status = request.Status,
-                                             PayoutTxHash = request.PayoutTxHash,
-                                             PayoutServiceFee = request.PayoutServiceFee,
-                                             PayoutMinerFee = request.PayoutMinerFee
-                                         };
+			using (var transaction = await context.Database.BeginTransactionAsync())
+			{
+				var paymentTransaction = context.PaymentTransactions
+												.FirstOrDefault(t => t.Hash == request.TransactionHash &&
+																	 t.BlockchainAddressId == blockchainAddress.Id);
 
-                    context.PaymentTransactions.Add(paymentTransaction);
+				if (paymentTransaction != null)
+				{
+					if (paymentTransaction.Status == PaymentTransactionStatus.Pending ||
+						paymentTransaction.Status == PaymentTransactionStatus.New)
+					{
+						paymentTransaction.Status = request.Status;
+						paymentTransaction.LastUpdated = DateTime.UtcNow;
+						context.Update(paymentTransaction);
+						await context.SaveChangesAsync();
+					}
+					else
+					{
+						logger.LogError($"Can not override status from {paymentTransaction.Status} to {request.Status}");
+					}
+				}
+				else
+				{
+					var walletTransactions = new WalletTransactions()
+					{
+						Id = Guid.NewGuid(),
+						WalletId = wallet.Id,
+						Type = WalletTransactionsType.Deposit,
+						Date = DateTime.UtcNow,
+						Amount = request.Amount
+					};
 
-                    if (paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
-                    {
-                        var wallet = context.Wallets.First(w => w.UserId == blockchainAddress.UserId &&
-                                                                w.Currency == blockchainAddress.Currency);
-                        wallet.Amount += paymentTransaction.Amount;
-                        await context.SaveChangesAsync();
-                    }
-                }
+					context.WalletTransactions.Add(walletTransactions);
+					await context.SaveChangesAsync();
 
-                transaction.Commit();
+					paymentTransaction = new PaymentTransactions
+					{
+						Id = Guid.NewGuid(),
+						Hash = request.TransactionHash,
+						Type = PaymentTransactionType.Deposit,
+						BlockchainAddressId = blockchainAddress.Id,
+						Amount = request.Amount,
+						Fee = request.Fee,
+						DateCreated = DateTime.UtcNow,
+						Status = request.Status,
+						PayoutTxHash = request.PayoutTxHash,
+						PayoutServiceFee = request.PayoutServiceFee,
+						PayoutMinerFee = request.PayoutMinerFee,
+						WalletTransaction = walletTransactions
+					};
 
-                paymentTransactionInfo = new PaymentTransactionInfo
-                                         {
-                                             TransactionId = paymentTransaction.Id,
-                                             TransactionHash = paymentTransaction.Hash,
-                                             Amount = paymentTransaction.Amount,
-                                             Currency = request.Currency.ToString(),
-                                             GatewayCode = request.GatewayCode,
-                                             Status = paymentTransaction.Status,
-                                             IsValid = true
-                                         };
-            }
+					context.PaymentTransactions.Add(paymentTransaction);
 
-            return paymentTransactionInfo;
-        }
-    }
+					if (paymentTransaction.Status == PaymentTransactionStatus.ConfirmedAndValidated)
+					{
+						
+						wallet.Amount += paymentTransaction.Amount;
+
+						await context.SaveChangesAsync();
+					}
+				}
+
+				transaction.Commit();
+
+				paymentTransactionInfo = new PaymentTransactionInfo
+				{
+					TransactionId = paymentTransaction.Id,
+					TransactionHash = paymentTransaction.Hash,
+					Amount = paymentTransaction.Amount,
+					Currency = request.Currency.ToString(),
+					GatewayCode = request.GatewayCode,
+					Status = paymentTransaction.Status,
+					IsValid = true
+				};
+			}
+
+			return paymentTransactionInfo;
+		}
+	}
 }

@@ -9,11 +9,7 @@ namespace GenesisVision.PaymentService.Models
     public class PaymentNotifyRequest
     {
         [Required]
-        public string Type { get; set; }
-
-        [Required]
         public string Tx_hash { get; set; }
-
 
         [Required]
         public string Address { get; set; }
@@ -22,9 +18,12 @@ namespace GenesisVision.PaymentService.Models
         public string GatewayKey { get; set; }
 
         public decimal Amount { get; set; }
+
 		public string Currency { get; set; }
 
 		[Range(0, int.MaxValue)]
         public int Confirmations { get; set; }
-    }
+
+		public bool IsConfirmed { get; set; }
+	}
 }
