@@ -148,15 +148,17 @@ namespace GenesisVision.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var type = context.ManagersAccounts
-                                  .Include(x => x.BrokerTradeServer)
-                                  .First(x => x.Id == tradeEvent.ManagerAccountId).BrokerTradeServer.Type;
+                var manager = context.ManagersAccounts
+                                     .Include(x => x.BrokerTradeServer)
+                                     .First(x => x.Id == tradeEvent.ManagerAccountId);
+                var type = manager.BrokerTradeServer.Type;
+                var count = 0;
 
                 switch (type)
                 {
                     case BrokerTradeServerType.MetaTrader4:
                         var mt4Orders = (IEnumerable<IMetaTrader4Order>)tradeEvent.Trades;
-                        foreach (var mt4Order in mt4Orders.Where(x => x.Direction == TradeDirectionType.Buy || x.Direction == TradeDirectionType.Sell))
+                        foreach (var mt4Order in mt4Orders.Where(x => (x.Direction == TradeDirectionType.Buy || x.Direction == TradeDirectionType.Sell) && x.DateClose?.Year > 2000))
                         {
                             context.Add(new ManagersAccountsTrades
                                         {
@@ -172,11 +174,12 @@ namespace GenesisVision.Core.Services
                                             PriceOpen = mt4Order.PriceOpen,
                                             PriceClose = mt4Order.PriceClose
                                         });
+                            count++;
                         }
                         break;
                     case BrokerTradeServerType.MetaTrader5:
                         var mt5Orders = (IEnumerable<IMetaTrader5Order>)tradeEvent.Trades;
-                        foreach (var mt5Order in mt5Orders.Where(x => (x.Direction == TradeDirectionType.Buy || x.Direction == TradeDirectionType.Sell) && x.Entry != TradeEntryType.In))
+                        foreach (var mt5Order in mt5Orders.Where(x => x.Direction == TradeDirectionType.Buy || x.Direction == TradeDirectionType.Sell))
                         {
                             context.Add(new ManagersAccountsTrades
                                         {
@@ -191,11 +194,14 @@ namespace GenesisVision.Core.Services
                                             Price = mt5Order.Price,
                                             Entry = mt5Order.Entry
                                         });
+                            count++;
                         }
                         break;
                     default:
                         throw new NotSupportedException();
                 }
+
+                manager.OrdersCount += count;
 
                 context.SaveChanges();
             });

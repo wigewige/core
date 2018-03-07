@@ -19,8 +19,6 @@ namespace GenesisVision.DataModel.Models
         public decimal InvestMinAmount { get; set; }
         public decimal? InvestMaxAmount { get; set; }
         public decimal Rating { get; set; }
-        public int OrdersCount { get; set; }
-        public decimal TotalProfit { get; set; }
 
         public ManagerAccounts ManagerAccount { get; set; }
         public Guid ManagerAccountId { get; set; }
@@ -30,8 +28,8 @@ namespace GenesisVision.DataModel.Models
 
         public ICollection<InvestmentRequests> InvestmentRequests { get; set; }
 
-        public ICollection<Periods> Periods { get; set; }
+        public ICollection<WalletTransactions> WalletTransactions { get; set; }
 
-        public ICollection<ManagersAccountsStatistics> ManagersAccountsStatistics { get; set; }
+        public ICollection<Periods> Periods { get; set; }
     }
 }

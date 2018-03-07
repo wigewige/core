@@ -1,6 +1,7 @@
 ﻿using GenesisVision.Common.Models;
 using GenesisVision.Core.ViewModels.Broker;
 using GenesisVision.Core.ViewModels.Investment;
+using GenesisVision.DataModel.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -16,7 +17,7 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult<Guid> CreateInvestmentProgram(NewManager request);
 
-        OperationResult<(List<InvestmentProgram>, int)> GetInvestmentPrograms(InvestmentProgramsFilter filter, Guid? userId);
+        OperationResult<(List<InvestmentProgram>, int)> GetInvestmentPrograms(InvestmentProgramsFilter filter, Guid? userId, UserType? userType);
 
         OperationResult<List<BrokerInvestmentProgram>> GetBrokerInvestmentsInitData(Guid brokerTradeServerId);
 
@@ -28,9 +29,9 @@ namespace GenesisVision.Core.Services.Interfaces
 
         OperationResult<(List<BrokerTradeServer>, int)> GetBrokerTradeServers(BrokersFilter filter);
 
-        OperationResult<InvestmentProgramDetails> GetInvestmentProgram(Guid investmentId, Guid? userId);
+        OperationResult<InvestmentProgramDetails> GetInvestmentProgram(Guid investmentId, Guid? userId, UserType? userType);
 
-        OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId, Guid? userId);
+        OperationResult<InvestorDashboard> GetInvestorDashboard(Guid investorUserId, Guid? userId, UserType? userType);
 
         OperationResult AccrueProfits(InvestmentProgramAccrual accrual);
 

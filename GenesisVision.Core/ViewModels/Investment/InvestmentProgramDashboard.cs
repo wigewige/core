@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GenesisVision.Core.ViewModels.Account;
 using GenesisVision.DataModel.Enums;
 using Newtonsoft.Json;
@@ -15,7 +16,7 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal Balance { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Currency Currency { get; set; }
-        public int InvestedTokens { get; set; }
+        public decimal InvestedTokens { get; set; }
         public int TradesCount { get; set; }
         public int InvestorsCount { get; set; }
         public int PeriodDuration { get; set; }
@@ -25,6 +26,8 @@ namespace GenesisVision.Core.ViewModels.Investment
         public decimal AvailableInvestment { get; set; }
         public decimal FeeSuccess { get; set; }
         public decimal FeeManagement { get; set; }
+        public bool IsEnabled { get; set; }
+        public List<Chart> Chart { get; set; }
 
         public ProfilePublicViewModel Manager { get; set; }
 
@@ -32,5 +35,6 @@ namespace GenesisVision.Core.ViewModels.Investment
         public bool IsHistoryEnable { get; set; }
         public bool IsInvestEnable { get; set; }
         public bool IsWithdrawEnable { get; set; }
+        public bool IsOwnProgram { get; set; }
     }
 }

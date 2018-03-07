@@ -119,7 +119,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestmentPrograms([FromHeader(Name = "Authorization")] string token, [FromBody]InvestmentProgramsFilter filter)
         {
-            var data = trustManagementService.GetInvestmentPrograms(filter ?? new InvestmentProgramsFilter(), CurrentUser?.Id);
+            var data = trustManagementService.GetInvestmentPrograms(filter ?? new InvestmentProgramsFilter(), CurrentUser?.Id, CurrentUser?.Type);
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 
@@ -141,7 +141,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInvestmentProgram([FromHeader(Name = "Authorization")] string token, Guid investmentProgramId)
         {
-            var investment = trustManagementService.GetInvestmentProgram(investmentProgramId, CurrentUser?.Id);
+            var investment = trustManagementService.GetInvestmentProgram(investmentProgramId, CurrentUser?.Id, CurrentUser?.Type);
             if (!investment.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(investment));
 
@@ -154,7 +154,7 @@ namespace GenesisVision.Core.Controllers
                           InvestmentProgram = investment.Data
                       });
         }
-
+        
         /// <summary>
         /// Get investment program's requests
         /// </summary>
@@ -191,7 +191,7 @@ namespace GenesisVision.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult InvestorDashboard()
         {
-            var data = trustManagementService.GetInvestorDashboard(CurrentUser.Id, CurrentUser?.Id);
+            var data = trustManagementService.GetInvestorDashboard(CurrentUser.Id, CurrentUser?.Id, CurrentUser?.Type);
             if (!data.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(data));
 

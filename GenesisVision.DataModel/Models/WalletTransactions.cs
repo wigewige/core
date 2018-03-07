@@ -13,6 +13,9 @@ namespace GenesisVision.DataModel.Models
         public Guid WalletId { get; set; }
         public Wallets Wallet { get; set; }
 
+        public InvestmentPrograms InvestmentProgram { get; set; }
+        public Guid? InvestmentProgramtId { get; set; }
+
         public PaymentTransactions PaymentTransaction { get; set; }
 
         public InvestmentRequests InvestmentRequest { get; set; }

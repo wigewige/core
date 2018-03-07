@@ -167,6 +167,10 @@ namespace GenesisVision.Core
             if (!string.IsNullOrEmpty(gethHost) && !string.IsNullOrWhiteSpace(gethHost))
                 Constants.GethHost = gethHost;
 
+            var periodInMinutesStr = Configuration["IsPeriodInMinutes"];
+            if (!string.IsNullOrEmpty(periodInMinutesStr) && bool.TryParse(periodInMinutesStr, out var periodInMinutes))
+                Constants.IsPeriodInMinutes = periodInMinutes;
+
 
             Constants.JwtValidIssuer = Configuration["JWT:ValidIssuer"];
             Constants.JwtValidAudience = Configuration["JWT:ValidAudience"];

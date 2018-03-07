@@ -93,11 +93,6 @@ namespace GenesisVision.DataModel
                    .HasForeignKey(x => x.BrokerTradeServerId);
             
             builder.Entity<ManagersAccountsStatistics>()
-                   .HasOne(x => x.User)
-                   .WithMany(x => x.ManagersAccountsStatistics)
-                   .HasForeignKey(x => x.UserId);
-
-            builder.Entity<ManagersAccountsStatistics>()
                    .HasOne(x => x.ManagerAccount)
                    .WithMany(x => x.ManagersAccountsStatistics)
                    .HasForeignKey(x => x.ManagerAccountId);
@@ -106,11 +101,6 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.Period)
                    .WithMany(x => x.ManagersAccountsStatistics)
                    .HasForeignKey(x => x.PeriodId);
-
-            builder.Entity<ManagersAccountsStatistics>()
-                   .HasOne(x => x.InvestmentProgram)
-                   .WithMany(x => x.ManagersAccountsStatistics)
-                   .HasForeignKey(x => x.InvestmentProgramId);
 
             builder.Entity<ManagersAccountsTrades>()
                    .HasOne(x => x.ManagerAccount)
@@ -238,6 +228,11 @@ namespace GenesisVision.DataModel
                    .HasOne(x => x.ProfitDistributionTransaction)
                    .WithOne(x => x.WalletTransaction)
                    .HasForeignKey<ProfitDistributionTransactions>(x => x.WalletTransactionId);
+
+            builder.Entity<WalletTransactions>()
+                   .HasOne(x => x.InvestmentProgram)
+                   .WithMany(x => x.WalletTransactions)
+                   .HasForeignKey(x => x.InvestmentProgramtId);
         }
     }
 }

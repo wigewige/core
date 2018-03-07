@@ -155,6 +155,8 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<string>("Host");
 
+                    b.Property<int>("HoursOffset");
+
                     b.Property<bool>("IsEnabled");
 
                     b.Property<string>("Name");
@@ -224,15 +226,11 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<Guid>("ManagerTokenId");
 
-                    b.Property<int>("OrdersCount");
-
                     b.Property<int>("Period");
 
                     b.Property<decimal>("Rating");
 
                     b.Property<string>("Title");
-
-                    b.Property<decimal>("TotalProfit");
 
                     b.HasKey("Id");
 
@@ -317,6 +315,8 @@ namespace GenesisVision.Core.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<decimal>("Balance");
+
                     b.Property<Guid>("BrokerTradeServerId");
 
                     b.Property<int>("Currency");
@@ -327,11 +327,21 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<string>("Login");
 
+                    b.Property<int>("OrdersCount");
+
+                    b.Property<decimal>("ProfitAvg");
+
+                    b.Property<decimal>("ProfitTotal");
+
                     b.Property<DateTime>("RegistrationDate");
 
                     b.Property<string>("TradeIpfsHash");
 
                     b.Property<Guid>("UserId");
+
+                    b.Property<decimal>("VolumeAvg");
+
+                    b.Property<decimal>("VolumeTotal");
 
                     b.HasKey("Id");
 
@@ -444,11 +454,11 @@ namespace GenesisVision.Core.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<decimal>("CurrentBalance");
-
                     b.Property<DateTime>("Date");
 
-                    b.Property<Guid>("InvestmentProgramId");
+                    b.Property<decimal>("Fund");
+
+                    b.Property<decimal>("Loss");
 
                     b.Property<Guid>("ManagerAccountId");
 
@@ -456,17 +466,15 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<decimal>("Profit");
 
-                    b.Property<Guid>("UserId");
+                    b.Property<decimal>("TotalProfit");
+
+                    b.Property<decimal>("Volume");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InvestmentProgramId");
 
                     b.HasIndex("ManagerAccountId");
 
                     b.HasIndex("PeriodId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ManagersAccountsStatistics");
                 });
@@ -696,6 +704,8 @@ namespace GenesisVision.Core.Migrations
 
                     b.Property<DateTime>("Date");
 
+                    b.Property<Guid?>("InvestmentProgramtId");
+
                     b.Property<int>("Type");
 
                     b.Property<Guid>("WalletId");
@@ -703,6 +713,8 @@ namespace GenesisVision.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("InvestmentProgramtId");
 
                     b.HasIndex("WalletId");
 
@@ -918,11 +930,6 @@ namespace GenesisVision.Core.Migrations
 
             modelBuilder.Entity("GenesisVision.DataModel.Models.ManagersAccountsStatistics", b =>
                 {
-                    b.HasOne("GenesisVision.DataModel.Models.InvestmentPrograms", "InvestmentProgram")
-                        .WithMany("ManagersAccountsStatistics")
-                        .HasForeignKey("InvestmentProgramId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("GenesisVision.DataModel.Models.ManagerAccounts", "ManagerAccount")
                         .WithMany("ManagersAccountsStatistics")
                         .HasForeignKey("ManagerAccountId")
@@ -931,11 +938,6 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.DataModel.Models.Periods", "Period")
                         .WithMany("ManagersAccountsStatistics")
                         .HasForeignKey("PeriodId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("GenesisVision.DataModel.Models.ApplicationUser", "User")
-                        .WithMany("ManagersAccountsStatistics")
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -1002,6 +1004,10 @@ namespace GenesisVision.Core.Migrations
                     b.HasOne("GenesisVision.DataModel.Models.ApplicationUser")
                         .WithMany("WalletTransactions")
                         .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("GenesisVision.DataModel.Models.InvestmentPrograms", "InvestmentProgram")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("InvestmentProgramtId");
 
                     b.HasOne("GenesisVision.DataModel.Models.Wallets", "Wallet")
                         .WithMany("WalletTransactions")
