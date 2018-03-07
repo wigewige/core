@@ -54,7 +54,7 @@ namespace GenesisVision.PaymentService.Controllers
 						Address = model.Address,
 						Amount = model.Amount,
 						Currency = Enum.Parse<Currency>(model.Currency), // TODO
-						Status = model.Confirmations >= 12 ? PaymentTransactionStatus.ConfirmedByGate : PaymentTransactionStatus.Pending,
+						Status = model.IsConfirmed ? PaymentTransactionStatus.ConfirmedAndValidated : PaymentTransactionStatus.Pending,
 						CustomKey = customKey // TODO check
 					};
 
